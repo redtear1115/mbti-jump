@@ -26,6 +26,7 @@ export class GameScene extends Phaser.Scene {
   private spawnY = 0; // 下一個平台的 y（往上遞減）
   private platformsSinceFork = 0;
   private banner!: Phaser.GameObjects.Text;
+  private levelComplete = false;
 
   constructor() {
     super('Game');
@@ -40,6 +41,7 @@ export class GameScene extends Phaser.Scene {
     this.answeredCount = 0;
     this.answeredIds.clear();
     this.platformsSinceFork = 0;
+    this.levelComplete = false;
     this.score.resetCurrentLevel();
   }
 
@@ -169,6 +171,8 @@ export class GameScene extends Phaser.Scene {
   }
 
   private completeLevel(): void {
+    if (this.levelComplete) return;
+    this.levelComplete = true;
     this.score.completeLevel(DIMENSIONS[this.levelIndex]);
     this.controls.destroy();
     this.scene.start('LevelTransition', { score: this.score, levelIndex: this.levelIndex });
