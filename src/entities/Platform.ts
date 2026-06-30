@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { GAME } from '../config/gameConfig';
-import type { Choice } from '../config/questions';
+import type { Letter } from '../config/questions';
 
 export type PlatformKind = 'normal' | 'question';
 
@@ -10,8 +10,8 @@ const NO_KEY = 'platform-no';
 
 export class Platform extends Phaser.Physics.Arcade.Sprite {
   kind: PlatformKind = 'normal';
-  choice?: Choice;
-  questionId?: number;
+  side?: Letter;
+  questionId?: string;
 
   static makeNormal(scene: Phaser.Scene, x: number, y: number): Platform {
     ensureTextures(scene);
@@ -24,17 +24,20 @@ export class Platform extends Phaser.Physics.Arcade.Sprite {
     scene: Phaser.Scene,
     x: number,
     y: number,
-    choice: Choice,
-    questionId: number,
-    isYes: boolean,
+    opts: { side: Letter; questionId: string; label: string; isYes: boolean },
   ): Platform {
     ensureTextures(scene);
-    const p = new Platform(scene, x, y, isYes ? YES_KEY : NO_KEY);
+    const p = new Platform(scene, x, y, opts.isYes ? YES_KEY : NO_KEY);
     p.kind = 'question';
-    p.choice = choice;
-    p.questionId = questionId;
+    p.side = opts.side;
+    p.questionId = opts.questionId;
     scene.add
-      .text(x, y, choice.label, { fontSize: '13px', color: '#ffffff', align: 'center', wordWrap: { width: GAME.platformWidth } })
+      .text(x, y, opts.label, {
+        fontSize: '13px',
+        color: '#ffffff',
+        align: 'center',
+        wordWrap: { width: GAME.platformWidth },
+      })
       .setOrigin(0.5, 0.5)
       .setDepth(5);
     return p;
