@@ -12,7 +12,9 @@ export const GAME = {
   platformWidth: 90,
   platformHeight: 18,
   platformGapY: 130, // 相鄰平台垂直間距
-  questionGapForks: 2, // 每隔幾個普通平台插入一組題目分叉
+  // 每隔幾個普通平台插入一組題目分叉。畫面高 800 / 平台間距 130 ≈ 6 平台/螢幕，
+  // 取 12 → 分叉間隔約 (12+1)*130 = 1690px ≈ 2.1 個螢幕，避免連續答題。
+  questionGapForks: 12,
 
   // 題目分叉
   forkLeftX: 110, // Yes 台階中心 x

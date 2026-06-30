@@ -10,6 +10,19 @@ describe('ScoreTracker', () => {
     expect(s.completeLevel('EI')).toBe('E');
   });
 
+  it('breaks an even tie toward the dimension first letter', () => {
+    // 玩家跳過題目 → 偶數題作答可能平手
+    const s = new ScoreTracker();
+    s.recordAnswer('E');
+    s.recordAnswer('I'); // 1-1
+    expect(s.completeLevel('EI')).toBe('E');
+  });
+
+  it('resolves a fully-skipped level to the first letter (no soft-lock)', () => {
+    const s = new ScoreTracker();
+    expect(s.completeLevel('SN')).toBe('S'); // 0-0
+  });
+
   it('clears current counts after completing a level', () => {
     const s = new ScoreTracker();
     s.recordAnswer('E');

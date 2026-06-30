@@ -27,6 +27,7 @@ export class GameScene extends Phaser.Scene {
   private platformsSinceFork = 0;
   private banner!: Phaser.GameObjects.Text;
   private levelComplete = false;
+  private lastForkY = -Infinity; // 最後一題分叉的 y；玩家爬過它即過關（避免跳過題目卡關）
 
   constructor() {
     super('Game');
@@ -42,6 +43,7 @@ export class GameScene extends Phaser.Scene {
     this.answeredIds.clear();
     this.platformsSinceFork = 0;
     this.levelComplete = false;
+    this.lastForkY = -Infinity;
     this.score.resetCurrentLevel();
   }
 
@@ -74,14 +76,22 @@ export class GameScene extends Phaser.Scene {
     this.controls.start();
 
     this.banner = this.add
-      .text(GAME.width / 2, 30, '', { fontSize: '18px', color: '#ffffff', align: 'center', wordWrap: { width: GAME.width - 40 } })
+      .text(GAME.width / 2, 24, '', {
+        fontSize: '24px',
+        fontStyle: 'bold',
+        color: '#ffffff',
+        align: 'center',
+        stroke: '#000000',
+        strokeThickness: 4,
+        wordWrap: { width: GAME.width - 24 },
+      })
       .setOrigin(0.5, 0)
       .setScrollFactor(0)
       .setDepth(20);
     this.updateBanner();
 
     this.add
-      .text(GAME.width / 2, 60, `第 ${this.levelIndex + 1} 關 · ${DIMENSIONS[this.levelIndex]}`, {
+      .text(GAME.width / 2, 92, `第 ${this.levelIndex + 1} 關 · ${DIMENSIONS[this.levelIndex]}`, {
         fontSize: '14px',
         color: '#ffffffaa',
       })
@@ -104,6 +114,17 @@ export class GameScene extends Phaser.Scene {
     const topVisible = this.cameras.main.scrollY;
     while (this.spawnY > topVisible - GAME.height) {
       this.spawnNextRow();
+    }
+
+    // 跳過題目的保險：所有分叉都生成後，玩家明顯爬過最後一題分叉，
+    // 就以「已記錄的答案」過關，不要求答滿 5 題（避免跳過題目無限往上卡關）。
+    if (
+      !this.levelComplete &&
+      this.nextQuestionIdx >= this.questions.length &&
+      this.player.y < this.lastForkY - GAME.height * 0.75
+    ) {
+      this.completeLevel();
+      return;
     }
 
     // 掉落判定
@@ -135,8 +156,23 @@ export class GameScene extends Phaser.Scene {
   private addQuestionFork(y: number): void {
     const q = this.questions[this.nextQuestionIdx];
     const id = this.nextQuestionIdx;
+    const isLast = this.nextQuestionIdx === this.questions.length - 1;
     this.platforms.add(Platform.makeQuestion(this, GAME.forkLeftX, y, q.yes, id, true));
     this.platforms.add(Platform.makeQuestion(this, GAME.forkRightX, y, q.no, id, false));
+    if (isLast) {
+      this.lastForkY = y;
+      this.add
+        .text(GAME.width / 2, y - 54, '🏁 最後一題 · 答完過關！', {
+          fontSize: '20px',
+          fontStyle: 'bold',
+          color: '#ffe066',
+          align: 'center',
+          stroke: '#000000',
+          strokeThickness: 5,
+        })
+        .setOrigin(0.5)
+        .setDepth(15);
+    }
     this.nextQuestionIdx += 1;
   }
 
@@ -167,7 +203,9 @@ export class GameScene extends Phaser.Scene {
   private updateBanner(): void {
     const upcoming = this.questions[this.nextQuestionIdx - 1] ?? this.questions[0];
     const idx = Math.min(this.answeredCount + 1, GAME.questionsPerLevel);
-    this.banner.setText(`(${idx}/${GAME.questionsPerLevel}) ${upcoming.text}`);
+    const onLastQuestion = this.answeredCount >= GAME.questionsPerLevel - 1;
+    const prefix = onLastQuestion ? '🏁 最後一題！' : `(${idx}/${GAME.questionsPerLevel})`;
+    this.banner.setText(`${prefix} ${upcoming.text}`);
   }
 
   private completeLevel(): void {
