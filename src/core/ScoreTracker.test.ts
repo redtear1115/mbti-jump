@@ -10,17 +10,32 @@ describe('ScoreTracker', () => {
     expect(s.completeLevel('EI')).toBe('E');
   });
 
-  it('breaks an even tie toward the dimension first letter', () => {
-    // 玩家跳過題目 → 偶數題作答可能平手
+  it('breaks an even tie by player side: left → first letter', () => {
+    // 玩家跳過題目 → 偶數題作答可能平手；靠左(Yes側)取第一字母
     const s = new ScoreTracker();
     s.recordAnswer('E');
     s.recordAnswer('I'); // 1-1
-    expect(s.completeLevel('EI')).toBe('E');
+    expect(s.completeLevel('EI', 'first')).toBe('E');
   });
 
-  it('resolves a fully-skipped level to the first letter (no soft-lock)', () => {
+  it('breaks an even tie by player side: right → second letter', () => {
     const s = new ScoreTracker();
-    expect(s.completeLevel('SN')).toBe('S'); // 0-0
+    s.recordAnswer('E');
+    s.recordAnswer('I'); // 1-1
+    expect(s.completeLevel('EI', 'second')).toBe('I');
+  });
+
+  it('does not let tieBreak override a real majority', () => {
+    const s = new ScoreTracker();
+    s.recordAnswer('E');
+    s.recordAnswer('E');
+    s.recordAnswer('I'); // 2-1, E wins regardless of tieBreak
+    expect(s.completeLevel('EI', 'second')).toBe('E');
+  });
+
+  it('resolves a fully-skipped level deterministically (no soft-lock)', () => {
+    const s = new ScoreTracker();
+    expect(s.completeLevel('SN')).toBe('S'); // 0-0, default first
   });
 
   it('clears current counts after completing a level', () => {

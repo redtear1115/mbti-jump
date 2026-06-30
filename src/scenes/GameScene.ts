@@ -211,7 +211,9 @@ export class GameScene extends Phaser.Scene {
   private completeLevel(): void {
     if (this.levelComplete) return;
     this.levelComplete = true;
-    this.score.completeLevel(DIMENSIONS[this.levelIndex]);
+    // 平手時以玩家當下水平位置決定：靠左(Yes側)→第一字母、靠右(No側)→第二字母。
+    const tieBreak = this.player.x < GAME.width / 2 ? 'first' : 'second';
+    this.score.completeLevel(DIMENSIONS[this.levelIndex], tieBreak);
     this.controls.destroy();
     this.scene.start('LevelTransition', { score: this.score, levelIndex: this.levelIndex });
   }
