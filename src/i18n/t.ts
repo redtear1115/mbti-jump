@@ -1,20 +1,20 @@
 import { EN } from './strings/en';
+import { ZH_HANT } from './strings/zh-Hant';
+import { ZH_HANS } from './strings/zh-Hans';
+import { JA } from './strings/ja';
+import { ES } from './strings/es';
 import type { StringKey } from './strings/en';
 import { getLocale } from './store';
 import type { Locale } from './locales';
 
 export type { StringKey };
 
-/**
- * locale → 字串表。Task 6 會把其他語言補進來。
- * 先以 EN 佔位，確保此檔可獨立編譯/測試。
- */
 export const TABLES: Record<Locale, Record<StringKey, string>> = {
   en: EN,
-  'zh-Hant': EN,
-  'zh-Hans': EN,
-  ja: EN,
-  es: EN,
+  'zh-Hant': ZH_HANT,
+  'zh-Hans': ZH_HANS,
+  ja: JA,
+  es: ES,
 };
 
 export function t(key: StringKey, locale: Locale = getLocale()): string {
