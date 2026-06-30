@@ -13,6 +13,8 @@ export const ES: Record<StringKey, string> = {
   'dim.JP': 'Juicio / Percepción',
 
   'level.label': 'Nivel {0} · {1}',
+  'level.lastQuestion': '🏁 ¡Última pregunta!',
+  'level.lastQuestionMarker': '🏁 ¡Última — supérala para pasar!',
 
   'transition.title': '¡Nivel {0} completado!',
   'transition.next': 'Siguiente nivel ▶',

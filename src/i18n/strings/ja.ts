@@ -13,6 +13,8 @@ export const JA: Record<StringKey, string> = {
   'dim.JP': '判断 / 知覚',
 
   'level.label': 'ステージ {0} · {1}',
+  'level.lastQuestion': '🏁 最後の問題！',
+  'level.lastQuestionMarker': '🏁 最後の問題 · クリアで突破！',
 
   'transition.title': 'ステージ {0} クリア！',
   'transition.next': '次のステージ ▶',

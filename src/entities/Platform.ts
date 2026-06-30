@@ -33,10 +33,13 @@ export class Platform extends Phaser.Physics.Arcade.Sprite {
     p.questionId = opts.questionId;
     scene.add
       .text(x, y, opts.label, {
-        fontSize: '13px',
+        fontSize: '18px',
+        fontStyle: 'bold',
         color: '#ffffff',
         align: 'center',
-        wordWrap: { width: GAME.platformWidth },
+        stroke: '#000000',
+        strokeThickness: 4,
+        wordWrap: { width: GAME.platformWidth + 60 },
       })
       .setOrigin(0.5, 0.5)
       .setDepth(5);

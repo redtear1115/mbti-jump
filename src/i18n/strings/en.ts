@@ -14,6 +14,8 @@ export const EN = {
 
   // --- 關卡 HUD ---
   'level.label': 'Level {0} · {1}', // {0}=關號, {1}=維度名稱
+  'level.lastQuestion': '🏁 Last question!',
+  'level.lastQuestionMarker': '🏁 Last one — clear it to pass!',
 
   // --- 過關 ---
   'transition.title': 'Level {0} complete!',

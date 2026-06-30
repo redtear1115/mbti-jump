@@ -14,12 +14,23 @@ export class ScoreTracker {
   }
 
   /**
-   * 依當前關累計鎖定維度字母。題數為奇數時不會平手；
-   * 萬一平手（非 MVP 路徑），預設取配對中的第一個字母。
+   * 依當前關累計鎖定維度字母。
+   * 平手機制：玩家可能跳過題目，使某關只答了偶數題而平手（甚至 0 題）。
+   * 平手時改由玩家當下「比較靠左還是靠右」決定：
+   *   tieBreak 'first'  = 靠左（Yes 側）→ 取維度第一字母（E/S/T/J）
+   *   tieBreak 'second' = 靠右（No 側）→ 取維度第二字母（I/N/F/P）
+   * 非平手時 tieBreak 無作用。預設 'first' 以維持確定性。
    */
-  completeLevel(d: Dimension): Letter {
+  completeLevel(d: Dimension, tieBreak: 'first' | 'second' = 'first'): Letter {
     const [a, b] = LETTERS_OF[d];
-    const letter = this.current[a] >= this.current[b] ? a : b;
+    let letter: Letter;
+    if (this.current[a] > this.current[b]) {
+      letter = a;
+    } else if (this.current[b] > this.current[a]) {
+      letter = b;
+    } else {
+      letter = tieBreak === 'second' ? b : a;
+    }
     this.locked.set(d, letter);
     this.current = freshCounts();
     return letter;

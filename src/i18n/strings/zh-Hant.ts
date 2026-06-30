@@ -12,6 +12,8 @@ export const ZH_HANT: Record<StringKey, string> = {
   'dim.JP': '判斷 / 感知',
 
   'level.label': '第 {0} 關 · {1}',
+  'level.lastQuestion': '🏁 最後一題！',
+  'level.lastQuestionMarker': '🏁 最後一題 · 答完過關！',
 
   'transition.title': '第 {0} 關完成！',
   'transition.next': '下一關 ▶',
