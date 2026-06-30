@@ -26,6 +26,8 @@ export class GameScene extends Phaser.Scene {
   private spawnY = 0; // 下一個平台的 y（往上遞減）
   private platformsSinceFork = 0;
   private banner!: Phaser.GameObjects.Text;
+  private previewLeft!: Phaser.GameObjects.Text; // 即將到來的 Yes(左) 選項，依距離淡入
+  private previewRight!: Phaser.GameObjects.Text; // 即將到來的 No(右) 選項，依距離淡入
   private levelComplete = false;
   private lastForkY = -Infinity; // 最後一題分叉的 y；玩家爬過它即過關（避免跳過題目卡關）
   private forks: { qIndex: number; y: number }[] = []; // 各題分叉位置，用來讓題目橫幅跟著玩家接近的分叉
@@ -101,6 +103,26 @@ export class GameScene extends Phaser.Scene {
       .setOrigin(0.5, 0)
       .setScrollFactor(0)
       .setDepth(20);
+
+    const previewStyle = {
+      fontSize: '17px',
+      fontStyle: 'bold',
+      stroke: '#000000',
+      strokeThickness: 4,
+      wordWrap: { width: GAME.width * 0.44 },
+    };
+    this.previewLeft = this.add
+      .text(12, 122, '', { ...previewStyle, color: '#5effa0', align: 'left' })
+      .setOrigin(0, 0)
+      .setScrollFactor(0)
+      .setDepth(20)
+      .setAlpha(0);
+    this.previewRight = this.add
+      .text(GAME.width - 12, 122, '', { ...previewStyle, color: '#ff8a99', align: 'right' })
+      .setOrigin(1, 0)
+      .setScrollFactor(0)
+      .setDepth(20)
+      .setAlpha(0);
   }
 
   update() {
@@ -119,11 +141,23 @@ export class GameScene extends Phaser.Scene {
       this.spawnNextRow();
     }
 
-    // 題目橫幅跟著玩家「即將接近的分叉」更新，而不是最後生成的那一題
-    const target = this.nextForkQuestionIdx();
-    if (target !== -1 && target !== this.shownQuestionIdx) {
-      this.shownQuestionIdx = target;
-      this.updateBanner(target);
+    // 題目橫幅 + 答案預覽跟著玩家「即將接近的分叉」走，而不是最後生成的那一題
+    const fork = this.nextFork();
+    if (fork) {
+      if (fork.qIndex !== this.shownQuestionIdx) {
+        this.shownQuestionIdx = fork.qIndex;
+        this.updateBanner(fork.qIndex);
+        this.updatePreview(fork.qIndex);
+      }
+      // 依玩家到分叉的距離淡入答案預覽：1.5 螢幕外全透明 → 0.9 螢幕內全顯示
+      // （台階本身約 0.6 螢幕才進畫面，所以答案會比台階更早出現）
+      const dist = this.player.y - fork.y;
+      const alpha = Phaser.Math.Clamp((GAME.height * 1.5 - dist) / (GAME.height * 0.6), 0, 1);
+      this.previewLeft.setAlpha(alpha);
+      this.previewRight.setAlpha(alpha);
+    } else {
+      this.previewLeft.setAlpha(0);
+      this.previewRight.setAlpha(0);
     }
 
     // 跳過題目的保險：所有分叉都生成後，玩家明顯爬過最後一題分叉，
@@ -210,17 +244,15 @@ export class GameScene extends Phaser.Scene {
     }
   };
 
-  /** 玩家即將接近的分叉題目 index：在玩家上方、最靠近的未通過分叉；找不到回 -1。 */
-  private nextForkQuestionIdx(): number {
-    let bestY = -Infinity;
-    let bestIdx = -1;
+  /** 玩家即將接近的分叉：在玩家上方、最靠近的未通過分叉；找不到回 null。 */
+  private nextFork(): { qIndex: number; y: number } | null {
+    let best: { qIndex: number; y: number } | null = null;
     for (const f of this.forks) {
-      if (f.y < this.player.y && f.y > bestY) {
-        bestY = f.y;
-        bestIdx = f.qIndex;
+      if (f.y < this.player.y && (best === null || f.y > best.y)) {
+        best = f;
       }
     }
-    return bestIdx;
+    return best;
   }
 
   private updateBanner(questionIdx: number): void {
@@ -229,6 +261,13 @@ export class GameScene extends Phaser.Scene {
     const isLast = questionIdx === this.questions.length - 1;
     const prefix = isLast ? '🏁 最後一題！' : `(${questionIdx + 1}/${GAME.questionsPerLevel})`;
     this.banner.setText(`${prefix} ${q.text}`);
+  }
+
+  private updatePreview(questionIdx: number): void {
+    const q = this.questions[questionIdx];
+    if (!q) return;
+    this.previewLeft.setText(`◀ ${q.yes.label}`);
+    this.previewRight.setText(`${q.no.label} ▶`);
   }
 
   private completeLevel(): void {
