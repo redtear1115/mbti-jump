@@ -1,22 +1,24 @@
 import { describe, it, expect } from 'vitest';
-import { LETTER_TRAITS, describeType } from './personalities';
+import { describeType } from './personalities';
+import { t } from '../i18n/t';
 
-describe('personalities', () => {
-  it('has a trait phrase for all 8 letters', () => {
-    for (const l of ['E', 'I', 'S', 'N', 'T', 'F', 'J', 'P'] as const) {
-      expect(LETTER_TRAITS[l].length).toBeGreaterThan(0);
-    }
+describe('describeType', () => {
+  it('composes EN description from the four letter traits', () => {
+    const text = describeType('ENFP', 'en');
+    expect(text).toContain(t('trait.E', 'en'));
+    expect(text).toContain(t('trait.N', 'en'));
+    expect(text).toContain(t('trait.F', 'en'));
+    expect(text).toContain(t('trait.P', 'en'));
   });
 
-  it('describeType includes each letter trait', () => {
-    const text = describeType('ENFP');
-    expect(text).toContain(LETTER_TRAITS.E);
-    expect(text).toContain(LETTER_TRAITS.N);
-    expect(text).toContain(LETTER_TRAITS.F);
-    expect(text).toContain(LETTER_TRAITS.P);
+  it('composes a localized (zh-Hant) description', () => {
+    const text = describeType('ISTJ', 'zh-Hant');
+    expect(text).toContain(t('trait.I', 'zh-Hant'));
+    expect(text).toContain(t('trait.J', 'zh-Hant'));
   });
 
-  it('describeType throws on malformed type', () => {
-    expect(() => describeType('ABC')).toThrow();
+  it('throws on malformed type', () => {
+    expect(() => describeType('ABC', 'en')).toThrow();
+    expect(() => describeType('ENFPX', 'en')).toThrow();
   });
 });
