@@ -1,18 +1,10 @@
 import Phaser from 'phaser';
-
-class BootScene extends Phaser.Scene {
-  constructor() {
-    super('Boot');
-  }
-  create() {
-    this.add
-      .text(this.scale.width / 2, this.scale.height / 2, 'MBTI Jump', {
-        fontSize: '32px',
-        color: '#ffffff',
-      })
-      .setOrigin(0.5);
-  }
-}
+import { GAME } from './config/gameConfig';
+import { StartScene } from './scenes/StartScene';
+import { GameScene } from './scenes/GameScene';
+import { LevelTransitionScene } from './scenes/LevelTransitionScene';
+import { GameOverScene } from './scenes/GameOverScene';
+import { ResultScene } from './scenes/ResultScene';
 
 new Phaser.Game({
   type: Phaser.AUTO,
@@ -21,9 +13,12 @@ new Phaser.Game({
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
-    width: 450,
-    height: 800,
+    width: GAME.width,
+    height: GAME.height,
   },
-  physics: { default: 'arcade', arcade: { gravity: { x: 0, y: 0 }, debug: false } },
-  scene: [BootScene],
+  physics: {
+    default: 'arcade',
+    arcade: { gravity: { x: 0, y: GAME.gravityY }, debug: false },
+  },
+  scene: [StartScene, GameScene, LevelTransitionScene, GameOverScene, ResultScene],
 });
