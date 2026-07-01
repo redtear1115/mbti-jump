@@ -5,6 +5,7 @@ import { t } from '../i18n/t';
 import { getLocale, setLocale } from '../i18n/store';
 import { SUPPORTED_LOCALES, LOCALE_LABELS } from '../i18n/locales';
 import { Button } from '../ui/Button';
+import { MuteButton } from '../ui/MuteButton';
 
 type OrientationPermissionApi = {
   requestPermission?: () => Promise<'granted' | 'denied'>;
@@ -73,6 +74,8 @@ export class StartScene extends Phaser.Scene {
         }
       });
     });
+
+    new MuteButton(this, GAME.width - 26, 26);
 
     // 主 CTA：實心圓角按鈕（hover/press 回饋 + ≥44 觸控）
     new Button(this, cx, 478, t('start.cta'), {

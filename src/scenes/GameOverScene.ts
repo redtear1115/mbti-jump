@@ -3,6 +3,7 @@ import { GAME } from '../config/gameConfig';
 import { ScoreTracker } from '../core/ScoreTracker';
 import { t, tf } from '../i18n/t';
 import { Button } from '../ui/Button';
+import { MuteButton } from '../ui/MuteButton';
 
 interface GameOverInit {
   score: ScoreTracker;
@@ -43,5 +44,7 @@ export class GameOverScene extends Phaser.Scene {
       bgHover: 0xf0b93a,
       onClick: () => this.scene.start('Game', { score }),
     });
+
+    new MuteButton(this, GAME.width - 26, 26);
   }
 }

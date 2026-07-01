@@ -12,6 +12,8 @@ import type { QuestionDef } from '../config/questions';
 import { t, tf } from '../i18n/t';
 import type { StringKey } from '../i18n/t';
 import { prefersReducedMotion } from '../ui/reducedMotion';
+import { Sfx } from '../audio/Sfx';
+import { MuteButton } from '../ui/MuteButton';
 
 interface GameInit {
   score: ScoreTracker;
@@ -152,6 +154,8 @@ export class GameScene extends Phaser.Scene {
       .setScrollFactor(0)
       .setDepth(20)
       .setAlpha(0);
+
+    new MuteButton(this, GAME.width - 26, 26);
   }
 
   update() {
@@ -273,10 +277,12 @@ export class GameScene extends Phaser.Scene {
   private onLand = (_player: unknown, platformObj: unknown): void => {
     const platform = platformObj as Platform;
     this.player.bounce();
+    Sfx.play('bounce');
 
     if (platform.kind === 'question' && platform.side && platform.questionId !== undefined) {
       if (!this.dimAnsweredIds.has(platform.questionId)) {
         this.dimAnsweredIds.add(platform.questionId);
+        Sfx.play('select');
         this.score.recordAnswer(platform.side);
         this.updateTally();
         if (this.dimAnsweredIds.size >= GAME.questionsPerLevel) {
@@ -331,6 +337,7 @@ export class GameScene extends Phaser.Scene {
     // 平手時以玩家當下水平位置決定：靠左(Yes側)→第一字母、靠右(No側)→第二字母。
     const tieBreak = this.player.x < GAME.width / 2 ? 'first' : 'second';
     this.score.completeLevel(DIMENSIONS[this.dimIndex], tieBreak);
+    Sfx.play('advance');
     this.advanceDimension();
   }
 
@@ -339,6 +346,7 @@ export class GameScene extends Phaser.Scene {
     this.dimIndex += 1;
     if (this.dimIndex >= DIMENSIONS.length) {
       this.controls.destroy();
+      Sfx.play('result');
       this.scene.start('Result', { score: this.score });
       return;
     }
@@ -393,6 +401,7 @@ export class GameScene extends Phaser.Scene {
 
   private gameOver(): void {
     this.controls.destroy();
+    Sfx.play('gameover');
     this.scene.start('GameOver', { score: this.score });
   }
 }

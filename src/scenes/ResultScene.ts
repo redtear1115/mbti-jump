@@ -5,6 +5,7 @@ import { describeType } from '../config/personalities';
 import { t, tf } from '../i18n/t';
 import type { StringKey } from '../i18n/t';
 import { Button } from '../ui/Button';
+import { MuteButton } from '../ui/MuteButton';
 import { groupOf, groupColorOf } from '../core/temperament';
 
 interface ResultInit {
@@ -79,5 +80,7 @@ export class ResultScene extends Phaser.Scene {
       bgHover: 0xf0b93a,
       onClick: () => this.scene.start('Start'),
     });
+
+    new MuteButton(this, GAME.width - 26, 26);
   }
 }
