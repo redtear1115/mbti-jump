@@ -14,11 +14,16 @@ export class Platform extends Phaser.Physics.Arcade.Sprite {
   side?: Letter;
   questionId?: string;
 
-  static makeNormal(scene: Phaser.Scene, x: number, y: number): Platform {
+  static makeNormal(scene: Phaser.Scene, x: number, y: number, width: number = GAME.platformWidth): Platform {
     const key = scene.textures.exists(ASSET_KEYS.platformNormal) ? ASSET_KEYS.platformNormal : NORMAL_KEY;
     if (key === NORMAL_KEY) ensureTextures(scene);
     const p = new Platform(scene, x, y, key);
     p.kind = 'normal';
+    if (width !== GAME.platformWidth) {
+      // 拉伸基準材質成指定寬度（有長有短），並同步靜態碰撞體。
+      p.setDisplaySize(width, GAME.platformHeight);
+      p.refreshBody();
+    }
     return p;
   }
 

@@ -4,14 +4,17 @@ export const GAME = {
   height: 800,
 
   // 物理
-  gravityY: 1400,
+  gravityY: 1150,
   jumpVelocity: -780, // 觸碰平台時的向上彈跳速度
   playerMaxSpeedX: 380, // 水平最大速度（px/s）
 
   // 平台
-  platformWidth: 90,
+  platformWidth: 90, // 材質基準寬 + 題目分叉（Yes/No）固定寬
+  // 普通平台寬度隨機（有長有短）：短易錯過、長好踩，平均比 90 寬 → 整體更好踩。
+  platformWidthMin: 70,
+  platformWidthMax: 160,
   platformHeight: 18,
-  platformGapY: 130, // 相鄰平台垂直間距
+  platformGapY: 105, // 相鄰平台垂直間距
   // 每隔幾個普通平台插入一組題目分叉。畫面高 800 / 平台間距 130 ≈ 6 平台/螢幕，
   // 取 12 → 分叉間隔約 (12+1)*130 = 1690px ≈ 2.1 個螢幕，避免連續答題。
   questionGapForks: 12,

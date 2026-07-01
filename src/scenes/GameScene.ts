@@ -223,15 +223,16 @@ export class GameScene extends Phaser.Scene {
       this.addQuestionFork(this.spawnY);
       this.platformsSinceFork = 0;
     } else {
-      const x = Phaser.Math.Between(GAME.platformWidth / 2, GAME.width - GAME.platformWidth / 2);
-      this.addNormalPlatform(x, this.spawnY);
+      const width = Phaser.Math.Between(GAME.platformWidthMin, GAME.platformWidthMax);
+      const x = Phaser.Math.Between(width / 2, GAME.width - width / 2);
+      this.addNormalPlatform(x, this.spawnY, width);
       this.platformsSinceFork += 1;
     }
     this.spawnY -= GAME.platformGapY;
   }
 
-  private addNormalPlatform(x: number, y: number): void {
-    this.platforms.add(Platform.makeNormal(this, x, y));
+  private addNormalPlatform(x: number, y: number, width?: number): void {
+    this.platforms.add(Platform.makeNormal(this, x, y, width));
   }
 
   private addQuestionFork(y: number): void {
