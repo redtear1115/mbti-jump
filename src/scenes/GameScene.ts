@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { GAME } from '../config/gameConfig';
 import { LEVEL_BG } from '../theme/palette';
+import { Background } from '../gfx/Background';
 import { Player } from '../entities/Player';
 import { Platform } from '../entities/Platform';
 import { Controls } from '../input/Controls';
@@ -43,6 +44,7 @@ export class GameScene extends Phaser.Scene {
   private forks: { qIndex: number; y: number }[] = [];
   private shownQuestionIdx = -1;
   private reducedMotion = false;
+  private background!: Background;
 
   constructor() {
     super('Game');
@@ -66,6 +68,7 @@ export class GameScene extends Phaser.Scene {
   create() {
     this.reducedMotion = prefersReducedMotion();
     this.cameras.main.setBackgroundColor(LEVEL_BG[this.dimIndex]);
+    this.background = new Background(this);
     this.platforms = this.physics.add.staticGroup();
 
     // 起始平台（玩家正下方）
@@ -160,6 +163,7 @@ export class GameScene extends Phaser.Scene {
     if (targetScroll < this.cameras.main.scrollY) {
       this.cameras.main.scrollY = targetScroll;
     }
+    this.background.update(this.cameras.main.scrollY);
 
     // 持續在上方補平台（多看 1.5 螢幕，讓題目分叉提早生成→題目橫幅有足夠提前量）
     const topVisible = this.cameras.main.scrollY;
