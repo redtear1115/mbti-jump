@@ -12,7 +12,9 @@
 - [x] **A. 人格趨勢 + 持久化底座** ✅（spec `2026-07-01-mbti-jump-trends-design.md`、plan `...-trends.md`，6 tasks，final review READY）
       profile(localStorage) + trends(純函式) + `ScoreTracker.allTallies` + TrendScene（總次數/最常型族群色/四維度偏向%/最近）+ 開始/結算入口 + 兩步清除 + 五語。browser 驗證通過。
       小尾巴（延後）：`trend.cleared` 死字串、bar label `%` 格式入 i18n。
-- [ ] **B. 成就系統** — 消費 `profile` 資料；成就定義+解鎖+提示+列表。（待 brainstorm→spec→plan）
+- [x] **B. 成就系統** ✅（spec `...-achievements-design.md`、plan `...-achievements.md`，5 tasks，final review READY）
+      8 個純函式成就（由 `getPlays()` 推導）+ `achievementStore`(去重) + `AchievementScene`(已/未解鎖) + 結算解鎖提示 + 開始頁入口 + 五語。browser 驗證（注入 11 場 → 5 解鎖/3 未解鎖，正確）。
+      小尾巴（延後）：reduced-motion 提示時長、多解鎖 toast 堆疊、anyDimension 冗餘 guard。
 - [ ] **C. 題庫擴充 + 隨機題組** — 每維度加題、隨機抽 5 題；翻譯量大（新題×五語）。（待 brainstorm→spec→plan）
 
 ---
