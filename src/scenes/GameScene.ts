@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { GAME } from '../config/gameConfig';
 import { LEVEL_BG } from '../theme/palette';
 import { Background } from '../gfx/Background';
+import { AuroraBackground } from '../gfx/AuroraBackground';
 import { Player } from '../entities/Player';
 import { Platform } from '../entities/Platform';
 import { Controls } from '../input/Controls';
@@ -52,6 +53,7 @@ export class GameScene extends Phaser.Scene {
   private shownQuestionIdx = -1;
   private reducedMotion = false;
   private background!: Background;
+  private aurora!: AuroraBackground;
 
   constructor() {
     super('Game');
@@ -79,6 +81,8 @@ export class GameScene extends Phaser.Scene {
   create() {
     this.reducedMotion = prefersReducedMotion();
     this.cameras.main.setBackgroundColor(LEVEL_BG[this.dimIndex]);
+    this.aurora = new AuroraBackground(this, this.reducedMotion);
+    this.aurora.retint(this.dimIndex);
     this.background = new Background(this);
     this.background.setDimension(this.dimIndex);
     this.platforms = this.physics.add.staticGroup();
@@ -401,6 +405,7 @@ export class GameScene extends Phaser.Scene {
 
     this.cameras.main.setBackgroundColor(LEVEL_BG[this.dimIndex]);
     this.background.setDimension(this.dimIndex);
+    this.aurora.retint(this.dimIndex);
     this.updateLevelLabel();
     this.drawScoreBar();
     this.announceDimension();
