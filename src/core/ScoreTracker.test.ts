@@ -102,4 +102,23 @@ describe('ScoreTracker', () => {
     s.recordAnswer('S'); s.completeLevel('SN');
     expect(s.lockedCount()).toBe(2);
   });
+
+  it('allTallies records each dimension\'s counts at lock time', () => {
+    const s = new ScoreTracker();
+    s.recordAnswer('E'); s.recordAnswer('E'); s.recordAnswer('I'); s.completeLevel('EI'); // EI 2:1
+    s.recordAnswer('N'); s.recordAnswer('N'); s.completeLevel('SN'); // SN S0:N2
+    const all = s.allTallies();
+    expect(all.EI).toEqual([2, 1]);
+    expect(all.SN).toEqual([0, 2]);
+    expect(all.TF).toEqual([0, 0]); // 未鎖定 → [0,0]
+    expect(all.JP).toEqual([0, 0]);
+  });
+
+  it('allTallies keeps locked dimensions after resetCurrentLevel', () => {
+    const s = new ScoreTracker();
+    s.recordAnswer('E'); s.completeLevel('EI'); // 鎖定 EI 1:0
+    s.recordAnswer('S'); s.resetCurrentLevel(); // 進行中死亡重來
+    expect(s.allTallies().EI).toEqual([1, 0]); // 已鎖定的不受影響
+    expect(s.allTallies().SN).toEqual([0, 0]);
+  });
 });

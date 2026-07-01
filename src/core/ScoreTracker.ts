@@ -8,6 +8,7 @@ function freshCounts(): Record<Letter, number> {
 export class ScoreTracker {
   private locked = new Map<Dimension, Letter>();
   private current: Record<Letter, number> = freshCounts();
+  private lockedTallies = new Map<Dimension, [number, number]>();
 
   recordAnswer(side: Letter): void {
     this.current[side] += 1;
@@ -32,12 +33,20 @@ export class ScoreTracker {
       letter = tieBreak === 'second' ? b : a;
     }
     this.locked.set(d, letter);
+    this.lockedTallies.set(d, [this.current[a], this.current[b]]);
     this.current = freshCounts();
     return letter;
   }
 
   resetCurrentLevel(): void {
     this.current = freshCounts();
+  }
+
+  /** 各維度鎖定當下的 [first, second]；未鎖定的維度回 [0, 0]。 */
+  allTallies(): Record<Dimension, [number, number]> {
+    const out = {} as Record<Dimension, [number, number]>;
+    for (const d of DIMENSIONS) out[d] = this.lockedTallies.get(d) ?? [0, 0];
+    return out;
   }
 
   /** 目前維度已鎖定的數量（0..4）；用來在無縫爬塔中推導現在爬到第幾個維度。 */
