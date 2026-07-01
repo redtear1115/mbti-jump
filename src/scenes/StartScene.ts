@@ -87,6 +87,16 @@ export class StartScene extends Phaser.Scene {
         this.scene.start('Game', { score: new ScoreTracker() });
       },
     });
+
+    new Button(this, cx, 558, t('trend.cta'), {
+      width: 200,
+      height: 50,
+      fontSize: 20,
+      bg: 0x4298b4, // 藍，區分主 CTA
+      bgHover: 0x54aec9,
+      bgDown: 0x3a86a0,
+      onClick: () => this.scene.start('Trend'),
+    });
   }
 
   /** iOS 13+ 需在使用者手勢中請求體感權限；其他平台略過。 */
