@@ -4,8 +4,8 @@ import { ASSET_KEYS } from '../config/assets';
 import { prefersReducedMotion } from '../ui/reducedMotion';
 
 const PROC_KEY = 'player-proc';
-const TEX_W = 44;
-const TEX_H = 40;
+const TEX_W = 48;
+const TEX_H = 44;
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
   private reduced = prefersReducedMotion();
@@ -48,24 +48,32 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 }
 
-/** 程式美術：百變怪風格的紫色液體怪（圓潤方塊身 + 點點眼 + 小微笑）。 */
+/** 程式美術：百變怪（Ditto）風格——淡紫液體怪，頂部有波浪凸起，點點眼 + 寬扁微笑。 */
 function ensureTexture(scene: Phaser.Scene): void {
   if (scene.textures.exists(PROC_KEY)) return;
   const g = scene.make.graphics({ x: 0, y: 0 }, false);
-  // 身體：百變怪淡紫色圓潤方塊
-  g.fillStyle(0xb9a5de, 1);
-  g.fillRoundedRect(2, 5, 40, 33, 15);
+  const body = 0xc0aee2; // 百變怪淡紫
+  // 由多個重疊圓形聯集出「有波浪凸起」的不定形身體
+  g.fillStyle(body, 1);
+  g.fillCircle(24, 28, 17); // 主體
+  g.fillEllipse(24, 33, 42, 22); // 加寬下半身
+  g.fillCircle(11, 16, 7); // 左上尖凸
+  g.fillCircle(20, 11, 8); // 中左凸
+  g.fillCircle(30, 12, 8); // 中右凸
+  g.fillCircle(39, 17, 7); // 右上圓凸
+  g.fillCircle(7, 25, 6); // 左側
+  g.fillCircle(42, 27, 6); // 右側小凸
   // 頂部高光（果凍感）
   g.fillStyle(0xffffff, 0.16);
-  g.fillEllipse(18, 14, 20, 9);
-  // 眼睛：兩個深色圓點
-  g.fillStyle(0x2b2440, 1);
-  g.fillCircle(17, 21, 3);
-  g.fillCircle(29, 21, 3);
-  // 微笑：一段小圓弧
-  g.lineStyle(2, 0x2b2440, 1);
+  g.fillEllipse(19, 18, 22, 11);
+  // 眼睛：兩個深色小圓點
+  g.fillStyle(0x2a2340, 1);
+  g.fillCircle(19, 24, 2.3);
+  g.fillCircle(31, 24, 2.3);
+  // 嘴巴：寬而淺的微笑線（百變怪招牌憨笑）
+  g.lineStyle(2, 0x2a2340, 1);
   g.beginPath();
-  g.arc(23, 24, 5, Phaser.Math.DegToRad(20), Phaser.Math.DegToRad(160));
+  g.arc(25, 16, 14, Phaser.Math.DegToRad(55), Phaser.Math.DegToRad(125));
   g.strokePath();
   g.generateTexture(PROC_KEY, TEX_W, TEX_H);
   g.destroy();

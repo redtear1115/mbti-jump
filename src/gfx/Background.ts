@@ -152,18 +152,23 @@ export class Background {
   }
 
   private spawnMeteor(): void {
-    const x = Phaser.Math.Between(Math.floor(GAME.width * 0.25), GAME.width + 40);
+    // 行進方向與拖尾角度一致：往左下 122°（cos<0 向左、sin>0 向下）
+    const angleDeg = 122;
+    const rad = Phaser.Math.DegToRad(angleDeg);
+    const dist = Phaser.Math.Between(300, 380);
+    const x = Phaser.Math.Between(Math.floor(GAME.width * 0.3), GAME.width + 40);
+    const y = Phaser.Math.Between(-30, Math.floor(GAME.height * 0.4));
     const m = this.scene.add
-      .image(x, Phaser.Math.Between(-20, Math.floor(GAME.height * 0.35)), TEX.meteor)
+      .image(x, y, TEX.meteor)
       .setScrollFactor(0)
       .setDepth(-9)
-      .setAngle(35)
+      .setAngle(angleDeg)
       .setAlpha(0);
     this.sky.push(m);
     this.scene.tweens.add({
       targets: m,
-      x: x - 240,
-      y: '+=320',
+      x: x + Math.cos(rad) * dist,
+      y: y + Math.sin(rad) * dist,
       alpha: { from: 0.9, to: 0 },
       duration: 720,
       ease: 'Quad.easeIn',
@@ -288,11 +293,15 @@ function ensureTextures(scene: Phaser.Scene): void {
     g.fillRect(10, 4, 1.6, 7);
   });
 
-  // 小鳥：淺灰剪影 M 形
-  make(TEX.bird, 20, 10, (g) => {
-    g.fillStyle(0x9aa0c0, 0.85);
-    g.fillTriangle(2, 8, 10, 2, 10, 6);
-    g.fillTriangle(18, 8, 10, 2, 10, 6);
+  // 海鷗：對稱雙弧剪影（⌢⌢），無方向性
+  make(TEX.bird, 22, 10, (g) => {
+    g.lineStyle(1.8, 0x9aa0c0, 0.9);
+    g.beginPath();
+    g.arc(7, 7, 5, Phaser.Math.DegToRad(200), Phaser.Math.DegToRad(340));
+    g.strokePath();
+    g.beginPath();
+    g.arc(15, 7, 5, Phaser.Math.DegToRad(200), Phaser.Math.DegToRad(340));
+    g.strokePath();
   });
 
   // 流星：白色短拖尾
