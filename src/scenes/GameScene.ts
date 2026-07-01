@@ -101,18 +101,28 @@ export class GameScene extends Phaser.Scene {
         stroke: '#000000',
         strokeThickness: 4,
         wordWrap: { width: GAME.width - 24 },
+        fontFamily: 'Fredoka, system-ui, sans-serif',
       })
       .setOrigin(0.5, 0)
       .setScrollFactor(0)
       .setDepth(20);
 
     this.levelLabel = this.add
-      .text(GAME.width / 2, 108, '', { fontSize: '14px', color: '#ffffffaa' })
+      .text(GAME.width / 2, 108, '', {
+        fontSize: '14px',
+        color: '#ffffffaa',
+        fontFamily: 'Nunito, system-ui, sans-serif',
+      })
       .setOrigin(0.5, 0)
       .setScrollFactor(0)
       .setDepth(20);
     this.tally = this.add
-      .text(GAME.width / 2, 126, '', { fontSize: '15px', fontStyle: 'bold', color: '#ffe066' })
+      .text(GAME.width / 2, 126, '', {
+        fontSize: '15px',
+        fontStyle: 'bold',
+        color: '#ffe066',
+        fontFamily: 'Nunito, system-ui, sans-serif',
+      })
       .setOrigin(0.5, 0)
       .setScrollFactor(0)
       .setDepth(20);
@@ -125,6 +135,7 @@ export class GameScene extends Phaser.Scene {
       stroke: '#000000',
       strokeThickness: 4,
       wordWrap: { width: GAME.width * 0.44 },
+      fontFamily: 'Nunito, system-ui, sans-serif',
     };
     this.previewLeft = this.add
       .text(12, 158, '', { ...previewStyle, color: '#5effa0', align: 'left' })
@@ -240,6 +251,7 @@ export class GameScene extends Phaser.Scene {
           align: 'center',
           stroke: '#000000',
           strokeThickness: 5,
+          fontFamily: 'Fredoka, system-ui, sans-serif',
         })
         .setOrigin(0.5)
         .setDepth(15);
@@ -354,6 +366,7 @@ export class GameScene extends Phaser.Scene {
         stroke: '#000000',
         strokeThickness: 5,
         wordWrap: { width: GAME.width - 40 },
+        fontFamily: 'Fredoka, system-ui, sans-serif',
       })
       .setOrigin(0.5)
       .setScrollFactor(0)

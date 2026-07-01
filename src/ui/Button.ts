@@ -48,6 +48,7 @@ export class Button {
         fontStyle: 'bold',
         color: opts.textColor ?? PALETTE.textOn,
         align: 'center',
+        fontFamily: 'Fredoka, system-ui, sans-serif',
       })
       .setOrigin(0.5)
       .setDepth(11);

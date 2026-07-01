@@ -21,12 +21,17 @@ export class GameOverScene extends Phaser.Scene {
     const cx = GAME.width / 2;
 
     this.add
-      .text(cx, GAME.height / 2 - 60, t('gameover.title'), { fontSize: '28px', color: '#b13e53' })
+      .text(cx, GAME.height / 2 - 60, t('gameover.title'), {
+        fontSize: '28px',
+        color: '#b13e53',
+        fontFamily: 'Fredoka, system-ui, sans-serif',
+      })
       .setOrigin(0.5);
     this.add
       .text(cx, GAME.height / 2 - 20, tf('gameover.subtitle', [resumeLevel + 1]), {
         fontSize: '15px',
         color: '#ffffffaa',
+        fontFamily: 'Nunito, system-ui, sans-serif',
       })
       .setOrigin(0.5);
 

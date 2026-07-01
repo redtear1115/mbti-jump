@@ -21,14 +21,30 @@ export class StartScene extends Phaser.Scene {
     const current = getLocale();
 
     this.add
-      .text(cx, 170, t('start.title'), { fontSize: '44px', color: '#ffcc00', fontStyle: 'bold' })
+      .text(cx, 170, t('start.title'), {
+        fontSize: '44px',
+        color: '#ffcc00',
+        fontStyle: 'bold',
+        fontFamily: 'Fredoka, system-ui, sans-serif',
+      })
       .setOrigin(0.5);
     this.add
-      .text(cx, 250, t('start.tagline'), { fontSize: '16px', color: '#ffffffcc', align: 'center' })
+      .text(cx, 250, t('start.tagline'), {
+        fontSize: '16px',
+        color: '#ffffffcc',
+        align: 'center',
+        fontFamily: 'Nunito, system-ui, sans-serif',
+      })
       .setOrigin(0.5);
 
     // 語言選單：橫排小按鈕，當前語言高亮，點選即切換並重繪
-    this.add.text(cx, 356, t('start.language'), { fontSize: '13px', color: '#ffffff88' }).setOrigin(0.5);
+    this.add
+      .text(cx, 356, t('start.language'), {
+        fontSize: '13px',
+        color: '#ffffff88',
+        fontFamily: 'Nunito, system-ui, sans-serif',
+      })
+      .setOrigin(0.5);
     const startX = cx - ((SUPPORTED_LOCALES.length - 1) * 80) / 2;
     SUPPORTED_LOCALES.forEach((loc, i) => {
       const active = loc === current;
@@ -38,6 +54,7 @@ export class StartScene extends Phaser.Scene {
           color: active ? '#1a1c2c' : '#ffffffdd',
           backgroundColor: active ? '#ffcc00' : '#ffffff22',
           padding: { x: 10, y: 12 },
+          fontFamily: 'Nunito, system-ui, sans-serif',
         })
         .setOrigin(0.5)
         .setInteractive({ useHandCursor: true });

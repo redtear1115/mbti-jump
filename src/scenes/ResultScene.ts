@@ -20,14 +20,28 @@ export class ResultScene extends Phaser.Scene {
     this.cameras.main.setBackgroundColor('#1a1c2c');
     const cx = GAME.width / 2;
 
-    this.add.text(cx, 180, t('result.heading'), { fontSize: '18px', color: '#ffffffaa' }).setOrigin(0.5);
-    this.add.text(cx, 250, type, { fontSize: '72px', color: '#ffcc00', fontStyle: 'bold' }).setOrigin(0.5);
+    this.add
+      .text(cx, 180, t('result.heading'), {
+        fontSize: '18px',
+        color: '#ffffffaa',
+        fontFamily: 'Fredoka, system-ui, sans-serif',
+      })
+      .setOrigin(0.5);
+    this.add
+      .text(cx, 250, type, {
+        fontSize: '72px',
+        color: '#ffcc00',
+        fontStyle: 'bold',
+        fontFamily: 'Fredoka, system-ui, sans-serif',
+      })
+      .setOrigin(0.5);
     this.add
       .text(cx, 360, desc, {
         fontSize: '18px',
         color: '#ffffff',
         align: 'center',
         wordWrap: { width: GAME.width - 60 },
+        fontFamily: 'Nunito, system-ui, sans-serif',
       })
       .setOrigin(0.5);
 
