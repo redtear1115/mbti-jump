@@ -76,6 +76,7 @@ export class GameScene extends Phaser.Scene {
     this.reducedMotion = prefersReducedMotion();
     this.cameras.main.setBackgroundColor(LEVEL_BG[this.dimIndex]);
     this.background = new Background(this);
+    this.background.setDimension(this.dimIndex);
     this.platforms = this.physics.add.staticGroup();
 
     // 起始平台（玩家正下方）
@@ -371,6 +372,7 @@ export class GameScene extends Phaser.Scene {
     this.shownQuestionIdx = -1;
 
     this.cameras.main.setBackgroundColor(LEVEL_BG[this.dimIndex]);
+    this.background.setDimension(this.dimIndex);
     this.updateLevelLabel();
     this.updateTally();
     this.announceDimension();

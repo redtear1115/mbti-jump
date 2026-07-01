@@ -45,11 +45,13 @@
 - [x] 視差背景 `gfx/Background.ts`（缺圖降純色）
 - [x] Player/Platform 真 texture 優先（缺檔用程式美術）
 - [x] SFX 觸發點 + 靜音鈕（缺音檔靜音、no-op）
-- [x] **把二進位素材放進 `public/assets/`** ✅ 真美術/音效已就位（browser 驗證：7 圖載入、5 段 .ogg 解碼成功、無 fallback warning）：
-  - 圖 `public/assets/sprites/`：`player.png`(Kenney 角色)、`platform-normal|yes|no.png`(Kenney grass/dirt 裁切調色：藍灰/綠/紅)、`bg-sky|clouds|hills.png`(自製深色視差三層) — Kenney「Platformer Art Complete Pack」CC0 + 自製 CC0
-  - 音 `public/assets/audio/`：`bounce|select|advance|result|gameover.ogg` — Juhani Junkala 512 SFX（CC0），ffmpeg 轉 Ogg Vorbis
-  - 已登記 `CREDITS.md`
-  - 小尾巴（延後）：平台材質為 90×18 直接縮放（略壓扁但可讀）；未來想更精緻可做「視覺高於碰撞體」的分離；bg 三層為自製（若想要 Kenney 風景圖可替換）
+- [x] **音效素材放進 `public/assets/audio/`** ✅ 5 段 .ogg（Juhani Junkala 512 SFX，CC0，ffmpeg 轉 Ogg Vorbis），browser 驗證解碼成功。
+- [x] **美術：改用程式美術（proc art）** ✅ 使用者回饋 Kenney 點陣圖不好看 → 全數還原：
+  - 主角：百變怪風格紫色液體怪（點點眼＋微笑），跳躍時 Elastic 壓扁回彈（果凍感）；reduced-motion 略過變形
+  - 台階：還原純色圓角方塊（藍灰/綠 Yes/紅 No）
+  - 背景：`gfx/Background.ts` 重寫為氛圍層——閃爍星點＋飄動蝴蝶/蜜蜂/小鳥＋各維度天象（0 流星／1 極光／2 下雨／3 螢火蟲），移除「一層層山」；MBTI 四色底透在最後（修正先前被深色 bg 蓋掉變黑的問題）
+  - `IMAGE_MANIFEST` 清空（不載點陣圖）；ASSET_KEYS 與 fallback 判斷保留，日後要換回點陣素材可加回
+  - 小尾巴（延後）：氛圍元素數量/顏色可再依喜好微調
 - Tier 2 延後小項（final review 記錄，非阻斷）：Button hover/down 色入色票、BootScene 載入指示、Platform proc-key 常數清理。
 
 ## Tier 3 — 內容 & 上線

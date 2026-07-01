@@ -16,16 +16,12 @@ export const SFX_KEYS = {
   gameover: 'sfx-gameover',
 } as const;
 
-/** BootScene 依此預載；檔案缺失時由 loaderror 略過（漸進增強）。 */
-export const IMAGE_MANIFEST: { key: string; path: string }[] = [
-  { key: ASSET_KEYS.player, path: 'assets/sprites/player.png' },
-  { key: ASSET_KEYS.platformNormal, path: 'assets/sprites/platform-normal.png' },
-  { key: ASSET_KEYS.platformYes, path: 'assets/sprites/platform-yes.png' },
-  { key: ASSET_KEYS.platformNo, path: 'assets/sprites/platform-no.png' },
-  { key: ASSET_KEYS.bgSky, path: 'assets/sprites/bg-sky.png' },
-  { key: ASSET_KEYS.bgClouds, path: 'assets/sprites/bg-clouds.png' },
-  { key: ASSET_KEYS.bgHills, path: 'assets/sprites/bg-hills.png' },
-];
+/**
+ * BootScene 依此預載；檔案缺失時由 loaderror 略過（漸進增強）。
+ * 目前刻意留空：主角/台階/背景全用程式美術（proc art），不載入點陣圖。
+ * 若日後要換回點陣素材，把對應項目加回（ASSET_KEYS 與 fallback 判斷都還在）。
+ */
+export const IMAGE_MANIFEST: { key: string; path: string }[] = [];
 
 export const AUDIO_MANIFEST: { key: string; path: string }[] = [
   { key: SFX_KEYS.bounce, path: 'assets/audio/bounce.ogg' },

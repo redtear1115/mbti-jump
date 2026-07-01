@@ -12,8 +12,7 @@
 
 | 素材名稱 | 用途 (模組) | 作者 | 授權 | 連結 |
 |---|---|---|---|---|
-| Platformer Art Complete Pack | Player（角色）、Platform（普通/Yes/No 台階，經裁切縮放/調色） | Kenney | CC0 | https://opengameart.org/content/platformer-art-complete-pack-often-updated |
-| 視差背景（天空/雲/山三層） | GameScene 背景 | 本專案自製 | CC0 / Public Domain | — |
+| （目前無第三方美術）主角、台階、背景氛圍皆為程式美術（proc art） | Player / Platform / Background | 本專案 | — | — |
 
 ## 🎵 音樂 (Music)
 
