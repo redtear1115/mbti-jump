@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { QUESTIONS, DIMENSIONS, LETTERS_OF, questionsForDimension } from './questions';
 
 describe('questions structure', () => {
-  it('has exactly 5 questions per dimension', () => {
-    for (const d of DIMENSIONS) expect(questionsForDimension(d)).toHaveLength(5);
+  it('has exactly 10 questions per dimension', () => {
+    for (const d of DIMENSIONS) expect(questionsForDimension(d)).toHaveLength(10);
   });
 
   it('every side belongs to its dimension pair, yes != no', () => {
