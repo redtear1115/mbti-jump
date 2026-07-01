@@ -1,12 +1,14 @@
 import Phaser from 'phaser';
 import { GAME } from '../config/gameConfig';
+import { ASSET_KEYS } from '../config/assets';
 
-const TEXTURE_KEY = 'player';
+const PROC_KEY = 'player-proc';
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    ensureTexture(scene);
-    super(scene, x, y, TEXTURE_KEY);
+    const key = scene.textures.exists(ASSET_KEYS.player) ? ASSET_KEYS.player : PROC_KEY;
+    if (key === PROC_KEY) ensureTexture(scene);
+    super(scene, x, y, key);
     scene.add.existing(this);
     scene.physics.add.existing(this);
     const body = this.body as Phaser.Physics.Arcade.Body;
@@ -30,13 +32,13 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
 /** 用 Graphics 產生一個簡單的圓角方塊貼圖（程式美術）。 */
 function ensureTexture(scene: Phaser.Scene): void {
-  if (scene.textures.exists(TEXTURE_KEY)) return;
+  if (scene.textures.exists(PROC_KEY)) return;
   const g = scene.make.graphics({ x: 0, y: 0 }, false);
   g.fillStyle(0xffcc00, 1);
   g.fillRoundedRect(0, 0, 36, 36, 8);
   g.fillStyle(0x000000, 1);
   g.fillCircle(12, 14, 3);
   g.fillCircle(24, 14, 3);
-  g.generateTexture(TEXTURE_KEY, 36, 36);
+  g.generateTexture(PROC_KEY, 36, 36);
   g.destroy();
 }

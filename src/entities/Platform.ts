@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { GAME } from '../config/gameConfig';
 import type { Letter } from '../config/questions';
+import { ASSET_KEYS } from '../config/assets';
 
 export type PlatformKind = 'normal' | 'question';
 
@@ -14,8 +15,9 @@ export class Platform extends Phaser.Physics.Arcade.Sprite {
   questionId?: string;
 
   static makeNormal(scene: Phaser.Scene, x: number, y: number): Platform {
-    ensureTextures(scene);
-    const p = new Platform(scene, x, y, NORMAL_KEY);
+    const key = scene.textures.exists(ASSET_KEYS.platformNormal) ? ASSET_KEYS.platformNormal : NORMAL_KEY;
+    if (key === NORMAL_KEY) ensureTextures(scene);
+    const p = new Platform(scene, x, y, key);
     p.kind = 'normal';
     return p;
   }
@@ -26,8 +28,11 @@ export class Platform extends Phaser.Physics.Arcade.Sprite {
     y: number,
     opts: { side: Letter; questionId: string; label: string; isYes: boolean },
   ): Platform {
-    ensureTextures(scene);
-    const p = new Platform(scene, x, y, opts.isYes ? YES_KEY : NO_KEY);
+    const realKey = opts.isYes ? ASSET_KEYS.platformYes : ASSET_KEYS.platformNo;
+    const procKey = opts.isYes ? YES_KEY : NO_KEY;
+    const key = scene.textures.exists(realKey) ? realKey : procKey;
+    if (key === procKey) ensureTextures(scene);
+    const p = new Platform(scene, x, y, key);
     p.kind = 'question';
     p.side = opts.side;
     p.questionId = opts.questionId;
