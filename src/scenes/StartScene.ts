@@ -46,15 +46,19 @@ export class StartScene extends Phaser.Scene {
         fontFamily: 'Nunito, system-ui, sans-serif',
       })
       .setOrigin(0.5);
-    const startX = cx - ((SUPPORTED_LOCALES.length - 1) * 80) / 2;
+    const chipPitch = 84;
+    const startX = cx - ((SUPPORTED_LOCALES.length - 1) * chipPitch) / 2;
     SUPPORTED_LOCALES.forEach((loc, i) => {
       const active = loc === current;
       const chip = this.add
-        .text(startX + i * 80, 392, LOCALE_LABELS[loc], {
+        .text(startX + i * chipPitch, 392, LOCALE_LABELS[loc], {
           fontSize: '13px',
           color: active ? '#1a1c2c' : '#ffffffdd',
           backgroundColor: active ? '#ffcc00' : '#ffffff22',
-          padding: { x: 10, y: 12 },
+          // 固定寬度 + 置中 → 每個語系膠囊等寬，間距一致
+          fixedWidth: 76,
+          align: 'center',
+          padding: { x: 6, y: 12 },
           fontFamily: 'Nunito, system-ui, sans-serif',
         })
         .setOrigin(0.5)
