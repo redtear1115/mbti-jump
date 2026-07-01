@@ -45,10 +45,11 @@
 - [x] 視差背景 `gfx/Background.ts`（缺圖降純色）
 - [x] Player/Platform 真 texture 優先（缺檔用程式美術）
 - [x] SFX 觸發點 + 靜音鈕（缺音檔靜音、no-op）
-- [ ] **⚠️ 剩下：把二進位素材放進 `public/assets/`** 才會看到真美術/音效（程式已就緒，drop-in 自動生效）：
-  - 圖 `public/assets/sprites/`：`player.png`、`platform-normal|yes|no.png`、`bg-sky|clouds|hills.png`（Kenney CC0）
-  - 音 `public/assets/audio/`：`bounce|select|advance|result|gameover.ogg`（Kenney/Freesound CC0）
-  - 取用 CC-BY 素材更新 `CREDITS.md`；來源見 `docs/assets-resources.md`
+- [x] **把二進位素材放進 `public/assets/`** ✅ 真美術/音效已就位（browser 驗證：7 圖載入、5 段 .ogg 解碼成功、無 fallback warning）：
+  - 圖 `public/assets/sprites/`：`player.png`(Kenney 角色)、`platform-normal|yes|no.png`(Kenney grass/dirt 裁切調色：藍灰/綠/紅)、`bg-sky|clouds|hills.png`(自製深色視差三層) — Kenney「Platformer Art Complete Pack」CC0 + 自製 CC0
+  - 音 `public/assets/audio/`：`bounce|select|advance|result|gameover.ogg` — Juhani Junkala 512 SFX（CC0），ffmpeg 轉 Ogg Vorbis
+  - 已登記 `CREDITS.md`
+  - 小尾巴（延後）：平台材質為 90×18 直接縮放（略壓扁但可讀）；未來想更精緻可做「視覺高於碰撞體」的分離；bg 三層為自製（若想要 Kenney 風景圖可替換）
 - Tier 2 延後小項（final review 記錄，非阻斷）：Button hover/down 色入色票、BootScene 載入指示、Platform proc-key 常數清理。
 
 ## Tier 3 — 內容 & 上線

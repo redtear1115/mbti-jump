@@ -12,8 +12,8 @@
 
 | 素材名稱 | 用途 (模組) | 作者 | 授權 | 連結 |
 |---|---|---|---|---|
-| _（範例）Jumper Pack_ | _Player / Platform_ | _Kenney_ | _CC0_ | _https://kenney.nl/assets/jumper-pack_ |
-|  |  |  |  |  |
+| Platformer Art Complete Pack | Player（角色）、Platform（普通/Yes/No 台階，經裁切縮放/調色） | Kenney | CC0 | https://opengameart.org/content/platformer-art-complete-pack-often-updated |
+| 視差背景（天空/雲/山三層） | GameScene 背景 | 本專案自製 | CC0 / Public Domain | — |
 
 ## 🎵 音樂 (Music)
 
@@ -26,7 +26,7 @@
 
 | 音效名稱 | 用途 (事件) | 作者 | 授權 | 連結 |
 |---|---|---|---|---|
-| _（範例）Interface Sounds_ | _跳躍 / 選答_ | _Kenney_ | _CC0_ | _https://kenney.nl/assets/interface-sounds_ |
+| The Essential Retro Video Game Sound Effects Collection [512 sounds] | 彈跳 / 選答 / 過關 / 結算 / 掉落（bounce·select·advance·result·gameover，轉為 .ogg） | Juhani Junkala | CC0 | https://opengameart.org/content/512-sound-effects-8-bit-style |
 |  |  |  |  |  |
 
 ## 🔤 字型 (Fonts)
