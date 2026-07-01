@@ -29,6 +29,11 @@ export const ZH_HANT: Record<StringKey, string> = {
   'result.copyFail': '複製失敗 — 請手動選取',
   'result.again': '再玩一次 ↻',
   'result.share': '我的 MBTI 是 {0}！{1} 來玩 MBTI Jump：{2}',
+  'result.groupLabel': '你屬於{0}',
+  'group.explorer': '探險家',
+  'group.diplomat': '外交官',
+  'group.analyst': '分析師',
+  'group.sentinel': '守護者',
 
   'trait.E': '從人群中獲得能量',
   'trait.I': '在獨處中充電',

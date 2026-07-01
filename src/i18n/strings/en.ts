@@ -34,6 +34,13 @@ export const EN = {
   'result.copyFail': 'Copy failed — select manually',
   'result.again': 'Play again ↻',
   'result.share': 'My MBTI is {0}! {1} Play MBTI Jump: {2}',
+  'result.groupLabel': 'You are {0}',
+
+  // --- 族群 ---
+  'group.explorer': 'an Explorer',
+  'group.diplomat': 'a Diplomat',
+  'group.analyst': 'an Analyst',
+  'group.sentinel': 'a Sentinel',
 
   // --- 人格字母特質（組句用）---
   'trait.E': 'draw energy from people',

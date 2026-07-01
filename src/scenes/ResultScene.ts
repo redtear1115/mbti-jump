@@ -3,7 +3,9 @@ import { GAME } from '../config/gameConfig';
 import { ScoreTracker } from '../core/ScoreTracker';
 import { describeType } from '../config/personalities';
 import { t, tf } from '../i18n/t';
+import type { StringKey } from '../i18n/t';
 import { Button } from '../ui/Button';
+import { groupOf, groupColorOf } from '../core/temperament';
 
 interface ResultInit {
   score: ScoreTracker;
@@ -17,6 +19,8 @@ export class ResultScene extends Phaser.Scene {
   create(data: ResultInit) {
     const type = data.score.result();
     const desc = describeType(type);
+    const group = groupOf(type);
+    const groupHex = '#' + groupColorOf(type).toString(16).padStart(6, '0');
     this.cameras.main.setBackgroundColor('#1a1c2c');
     const cx = GAME.width / 2;
 
@@ -30,13 +34,20 @@ export class ResultScene extends Phaser.Scene {
     this.add
       .text(cx, 250, type, {
         fontSize: '72px',
-        color: '#ffcc00',
+        color: groupHex,
         fontStyle: 'bold',
         fontFamily: 'Fredoka, system-ui, sans-serif',
       })
       .setOrigin(0.5);
     this.add
-      .text(cx, 360, desc, {
+      .text(cx, 320, tf('result.groupLabel', [t(`group.${group}` as StringKey)]), {
+        fontFamily: 'Fredoka, system-ui, sans-serif',
+        fontSize: '20px',
+        color: groupHex,
+      })
+      .setOrigin(0.5);
+    this.add
+      .text(cx, 390, desc, {
         fontSize: '18px',
         color: '#ffffff',
         align: 'center',

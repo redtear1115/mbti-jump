@@ -30,6 +30,11 @@ export const JA: Record<StringKey, string> = {
   'result.copyFail': 'コピー失敗 — 手動で選択してください',
   'result.again': 'もう一度遊ぶ ↻',
   'result.share': '私の MBTI は {0}！{1} MBTI Jump で遊ぼう：{2}',
+  'result.groupLabel': 'あなたは{0}',
+  'group.explorer': '探検家',
+  'group.diplomat': '外交官',
+  'group.analyst': '分析家',
+  'group.sentinel': '番人',
 
   'trait.E': '人と関わって元気が出る',
   'trait.I': '一人の時間で充電する',
