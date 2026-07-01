@@ -3,7 +3,7 @@ import { GAME } from '../config/gameConfig';
 import { ScoreTracker } from '../core/ScoreTracker';
 import { t, tf } from '../i18n/t';
 
-interface Init {
+interface GameOverInit {
   score: ScoreTracker;
 }
 
@@ -12,7 +12,7 @@ export class GameOverScene extends Phaser.Scene {
     super('GameOver');
   }
 
-  create(data: Init) {
+  create(data: GameOverInit) {
     const { score } = data;
     // 無縫爬塔：重來時從尚未鎖定的維度接續（已鎖定的維度保留）。
     const resumeLevel = score.lockedCount();

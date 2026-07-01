@@ -4,7 +4,7 @@ import { ScoreTracker } from '../core/ScoreTracker';
 import { describeType } from '../config/personalities';
 import { t, tf } from '../i18n/t';
 
-interface Init {
+interface ResultInit {
   score: ScoreTracker;
 }
 
@@ -13,7 +13,7 @@ export class ResultScene extends Phaser.Scene {
     super('Result');
   }
 
-  create(data: Init) {
+  create(data: ResultInit) {
     const type = data.score.result();
     const desc = describeType(type);
     this.cameras.main.setBackgroundColor('#1a1c2c');

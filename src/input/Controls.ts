@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { GAME } from '../config/gameConfig';
-import { tiltToAxis } from './tilt';
+import { tiltToAxis } from '../core/tilt';
 
 export class Controls {
   private scene: Phaser.Scene;

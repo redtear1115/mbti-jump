@@ -2,8 +2,9 @@ import Phaser from 'phaser';
 import { GAME } from '../config/gameConfig';
 import { Player } from '../entities/Player';
 import { Platform } from '../entities/Platform';
-import { Controls } from '../core/Controls';
+import { Controls } from '../input/Controls';
 import { ScoreTracker } from '../core/ScoreTracker';
+import { shouldAutoComplete } from '../core/progression';
 import { DIMENSIONS, LETTERS_OF, questionsForDimension } from '../config/questions';
 import type { QuestionDef } from '../config/questions';
 import { t, tf } from '../i18n/t';
@@ -12,8 +13,6 @@ import type { StringKey } from '../i18n/t';
 interface GameInit {
   score: ScoreTracker;
 }
-
-const LEVEL_COLORS = ['#2e3a59', '#3a2e59', '#594a2e', '#2e594a'];
 
 /**
  * 無縫單一爬塔：整場是一座塔，玩家一路往上跳。
@@ -29,8 +28,7 @@ export class GameScene extends Phaser.Scene {
 
   private questions: QuestionDef[] = [];
   private nextQuestionIdx = 0; // 目前維度中下一個要生成的題目
-  private answeredCount = 0; // 目前維度已答題數
-  private answeredIds = new Set<string>(); // 全程已計分的題目 id（id 跨維度唯一）
+  private dimAnsweredIds = new Set<string>(); // 目前維度已計分的題目 id（換維度時清空）
   private spawnY = 0; // 下一個平台的 y（往上遞減）
   private platformsSinceFork = 0;
   private dimComplete = false; // 目前維度是否已鎖定（避免重複鎖定）
@@ -53,8 +51,7 @@ export class GameScene extends Phaser.Scene {
     this.dimIndex = this.score.lockedCount();
     this.questions = questionsForDimension(DIMENSIONS[this.dimIndex]);
     this.nextQuestionIdx = 0;
-    this.answeredCount = 0;
-    this.answeredIds.clear();
+    this.dimAnsweredIds.clear();
     this.platformsSinceFork = 0;
     this.dimComplete = false;
     this.lastForkY = -Infinity;
@@ -64,7 +61,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   create() {
-    this.cameras.main.setBackgroundColor(LEVEL_COLORS[this.dimIndex]);
+    this.cameras.main.setBackgroundColor(GAME.levelColors[this.dimIndex]);
     this.platforms = this.physics.add.staticGroup();
 
     // 起始平台（玩家正下方）
@@ -176,8 +173,7 @@ export class GameScene extends Phaser.Scene {
     // 就以「已記錄的答案」鎖定本維度並無縫接下一維度（不要求答滿 5 題）。
     if (
       !this.dimComplete &&
-      this.nextQuestionIdx >= this.questions.length &&
-      this.player.y < this.lastForkY - GAME.height * 0.75
+      shouldAutoComplete(this.nextQuestionIdx, this.questions.length, this.player.y, this.lastForkY, GAME.height)
     ) {
       this.completeCurrentDimension();
     }
@@ -257,12 +253,11 @@ export class GameScene extends Phaser.Scene {
     this.player.bounce();
 
     if (platform.kind === 'question' && platform.side && platform.questionId !== undefined) {
-      if (!this.answeredIds.has(platform.questionId)) {
-        this.answeredIds.add(platform.questionId);
+      if (!this.dimAnsweredIds.has(platform.questionId)) {
+        this.dimAnsweredIds.add(platform.questionId);
         this.score.recordAnswer(platform.side);
-        this.answeredCount += 1;
         this.updateTally();
-        if (this.answeredCount >= GAME.questionsPerLevel) {
+        if (this.dimAnsweredIds.size >= GAME.questionsPerLevel) {
           this.completeCurrentDimension();
         }
       }
@@ -328,14 +323,14 @@ export class GameScene extends Phaser.Scene {
 
     this.questions = questionsForDimension(DIMENSIONS[this.dimIndex]);
     this.nextQuestionIdx = 0;
-    this.answeredCount = 0;
+    this.dimAnsweredIds.clear();
     this.platformsSinceFork = 0;
     this.dimComplete = false;
     this.lastForkY = -Infinity;
     this.forks = [];
     this.shownQuestionIdx = -1;
 
-    this.cameras.main.setBackgroundColor(LEVEL_COLORS[this.dimIndex]);
+    this.cameras.main.setBackgroundColor(GAME.levelColors[this.dimIndex]);
     this.updateLevelLabel();
     this.updateTally();
     this.announceDimension();
