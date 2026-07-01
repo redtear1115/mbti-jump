@@ -6,6 +6,7 @@ import { GameScene } from './scenes/GameScene';
 import { GameOverScene } from './scenes/GameOverScene';
 import { ResultScene } from './scenes/ResultScene';
 import { TrendScene } from './scenes/TrendScene';
+import { AchievementScene } from './scenes/AchievementScene';
 
 new Phaser.Game({
   type: Phaser.AUTO,
@@ -21,5 +22,5 @@ new Phaser.Game({
     default: 'arcade',
     arcade: { gravity: { x: 0, y: GAME.gravityY }, debug: false },
   },
-  scene: [BootScene, StartScene, GameScene, GameOverScene, ResultScene, TrendScene],
+  scene: [BootScene, StartScene, GameScene, GameOverScene, ResultScene, TrendScene, AchievementScene],
 });

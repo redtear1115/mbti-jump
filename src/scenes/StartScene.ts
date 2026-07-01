@@ -97,6 +97,16 @@ export class StartScene extends Phaser.Scene {
       bgDown: 0x3a86a0,
       onClick: () => this.scene.start('Trend'),
     });
+
+    new Button(this, cx, 620, t('ach.cta'), {
+      width: 200,
+      height: 50,
+      fontSize: 20,
+      bg: 0x88619a, // 紫，區分其他鈕
+      bgHover: 0x9d78ae,
+      bgDown: 0x76527f,
+      onClick: () => this.scene.start('Achievements'),
+    });
   }
 
   /** iOS 13+ 需在使用者手勢中請求體感權限；其他平台略過。 */
