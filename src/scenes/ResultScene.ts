@@ -11,6 +11,9 @@ import { recordPlay, getPlays } from '../core/profile';
 import { newlyUnlocked } from '../core/achievements';
 import { getSeenIds, markSeen } from '../core/achievementStore';
 import { prefersReducedMotion } from '../ui/reducedMotion';
+import { buildShareCardModel } from '../share/shareCardModel';
+import { renderShareCard, downloadCard } from '../share/shareCard';
+import { getLocale } from '../i18n/store';
 
 interface ResultInit {
   score: ScoreTracker;
@@ -82,7 +85,26 @@ export class ResultScene extends Phaser.Scene {
       },
     });
 
-    new Button(this, cx, 575, t('result.again'), {
+    const saveBtn = new Button(this, cx, 575, t('result.saveCard'), {
+      width: 240,
+      height: 54,
+      fontSize: 20,
+      bg: 0x33a474,
+      bgHover: 0x3fb886,
+      bgDown: 0x2b8a61,
+      onClick: async () => {
+        try {
+          const model = buildShareCardModel(type, data.score.allTallies(), getLocale());
+          const canvas = renderShareCard(model);
+          await downloadCard(canvas, `mbti-jump-${type}.png`);
+          saveBtn.setLabel(t('result.saved'));
+        } catch {
+          saveBtn.setLabel(t('result.saveFail'));
+        }
+      },
+    });
+
+    new Button(this, cx, 645, t('result.again'), {
       width: 240,
       height: 54,
       fontSize: 20,
@@ -91,7 +113,7 @@ export class ResultScene extends Phaser.Scene {
       onClick: () => this.scene.start('Start'),
     });
 
-    new Button(this, cx, 640, t('trend.cta'), {
+    new Button(this, cx, 710, t('trend.cta'), {
       width: 240,
       height: 50,
       fontSize: 18,
