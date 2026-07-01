@@ -15,6 +15,8 @@ import type { StringKey } from '../i18n/t';
 import { prefersReducedMotion } from '../ui/reducedMotion';
 import { Sfx } from '../audio/Sfx';
 import { MuteButton } from '../ui/MuteButton';
+import { LETTER_COLORS } from '../theme/palette';
+import { scoreBarModel } from '../core/scoreBar';
 
 interface GameInit {
   score: ScoreTracker;
@@ -40,7 +42,9 @@ export class GameScene extends Phaser.Scene {
   private dimComplete = false; // 目前維度是否已鎖定（避免重複鎖定）
   private banner!: Phaser.GameObjects.Text;
   private levelLabel!: Phaser.GameObjects.Text;
-  private tally!: Phaser.GameObjects.Text; // 目前維度即時取向，例如 "E 2 · I 1"
+  private scoreBar!: Phaser.GameObjects.Graphics; // 得分條底＋分隔線
+  private scoreLeft!: Phaser.GameObjects.Text; // 左側票數
+  private scoreRight!: Phaser.GameObjects.Text; // 右側票數
   private previewLeft!: Phaser.GameObjects.Text;
   private previewRight!: Phaser.GameObjects.Text;
   private lastForkY = -Infinity; // 目前維度最後一題分叉的 y
@@ -127,18 +131,27 @@ export class GameScene extends Phaser.Scene {
       .setOrigin(0.5, 0)
       .setScrollFactor(0)
       .setDepth(20);
-    this.tally = this.add
-      .text(GAME.width / 2, 126, '', {
-        fontSize: '15px',
-        fontStyle: 'bold',
-        color: '#ffe066',
-        fontFamily: 'Nunito, system-ui, sans-serif',
-      })
-      .setOrigin(0.5, 0)
+    this.scoreBar = this.add.graphics().setScrollFactor(0).setDepth(20);
+    const scoreLabelStyle = {
+      fontSize: '14px',
+      fontStyle: 'bold',
+      color: '#ffffff',
+      stroke: '#000000',
+      strokeThickness: 3,
+      fontFamily: 'Nunito, system-ui, sans-serif',
+    };
+    this.scoreLeft = this.add
+      .text(135, 139, '', scoreLabelStyle)
+      .setOrigin(0, 0.5)
       .setScrollFactor(0)
-      .setDepth(20);
+      .setDepth(21);
+    this.scoreRight = this.add
+      .text(315, 139, '', scoreLabelStyle)
+      .setOrigin(1, 0.5)
+      .setScrollFactor(0)
+      .setDepth(21);
     this.updateLevelLabel();
-    this.updateTally();
+    this.drawScoreBar();
 
     const previewStyle = {
       fontSize: '17px',
@@ -291,7 +304,7 @@ export class GameScene extends Phaser.Scene {
         this.dimAnsweredIds.add(platform.questionId);
         Sfx.play('select');
         this.score.recordAnswer(platform.side);
-        this.updateTally();
+        this.drawScoreBar();
         if (this.dimAnsweredIds.size >= GAME.questionsPerLevel) {
           this.completeCurrentDimension();
         }
@@ -330,12 +343,27 @@ export class GameScene extends Phaser.Scene {
     this.levelLabel.setText(tf('level.label', [this.dimIndex + 1, t(`dim.${dimCode}` as StringKey)]));
   }
 
-  /** 更新目前維度兩側即時票數，例如 "E 2 · I 1"（MBTI 字母跨語言通用，不需翻譯）。 */
-  private updateTally(): void {
+  /** 依目前維度票數重繪得分條（雙色漸變底＋白色分隔線＋兩側高對比票數）。 */
+  private drawScoreBar(): void {
     const dimCode = DIMENSIONS[this.dimIndex];
     const [a, b] = LETTERS_OF[dimCode];
     const [na, nb] = this.score.tallyFor(dimCode);
-    this.tally.setText(`${a} ${na} · ${b} ${nb}`);
+    const m = scoreBarModel(a, na, b, nb);
+
+    const w = 200;
+    const h = 22;
+    const x0 = (GAME.width - w) / 2;
+    const y0 = 128;
+    const g = this.scoreBar;
+    g.clear();
+    g.fillGradientStyle(LETTER_COLORS[a], LETTER_COLORS[b], LETTER_COLORS[a], LETTER_COLORS[b], 1);
+    g.fillRoundedRect(x0, y0, w, h, 11);
+    const dx = x0 + m.dividerFrac * w;
+    g.fillStyle(0xffffff, 1);
+    g.fillRect(dx - 1.5, y0 - 2, 3, h + 4);
+
+    this.scoreLeft.setText(m.leftLabel);
+    this.scoreRight.setText(m.rightLabel);
   }
 
   private completeCurrentDimension(): void {
@@ -374,7 +402,7 @@ export class GameScene extends Phaser.Scene {
     this.cameras.main.setBackgroundColor(LEVEL_BG[this.dimIndex]);
     this.background.setDimension(this.dimIndex);
     this.updateLevelLabel();
-    this.updateTally();
+    this.drawScoreBar();
     this.announceDimension();
   }
 
