@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { GAME } from './config/gameConfig';
+import { BootScene } from './scenes/BootScene';
 import { StartScene } from './scenes/StartScene';
 import { GameScene } from './scenes/GameScene';
 import { GameOverScene } from './scenes/GameOverScene';
@@ -19,5 +20,5 @@ new Phaser.Game({
     default: 'arcade',
     arcade: { gravity: { x: 0, y: GAME.gravityY }, debug: false },
   },
-  scene: [StartScene, GameScene, GameOverScene, ResultScene],
+  scene: [BootScene, StartScene, GameScene, GameOverScene, ResultScene],
 });
