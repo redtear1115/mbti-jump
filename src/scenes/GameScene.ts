@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { GAME } from '../config/gameConfig';
+import { LEVEL_BG } from '../theme/palette';
 import { Player } from '../entities/Player';
 import { Platform } from '../entities/Platform';
 import { Controls } from '../input/Controls';
@@ -64,7 +65,7 @@ export class GameScene extends Phaser.Scene {
 
   create() {
     this.reducedMotion = prefersReducedMotion();
-    this.cameras.main.setBackgroundColor(GAME.levelColors[this.dimIndex]);
+    this.cameras.main.setBackgroundColor(LEVEL_BG[this.dimIndex]);
     this.platforms = this.physics.add.staticGroup();
 
     // 起始平台（玩家正下方）
@@ -335,7 +336,7 @@ export class GameScene extends Phaser.Scene {
     this.forks = [];
     this.shownQuestionIdx = -1;
 
-    this.cameras.main.setBackgroundColor(GAME.levelColors[this.dimIndex]);
+    this.cameras.main.setBackgroundColor(LEVEL_BG[this.dimIndex]);
     this.updateLevelLabel();
     this.updateTally();
     this.announceDimension();

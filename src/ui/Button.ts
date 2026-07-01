@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { PALETTE } from '../theme/palette';
 
 export interface ButtonOptions {
   onClick: () => void;
@@ -36,7 +37,7 @@ export class Button {
     this.w = opts.width ?? 240;
     this.h = Math.max(opts.height ?? 56, 44); // 觸控目標至少 44
     this.radius = opts.radius ?? 14;
-    this.bg = opts.bg ?? 0x38b764;
+    this.bg = opts.bg ?? PALETTE.yes;
     this.bgHover = opts.bgHover ?? 0x49cf82;
     this.bgDown = opts.bgDown ?? 0x2f9d57;
 
@@ -45,7 +46,7 @@ export class Button {
       .text(x, y, text, {
         fontSize: `${opts.fontSize ?? 24}px`,
         fontStyle: 'bold',
-        color: opts.textColor ?? '#0f1220',
+        color: opts.textColor ?? PALETTE.textOn,
         align: 'center',
       })
       .setOrigin(0.5)

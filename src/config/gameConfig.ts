@@ -29,7 +29,4 @@ export const GAME = {
 
   // 掉落判定：玩家低於「相機底部 + 此緩衝」即死亡
   fallMargin: 60,
-
-  // 各維度背景色（對應 DIMENSIONS 順序 EI/SN/TF/JP）
-  levelColors: ['#2e3a59', '#3a2e59', '#594a2e', '#2e594a'],
 } as const;
