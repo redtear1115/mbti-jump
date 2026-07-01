@@ -60,7 +60,7 @@ export class StartScene extends Phaser.Scene {
 
     btn.on('pointerdown', async () => {
       await this.requestTiltPermission();
-      this.scene.start('Game', { score: new ScoreTracker(), levelIndex: 0 });
+      this.scene.start('Game', { score: new ScoreTracker() });
     });
   }
 

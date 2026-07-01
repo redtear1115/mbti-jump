@@ -5,7 +5,6 @@ import { t, tf } from '../i18n/t';
 
 interface Init {
   score: ScoreTracker;
-  levelIndex: number;
 }
 
 export class GameOverScene extends Phaser.Scene {
@@ -14,7 +13,9 @@ export class GameOverScene extends Phaser.Scene {
   }
 
   create(data: Init) {
-    const { score, levelIndex } = data;
+    const { score } = data;
+    // 無縫爬塔：重來時從尚未鎖定的維度接續（已鎖定的維度保留）。
+    const resumeLevel = score.lockedCount();
     this.cameras.main.setBackgroundColor('#1a1c2c');
     const cx = GAME.width / 2;
 
@@ -22,7 +23,7 @@ export class GameOverScene extends Phaser.Scene {
       .text(cx, GAME.height / 2 - 60, t('gameover.title'), { fontSize: '28px', color: '#b13e53' })
       .setOrigin(0.5);
     this.add
-      .text(cx, GAME.height / 2 - 20, tf('gameover.subtitle', [levelIndex + 1]), {
+      .text(cx, GAME.height / 2 - 20, tf('gameover.subtitle', [resumeLevel + 1]), {
         fontSize: '15px',
         color: '#ffffffaa',
       })
@@ -38,6 +39,6 @@ export class GameOverScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
 
-    btn.on('pointerdown', () => this.scene.start('Game', { score, levelIndex }));
+    btn.on('pointerdown', () => this.scene.start('Game', { score }));
   }
 }

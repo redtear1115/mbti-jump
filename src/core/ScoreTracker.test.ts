@@ -82,4 +82,24 @@ describe('ScoreTracker', () => {
     const s = new ScoreTracker();
     expect(() => s.result()).toThrow();
   });
+
+  it('tallyFor reports live counts for the current level, in [first, second] order', () => {
+    const s = new ScoreTracker();
+    expect(s.tallyFor('EI')).toEqual([0, 0]);
+    s.recordAnswer('E');
+    s.recordAnswer('E');
+    s.recordAnswer('I');
+    expect(s.tallyFor('EI')).toEqual([2, 1]);
+    s.completeLevel('EI');
+    expect(s.tallyFor('SN')).toEqual([0, 0]); // resets with the new level
+  });
+
+  it('lockedCount tracks how many dimensions are locked (resume cursor)', () => {
+    const s = new ScoreTracker();
+    expect(s.lockedCount()).toBe(0);
+    s.recordAnswer('E'); s.completeLevel('EI');
+    expect(s.lockedCount()).toBe(1);
+    s.recordAnswer('S'); s.completeLevel('SN');
+    expect(s.lockedCount()).toBe(2);
+  });
 });

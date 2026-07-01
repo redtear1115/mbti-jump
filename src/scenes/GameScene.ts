@@ -4,38 +4,44 @@ import { Player } from '../entities/Player';
 import { Platform } from '../entities/Platform';
 import { Controls } from '../core/Controls';
 import { ScoreTracker } from '../core/ScoreTracker';
-import { DIMENSIONS, questionsForDimension } from '../config/questions';
+import { DIMENSIONS, LETTERS_OF, questionsForDimension } from '../config/questions';
 import type { QuestionDef } from '../config/questions';
 import { t, tf } from '../i18n/t';
 import type { StringKey } from '../i18n/t';
 
 interface GameInit {
   score: ScoreTracker;
-  levelIndex: number;
 }
 
 const LEVEL_COLORS = ['#2e3a59', '#3a2e59', '#594a2e', '#2e594a'];
 
+/**
+ * 無縫單一爬塔：整場是一座塔，玩家一路往上跳。
+ * 每答完（或跳過）一個維度的 5 題，塔直接往上接下一個維度——不切場景、不需點擊。
+ * 四個維度全部鎖定後才進結算。掉落 → GameOver，重來時從尚未鎖定的維度接續。
+ */
 export class GameScene extends Phaser.Scene {
   private score!: ScoreTracker;
-  private levelIndex = 0;
+  private dimIndex = 0; // 目前維度（0..3）
   private player!: Player;
   private platforms!: Phaser.Physics.Arcade.StaticGroup;
   private controls!: Controls;
 
   private questions: QuestionDef[] = [];
-  private nextQuestionIdx = 0; // 下一個要生成的題目
-  private answeredCount = 0; // 已答題數
-  private answeredIds = new Set<string>();
+  private nextQuestionIdx = 0; // 目前維度中下一個要生成的題目
+  private answeredCount = 0; // 目前維度已答題數
+  private answeredIds = new Set<string>(); // 全程已計分的題目 id（id 跨維度唯一）
   private spawnY = 0; // 下一個平台的 y（往上遞減）
   private platformsSinceFork = 0;
+  private dimComplete = false; // 目前維度是否已鎖定（避免重複鎖定）
   private banner!: Phaser.GameObjects.Text;
-  private previewLeft!: Phaser.GameObjects.Text; // 即將到來的 Yes(左) 選項，依距離淡入
-  private previewRight!: Phaser.GameObjects.Text; // 即將到來的 No(右) 選項，依距離淡入
-  private levelComplete = false;
-  private lastForkY = -Infinity; // 最後一題分叉的 y；玩家爬過它即過關（避免跳過題目卡關）
-  private forks: { qIndex: number; y: number }[] = []; // 各題分叉位置，用來讓題目橫幅跟著玩家接近的分叉
-  private shownQuestionIdx = -1; // 橫幅目前顯示的題目 index
+  private levelLabel!: Phaser.GameObjects.Text;
+  private tally!: Phaser.GameObjects.Text; // 目前維度即時取向，例如 "E 2 · I 1"
+  private previewLeft!: Phaser.GameObjects.Text;
+  private previewRight!: Phaser.GameObjects.Text;
+  private lastForkY = -Infinity; // 目前維度最後一題分叉的 y
+  private forks: { qIndex: number; y: number }[] = [];
+  private shownQuestionIdx = -1;
 
   constructor() {
     super('Game');
@@ -43,14 +49,14 @@ export class GameScene extends Phaser.Scene {
 
   init(data: GameInit) {
     this.score = data.score;
-    this.levelIndex = data.levelIndex;
-    // 每次進場重置關卡狀態（死亡重玩時要乾淨）
-    this.questions = questionsForDimension(DIMENSIONS[this.levelIndex]);
+    // 從尚未鎖定的維度接續（重玩時保留已鎖定的維度）
+    this.dimIndex = this.score.lockedCount();
+    this.questions = questionsForDimension(DIMENSIONS[this.dimIndex]);
     this.nextQuestionIdx = 0;
     this.answeredCount = 0;
     this.answeredIds.clear();
     this.platformsSinceFork = 0;
-    this.levelComplete = false;
+    this.dimComplete = false;
     this.lastForkY = -Infinity;
     this.forks = [];
     this.shownQuestionIdx = -1;
@@ -58,7 +64,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   create() {
-    this.cameras.main.setBackgroundColor(LEVEL_COLORS[this.levelIndex]);
+    this.cameras.main.setBackgroundColor(LEVEL_COLORS[this.dimIndex]);
     this.platforms = this.physics.add.staticGroup();
 
     // 起始平台（玩家正下方）
@@ -99,15 +105,18 @@ export class GameScene extends Phaser.Scene {
       .setScrollFactor(0)
       .setDepth(20);
 
-    const dimCode = DIMENSIONS[this.levelIndex];
-    this.add
-      .text(GAME.width / 2, 92, tf('level.label', [this.levelIndex + 1, t(`dim.${dimCode}` as StringKey)]), {
-        fontSize: '14px',
-        color: '#ffffffaa',
-      })
+    this.levelLabel = this.add
+      .text(GAME.width / 2, 92, '', { fontSize: '14px', color: '#ffffffaa' })
       .setOrigin(0.5, 0)
       .setScrollFactor(0)
       .setDepth(20);
+    this.tally = this.add
+      .text(GAME.width / 2, 110, '', { fontSize: '15px', fontStyle: 'bold', color: '#ffe066' })
+      .setOrigin(0.5, 0)
+      .setScrollFactor(0)
+      .setDepth(20);
+    this.updateLevelLabel();
+    this.updateTally();
 
     const previewStyle = {
       fontSize: '17px',
@@ -117,13 +126,13 @@ export class GameScene extends Phaser.Scene {
       wordWrap: { width: GAME.width * 0.44 },
     };
     this.previewLeft = this.add
-      .text(12, 122, '', { ...previewStyle, color: '#5effa0', align: 'left' })
+      .text(12, 140, '', { ...previewStyle, color: '#5effa0', align: 'left' })
       .setOrigin(0, 0)
       .setScrollFactor(0)
       .setDepth(20)
       .setAlpha(0);
     this.previewRight = this.add
-      .text(GAME.width - 12, 122, '', { ...previewStyle, color: '#ff8a99', align: 'right' })
+      .text(GAME.width - 12, 140, '', { ...previewStyle, color: '#ff8a99', align: 'right' })
       .setOrigin(1, 0)
       .setScrollFactor(0)
       .setDepth(20)
@@ -146,7 +155,7 @@ export class GameScene extends Phaser.Scene {
       this.spawnNextRow();
     }
 
-    // 題目橫幅 + 答案預覽跟著玩家「即將接近的分叉」走，而不是最後生成的那一題
+    // 題目橫幅 + 答案預覽跟著玩家「即將接近的分叉」走
     const fork = this.nextFork();
     if (fork) {
       if (fork.qIndex !== this.shownQuestionIdx) {
@@ -154,8 +163,6 @@ export class GameScene extends Phaser.Scene {
         this.updateBanner(fork.qIndex);
         this.updatePreview(fork.qIndex);
       }
-      // 依玩家到分叉的距離淡入答案預覽：1.5 螢幕外全透明 → 0.9 螢幕內全顯示
-      // （台階本身約 0.6 螢幕才進畫面，所以答案會比台階更早出現）
       const dist = this.player.y - fork.y;
       const alpha = Phaser.Math.Clamp((GAME.height * 1.5 - dist) / (GAME.height * 0.6), 0, 1);
       this.previewLeft.setAlpha(alpha);
@@ -165,15 +172,14 @@ export class GameScene extends Phaser.Scene {
       this.previewRight.setAlpha(0);
     }
 
-    // 跳過題目的保險：所有分叉都生成後，玩家明顯爬過最後一題分叉，
-    // 就以「已記錄的答案」過關，不要求答滿 5 題（避免跳過題目無限往上卡關）。
+    // 跳過題目的保險：本維度所有分叉都生成後，玩家明顯爬過最後一題分叉，
+    // 就以「已記錄的答案」鎖定本維度並無縫接下一維度（不要求答滿 5 題）。
     if (
-      !this.levelComplete &&
+      !this.dimComplete &&
       this.nextQuestionIdx >= this.questions.length &&
       this.player.y < this.lastForkY - GAME.height * 0.75
     ) {
-      this.completeLevel();
-      return;
+      this.completeCurrentDimension();
     }
 
     // 掉落判定
@@ -255,8 +261,9 @@ export class GameScene extends Phaser.Scene {
         this.answeredIds.add(platform.questionId);
         this.score.recordAnswer(platform.side);
         this.answeredCount += 1;
+        this.updateTally();
         if (this.answeredCount >= GAME.questionsPerLevel) {
-          this.completeLevel();
+          this.completeCurrentDimension();
         }
       }
     }
@@ -288,18 +295,81 @@ export class GameScene extends Phaser.Scene {
     this.previewRight.setText(`${t(`q.${q.id}.no` as StringKey)} ▶`);
   }
 
-  private completeLevel(): void {
-    if (this.levelComplete) return;
-    this.levelComplete = true;
+  private updateLevelLabel(): void {
+    const dimCode = DIMENSIONS[this.dimIndex];
+    this.levelLabel.setText(tf('level.label', [this.dimIndex + 1, t(`dim.${dimCode}` as StringKey)]));
+  }
+
+  /** 更新目前維度兩側即時票數，例如 "E 2 · I 1"（MBTI 字母跨語言通用，不需翻譯）。 */
+  private updateTally(): void {
+    const dimCode = DIMENSIONS[this.dimIndex];
+    const [a, b] = LETTERS_OF[dimCode];
+    const [na, nb] = this.score.tallyFor(dimCode);
+    this.tally.setText(`${a} ${na} · ${b} ${nb}`);
+  }
+
+  private completeCurrentDimension(): void {
+    if (this.dimComplete) return;
+    this.dimComplete = true;
     // 平手時以玩家當下水平位置決定：靠左(Yes側)→第一字母、靠右(No側)→第二字母。
     const tieBreak = this.player.x < GAME.width / 2 ? 'first' : 'second';
-    this.score.completeLevel(DIMENSIONS[this.levelIndex], tieBreak);
-    this.controls.destroy();
-    this.scene.start('LevelTransition', { score: this.score, levelIndex: this.levelIndex });
+    this.score.completeLevel(DIMENSIONS[this.dimIndex], tieBreak);
+    this.advanceDimension();
+  }
+
+  /** 無縫切到下一個維度（不換場景）；四個維度都鎖定後進結算。 */
+  private advanceDimension(): void {
+    this.dimIndex += 1;
+    if (this.dimIndex >= DIMENSIONS.length) {
+      this.controls.destroy();
+      this.scene.start('Result', { score: this.score });
+      return;
+    }
+
+    this.questions = questionsForDimension(DIMENSIONS[this.dimIndex]);
+    this.nextQuestionIdx = 0;
+    this.answeredCount = 0;
+    this.platformsSinceFork = 0;
+    this.dimComplete = false;
+    this.lastForkY = -Infinity;
+    this.forks = [];
+    this.shownQuestionIdx = -1;
+
+    this.cameras.main.setBackgroundColor(LEVEL_COLORS[this.dimIndex]);
+    this.updateLevelLabel();
+    this.updateTally();
+    this.announceDimension();
+  }
+
+  /** 進入新維度時，畫面中央淡入淡出顯示新維度名稱，讓玩家知道換維度了。 */
+  private announceDimension(): void {
+    const dimCode = DIMENSIONS[this.dimIndex];
+    const label = this.add
+      .text(GAME.width / 2, GAME.height * 0.32, t(`dim.${dimCode}` as StringKey), {
+        fontSize: '26px',
+        fontStyle: 'bold',
+        color: '#ffffff',
+        align: 'center',
+        stroke: '#000000',
+        strokeThickness: 5,
+        wordWrap: { width: GAME.width - 40 },
+      })
+      .setOrigin(0.5)
+      .setScrollFactor(0)
+      .setDepth(30)
+      .setAlpha(0);
+    this.tweens.add({
+      targets: label,
+      alpha: { from: 0, to: 1 },
+      duration: 300,
+      yoyo: true,
+      hold: 700,
+      onComplete: () => label.destroy(),
+    });
   }
 
   private gameOver(): void {
     this.controls.destroy();
-    this.scene.start('GameOver', { score: this.score, levelIndex: this.levelIndex });
+    this.scene.start('GameOver', { score: this.score });
   }
 }

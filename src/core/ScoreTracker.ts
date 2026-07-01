@@ -40,6 +40,17 @@ export class ScoreTracker {
     this.current = freshCounts();
   }
 
+  /** 目前維度已鎖定的數量（0..4）；用來在無縫爬塔中推導現在爬到第幾個維度。 */
+  lockedCount(): number {
+    return this.locked.size;
+  }
+
+  /** 當前關某維度兩側的即時票數 [第一字母, 第二字母]，供 HUD 顯示目前取向。 */
+  tallyFor(d: Dimension): [number, number] {
+    const [a, b] = LETTERS_OF[d];
+    return [this.current[a], this.current[b]];
+  }
+
   isComplete(): boolean {
     return this.locked.size === DIMENSIONS.length;
   }
