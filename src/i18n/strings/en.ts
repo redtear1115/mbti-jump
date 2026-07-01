@@ -35,6 +35,16 @@ export const EN = {
   'result.again': 'Play again ↻',
   'result.share': 'My MBTI is {0}! {1} Play MBTI Jump: {2}',
   'result.groupLabel': 'You are {0}',
+  'trend.title': 'Your Trends',
+  'trend.cta': 'Trends 📊',
+  'trend.totalPlays': 'Played {0} times',
+  'trend.topType': 'Most often',
+  'trend.recent': 'Recent',
+  'trend.clear': 'Clear history',
+  'trend.clearConfirm': 'Tap again to confirm',
+  'trend.cleared': 'History cleared',
+  'trend.empty': 'No plays yet — play a round!',
+  'common.back': '◀ Back',
 
   // --- 族群 ---
   'group.explorer': 'an Explorer',
