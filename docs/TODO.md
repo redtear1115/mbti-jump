@@ -23,16 +23,19 @@
 - [ ] **安全區**：確認 HUD 頂端在瀏海/Dynamic Island 下不被遮，必要時加上 inset
 - [ ] **reduced-motion**：答案預覽淡入、維度名稱淡入判斷 `prefers-reduced-motion`
 
-## Tier 2 — 美術 & 音效（下一個主要階段）
-> 前置：先做 BootScene，其餘才好接。
-- [ ] **新增 `BootScene`**（`preload()` 載圖/載音 → `scene.start('Start')`；順便把 iOS 體感權限請求移過來）← 美術/音效的頭號 enabler
-- [ ] （選）`config/assets.ts` 集中 asset key，避免字串打錯
-- [ ] 替換程式美術為 Kenney 精靈：玩家、平台、Yes/No 台階、視差背景（`ensureTexture` 改為 preloaded key）
-- [ ] **字體**：Fredoka（標題）+ Nunito（內文）或 Kenney 圓體
-- [ ] **色票 `theme/palette.ts`**：語意色（primary/accent/yes/no/surface…），統一散落的硬編碼色；方向 claymorphism（柔和厚圓角、toy-like、深底提高彩度 + 金色 accent）
-- [ ] **音訊**：BGM 循環 + 跳躍/落地/選答/過關 SFX
-- [ ] 取用 CC-BY 素材時更新 `CREDITS.md`
-- 素材來源：`docs/assets-resources.md`（Kenney CC0 等）
+## Tier 2 — 美術 & 音效 ✅ 完成（程式管線）
+實作見 `docs/superpowers/plans/2026-07-01-mbti-jump-art-audio.md`（10 tasks，全數審查通過，最終 whole-branch review = READY）。
+- [x] BootScene 容錯載入管線 + 網頁字體（Fredoka/Nunito）
+- [x] `config/assets.ts` asset key 清單
+- [x] 四族群色票 `theme/palette.ts` + `core/temperament.ts`（結算族群色 + 族群名稱五語）
+- [x] 視差背景 `gfx/Background.ts`（缺圖降純色）
+- [x] Player/Platform 真 texture 優先（缺檔用程式美術）
+- [x] SFX 觸發點 + 靜音鈕（缺音檔靜音、no-op）
+- [ ] **⚠️ 剩下：把二進位素材放進 `public/assets/`** 才會看到真美術/音效（程式已就緒，drop-in 自動生效）：
+  - 圖 `public/assets/sprites/`：`player.png`、`platform-normal|yes|no.png`、`bg-sky|clouds|hills.png`（Kenney CC0）
+  - 音 `public/assets/audio/`：`bounce|select|advance|result|gameover.ogg`（Kenney/Freesound CC0）
+  - 取用 CC-BY 素材更新 `CREDITS.md`；來源見 `docs/assets-resources.md`
+- Tier 2 延後小項（final review 記錄，非阻斷）：Button hover/down 色入色票、BootScene 載入指示、Platform proc-key 常數清理。
 
 ## Tier 3 — 內容 & 上線
 - [ ] `ja`/`es` 譯文母語校稿（目前 AI 草稿，已標 `needs-review`）
