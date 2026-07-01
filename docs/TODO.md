@@ -7,6 +7,16 @@
 
 ---
 
+## 新功能路線（使用者要求：成就 / 隨機題庫 / 人格趨勢）
+共用持久化底座；拆三子專案，順序 A → B → C。
+- [x] **A. 人格趨勢 + 持久化底座** ✅（spec `2026-07-01-mbti-jump-trends-design.md`、plan `...-trends.md`，6 tasks，final review READY）
+      profile(localStorage) + trends(純函式) + `ScoreTracker.allTallies` + TrendScene（總次數/最常型族群色/四維度偏向%/最近）+ 開始/結算入口 + 兩步清除 + 五語。browser 驗證通過。
+      小尾巴（延後）：`trend.cleared` 死字串、bar label `%` 格式入 i18n。
+- [ ] **B. 成就系統** — 消費 `profile` 資料；成就定義+解鎖+提示+列表。（待 brainstorm→spec→plan）
+- [ ] **C. 題庫擴充 + 隨機題組** — 每維度加題、隨機抽 5 題；翻譯量大（新題×五語）。（待 brainstorm→spec→plan）
+
+---
+
 ## Tier 0 — 程式品質快修（小、低風險，隨時可做）
 - [ ] `Controls.ts` 從 `core/` 移到 `input/` 或 `entities/`（它 import Phaser，破壞 core=純邏輯 的語意）
 - [ ] 移除 `GameScene.answeredCount`，改用「本維度題目集」計數，消除與 `answeredIds` 的雙重真相
