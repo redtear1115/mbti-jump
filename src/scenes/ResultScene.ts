@@ -7,7 +7,10 @@ import type { StringKey } from '../i18n/t';
 import { Button } from '../ui/Button';
 import { MuteButton } from '../ui/MuteButton';
 import { groupOf, groupColorOf } from '../core/temperament';
-import { recordPlay } from '../core/profile';
+import { recordPlay, getPlays } from '../core/profile';
+import { newlyUnlocked } from '../core/achievements';
+import { getSeenIds, markSeen } from '../core/achievementStore';
+import { prefersReducedMotion } from '../ui/reducedMotion';
 
 interface ResultInit {
   score: ScoreTracker;
@@ -21,6 +24,11 @@ export class ResultScene extends Phaser.Scene {
   create(data: ResultInit) {
     const type = data.score.result();
     recordPlay(type, data.score.allTallies());
+    const fresh = newlyUnlocked(getPlays(), getSeenIds());
+    if (fresh.length > 0) {
+      this.showUnlockToast(fresh);
+      markSeen(fresh);
+    }
     const desc = describeType(type);
     const group = groupOf(type);
     const groupHex = '#' + groupColorOf(type).toString(16).padStart(6, '0');
@@ -94,5 +102,39 @@ export class ResultScene extends Phaser.Scene {
     });
 
     new MuteButton(this, GAME.width - 26, 26);
+  }
+
+  /** 於畫面上方依序淡入淡出顯示新解鎖成就；reduced-motion 時直接顯示短暫後移除。 */
+  private showUnlockToast(ids: string[]): void {
+    const cx = GAME.width / 2;
+    const reduce = prefersReducedMotion();
+    ids.forEach((id, i) => {
+      const label = this.add
+        .text(cx, 44 + i * 46, tf('ach.unlocked', [t(`ach.${id}.name` as StringKey)]), {
+          fontFamily: 'Fredoka, system-ui, sans-serif',
+          fontSize: '18px',
+          color: '#0f1220',
+          backgroundColor: '#ffe066',
+          padding: { x: 12, y: 8 },
+          align: 'center',
+        })
+        .setOrigin(0.5)
+        .setDepth(60)
+        .setAlpha(0);
+      if (reduce) {
+        label.setAlpha(1);
+        this.time.delayedCall(2500 + i * 400, () => label.destroy());
+        return;
+      }
+      this.tweens.add({
+        targets: label,
+        alpha: { from: 0, to: 1 },
+        duration: 300,
+        delay: i * 300,
+        hold: 2000,
+        yoyo: true,
+        onComplete: () => label.destroy(),
+      });
+    });
   }
 }
