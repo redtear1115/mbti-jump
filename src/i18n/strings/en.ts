@@ -46,6 +46,27 @@ export const EN = {
   'trend.empty': 'No plays yet — play a round!',
   'common.back': '◀ Back',
 
+  // --- 成就 ---
+  'ach.title': 'Achievements',
+  'ach.cta': 'Achievements 🏆',
+  'ach.unlocked': '🏆 Unlocked: {0}',
+  'ach.first_play.name': 'First Steps',
+  'ach.first_play.desc': 'Finish your first game',
+  'ach.persistent.name': 'Persistent',
+  'ach.persistent.desc': 'Play 10 games',
+  'ach.dedicated.name': 'Dedicated',
+  'ach.dedicated.desc': 'Play 25 games',
+  'ach.collector.name': 'Collector',
+  'ach.collector.desc': 'Discover all 16 types',
+  'ach.four_realms.name': 'Four Realms',
+  'ach.four_realms.desc': 'Get a type from all 4 groups',
+  'ach.decisive.name': 'Decisive',
+  'ach.decisive.desc': 'Sweep a dimension 5–0 in one game',
+  'ach.torn.name': 'Torn',
+  'ach.torn.desc': 'Split a dimension 3–2 in one game',
+  'ach.creature_of_habit.name': 'Creature of Habit',
+  'ach.creature_of_habit.desc': 'Get the same type 3 times',
+
   // --- 族群 ---
   'group.explorer': 'an Explorer',
   'group.diplomat': 'a Diplomat',
