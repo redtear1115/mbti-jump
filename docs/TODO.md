@@ -15,7 +15,9 @@
 - [x] **B. 成就系統** ✅（spec `...-achievements-design.md`、plan `...-achievements.md`，5 tasks，final review READY）
       8 個純函式成就（由 `getPlays()` 推導）+ `achievementStore`(去重) + `AchievementScene`(已/未解鎖) + 結算解鎖提示 + 開始頁入口 + 五語。browser 驗證（注入 11 場 → 5 解鎖/3 未解鎖，正確）。
       小尾巴（延後）：reduced-motion 提示時長、多解鎖 toast 堆疊、anyDimension 冗餘 guard。
-- [ ] **C. 題庫擴充 + 隨機題組** — 每維度加題、隨機抽 5 題；翻譯量大（新題×五語）。（待 brainstorm→spec→plan）
+- [x] **C. 題庫擴充 + 隨機題組** ✅（spec `...-question-bank-design.md`、plan `...-question-bank.md`，5 tasks，final review READY）
+      `core/pickQuestions`（純函式 Fisher-Yates，注入 rng）+ `questions.ts` 每維度 5→10（共 40）+ 20 新題×五語 i18n（ja/es 沿用 needs-review）+ GameScene init/advanceDimension 每場隨機抽 5 題（奇數不平手不變）。85 tests 綠、tsc/build 通過。
+      小尾巴（延後）：locale 檔內新題 key 排序非按維度分塊（純美觀、completeness 以 key set 比對不受影響）；ja/es 母語校稿。
 
 ---
 
