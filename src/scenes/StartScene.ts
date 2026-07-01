@@ -4,6 +4,7 @@ import { ScoreTracker } from '../core/ScoreTracker';
 import { t } from '../i18n/t';
 import { getLocale, setLocale } from '../i18n/store';
 import { SUPPORTED_LOCALES, LOCALE_LABELS } from '../i18n/locales';
+import { Button } from '../ui/Button';
 
 type OrientationPermissionApi = {
   requestPermission?: () => Promise<'granted' | 'denied'>;
@@ -27,20 +28,28 @@ export class StartScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     // 語言選單：橫排小按鈕，當前語言高亮，點選即切換並重繪
-    this.add.text(cx, 360, t('start.language'), { fontSize: '13px', color: '#ffffff88' }).setOrigin(0.5);
-    const startX = cx - ((SUPPORTED_LOCALES.length - 1) * 78) / 2;
+    this.add.text(cx, 356, t('start.language'), { fontSize: '13px', color: '#ffffff88' }).setOrigin(0.5);
+    const startX = cx - ((SUPPORTED_LOCALES.length - 1) * 80) / 2;
     SUPPORTED_LOCALES.forEach((loc, i) => {
       const active = loc === current;
-      const item = this.add
-        .text(startX + i * 78, 390, LOCALE_LABELS[loc], {
+      const chip = this.add
+        .text(startX + i * 80, 392, LOCALE_LABELS[loc], {
           fontSize: '13px',
-          color: active ? '#1a1c2c' : '#ffffffcc',
-          backgroundColor: active ? '#ffcc00' : '#ffffff11',
-          padding: { x: 8, y: 6 },
+          color: active ? '#1a1c2c' : '#ffffffdd',
+          backgroundColor: active ? '#ffcc00' : '#ffffff22',
+          padding: { x: 10, y: 12 },
         })
         .setOrigin(0.5)
         .setInteractive({ useHandCursor: true });
-      item.on('pointerdown', () => {
+      if (!active) {
+        chip.on('pointerover', () => chip.setBackgroundColor('#ffffff3a'));
+        chip.on('pointerout', () => {
+          chip.setBackgroundColor('#ffffff22');
+          chip.setScale(1);
+        });
+        chip.on('pointerdown', () => chip.setScale(0.94));
+      }
+      chip.on('pointerup', () => {
         if (loc !== current) {
           setLocale(loc);
           this.scene.restart();
@@ -48,19 +57,15 @@ export class StartScene extends Phaser.Scene {
       });
     });
 
-    const btn = this.add
-      .text(cx, 470, t('start.cta'), {
-        fontSize: '28px',
-        color: '#38b764',
-        backgroundColor: '#ffffff11',
-        padding: { x: 24, y: 12 },
-      })
-      .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true });
-
-    btn.on('pointerdown', async () => {
-      await this.requestTiltPermission();
-      this.scene.start('Game', { score: new ScoreTracker() });
+    // 主 CTA：實心圓角按鈕（hover/press 回饋 + ≥44 觸控）
+    new Button(this, cx, 478, t('start.cta'), {
+      width: 200,
+      height: 60,
+      fontSize: 28,
+      onClick: async () => {
+        await this.requestTiltPermission();
+        this.scene.start('Game', { score: new ScoreTracker() });
+      },
     });
   }
 

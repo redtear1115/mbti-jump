@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { GAME } from '../config/gameConfig';
 import { ScoreTracker } from '../core/ScoreTracker';
 import { t, tf } from '../i18n/t';
+import { Button } from '../ui/Button';
 
 interface GameOverInit {
   score: ScoreTracker;
@@ -29,16 +30,13 @@ export class GameOverScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
-    const btn = this.add
-      .text(cx, GAME.height / 2 + 50, t('gameover.retry'), {
-        fontSize: '24px',
-        color: '#ffcc00',
-        backgroundColor: '#ffffff11',
-        padding: { x: 16, y: 10 },
-      })
-      .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true });
-
-    btn.on('pointerdown', () => this.scene.start('Game', { score }));
+    new Button(this, cx, GAME.height / 2 + 55, t('gameover.retry'), {
+      width: 220,
+      height: 58,
+      fontSize: 24,
+      bg: 0xd9a521,
+      bgHover: 0xf0b93a,
+      onClick: () => this.scene.start('Game', { score }),
+    });
   }
 }

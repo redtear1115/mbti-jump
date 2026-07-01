@@ -9,6 +9,7 @@ import { DIMENSIONS, LETTERS_OF, questionsForDimension } from '../config/questio
 import type { QuestionDef } from '../config/questions';
 import { t, tf } from '../i18n/t';
 import type { StringKey } from '../i18n/t';
+import { prefersReducedMotion } from '../ui/reducedMotion';
 
 interface GameInit {
   score: ScoreTracker;
@@ -40,6 +41,7 @@ export class GameScene extends Phaser.Scene {
   private lastForkY = -Infinity; // 目前維度最後一題分叉的 y
   private forks: { qIndex: number; y: number }[] = [];
   private shownQuestionIdx = -1;
+  private reducedMotion = false;
 
   constructor() {
     super('Game');
@@ -61,6 +63,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   create() {
+    this.reducedMotion = prefersReducedMotion();
     this.cameras.main.setBackgroundColor(GAME.levelColors[this.dimIndex]);
     this.platforms = this.physics.add.staticGroup();
 
@@ -89,7 +92,7 @@ export class GameScene extends Phaser.Scene {
     this.controls.start();
 
     this.banner = this.add
-      .text(GAME.width / 2, 24, '', {
+      .text(GAME.width / 2, 40, '', {
         fontSize: '24px',
         fontStyle: 'bold',
         color: '#ffffff',
@@ -103,12 +106,12 @@ export class GameScene extends Phaser.Scene {
       .setDepth(20);
 
     this.levelLabel = this.add
-      .text(GAME.width / 2, 92, '', { fontSize: '14px', color: '#ffffffaa' })
+      .text(GAME.width / 2, 108, '', { fontSize: '14px', color: '#ffffffaa' })
       .setOrigin(0.5, 0)
       .setScrollFactor(0)
       .setDepth(20);
     this.tally = this.add
-      .text(GAME.width / 2, 110, '', { fontSize: '15px', fontStyle: 'bold', color: '#ffe066' })
+      .text(GAME.width / 2, 126, '', { fontSize: '15px', fontStyle: 'bold', color: '#ffe066' })
       .setOrigin(0.5, 0)
       .setScrollFactor(0)
       .setDepth(20);
@@ -123,13 +126,13 @@ export class GameScene extends Phaser.Scene {
       wordWrap: { width: GAME.width * 0.44 },
     };
     this.previewLeft = this.add
-      .text(12, 140, '', { ...previewStyle, color: '#5effa0', align: 'left' })
+      .text(12, 158, '', { ...previewStyle, color: '#5effa0', align: 'left' })
       .setOrigin(0, 0)
       .setScrollFactor(0)
       .setDepth(20)
       .setAlpha(0);
     this.previewRight = this.add
-      .text(GAME.width - 12, 140, '', { ...previewStyle, color: '#ff8a99', align: 'right' })
+      .text(GAME.width - 12, 158, '', { ...previewStyle, color: '#ff8a99', align: 'right' })
       .setOrigin(1, 0)
       .setScrollFactor(0)
       .setDepth(20)
@@ -161,7 +164,9 @@ export class GameScene extends Phaser.Scene {
         this.updatePreview(fork.qIndex);
       }
       const dist = this.player.y - fork.y;
-      const alpha = Phaser.Math.Clamp((GAME.height * 1.5 - dist) / (GAME.height * 0.6), 0, 1);
+      const alpha = this.reducedMotion
+        ? 1
+        : Phaser.Math.Clamp((GAME.height * 1.5 - dist) / (GAME.height * 0.6), 0, 1);
       this.previewLeft.setAlpha(alpha);
       this.previewRight.setAlpha(alpha);
     } else {
@@ -353,6 +358,11 @@ export class GameScene extends Phaser.Scene {
       .setScrollFactor(0)
       .setDepth(30)
       .setAlpha(0);
+    if (this.reducedMotion) {
+      label.setAlpha(1);
+      this.time.delayedCall(1000, () => label.destroy());
+      return;
+    }
     this.tweens.add({
       targets: label,
       alpha: { from: 0, to: 1 },

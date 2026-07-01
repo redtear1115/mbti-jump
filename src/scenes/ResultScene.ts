@@ -3,6 +3,7 @@ import { GAME } from '../config/gameConfig';
 import { ScoreTracker } from '../core/ScoreTracker';
 import { describeType } from '../config/personalities';
 import { t, tf } from '../i18n/t';
+import { Button } from '../ui/Button';
 
 interface ResultInit {
   score: ScoreTracker;
@@ -30,34 +31,28 @@ export class ResultScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
-    const copyBtn = this.add
-      .text(cx, 500, t('result.copy'), {
-        fontSize: '20px',
-        color: '#38b764',
-        backgroundColor: '#ffffff11',
-        padding: { x: 16, y: 10 },
-      })
-      .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true });
-    copyBtn.on('pointerdown', async () => {
-      const text = tf('result.share', [type, desc, location.href]);
-      try {
-        await navigator.clipboard.writeText(text);
-        copyBtn.setText(t('result.copied'));
-      } catch {
-        copyBtn.setText(t('result.copyFail'));
-      }
+    const copyBtn = new Button(this, cx, 505, t('result.copy'), {
+      width: 240,
+      height: 54,
+      fontSize: 20,
+      onClick: async () => {
+        const text = tf('result.share', [type, desc, location.href]);
+        try {
+          await navigator.clipboard.writeText(text);
+          copyBtn.setLabel(t('result.copied'));
+        } catch {
+          copyBtn.setLabel(t('result.copyFail'));
+        }
+      },
     });
 
-    const againBtn = this.add
-      .text(cx, 570, t('result.again'), {
-        fontSize: '20px',
-        color: '#ffcc00',
-        backgroundColor: '#ffffff11',
-        padding: { x: 16, y: 10 },
-      })
-      .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true });
-    againBtn.on('pointerdown', () => this.scene.start('Start'));
+    new Button(this, cx, 575, t('result.again'), {
+      width: 240,
+      height: 54,
+      fontSize: 20,
+      bg: 0xd9a521,
+      bgHover: 0xf0b93a,
+      onClick: () => this.scene.start('Start'),
+    });
   }
 }
