@@ -8,6 +8,7 @@ import { Controls } from '../input/Controls';
 import { ScoreTracker } from '../core/ScoreTracker';
 import { shouldAutoComplete } from '../core/progression';
 import { DIMENSIONS, LETTERS_OF, questionsForDimension } from '../config/questions';
+import { pickQuestions } from '../core/pickQuestions';
 import type { QuestionDef } from '../config/questions';
 import { t, tf } from '../i18n/t';
 import type { StringKey } from '../i18n/t';
@@ -56,7 +57,11 @@ export class GameScene extends Phaser.Scene {
     this.score = data.score;
     // 從尚未鎖定的維度接續（重玩時保留已鎖定的維度）
     this.dimIndex = this.score.lockedCount();
-    this.questions = questionsForDimension(DIMENSIONS[this.dimIndex]);
+    this.questions = pickQuestions(
+      questionsForDimension(DIMENSIONS[this.dimIndex]),
+      GAME.questionsPerLevel,
+      Math.random,
+    );
     this.nextQuestionIdx = 0;
     this.dimAnsweredIds.clear();
     this.platformsSinceFork = 0;
@@ -351,7 +356,11 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    this.questions = questionsForDimension(DIMENSIONS[this.dimIndex]);
+    this.questions = pickQuestions(
+      questionsForDimension(DIMENSIONS[this.dimIndex]),
+      GAME.questionsPerLevel,
+      Math.random,
+    );
     this.nextQuestionIdx = 0;
     this.dimAnsweredIds.clear();
     this.platformsSinceFork = 0;
