@@ -15,7 +15,7 @@ import type { StringKey } from '../i18n/t';
 import { prefersReducedMotion } from '../ui/reducedMotion';
 import { Sfx } from '../audio/Sfx';
 import { MuteButton } from '../ui/MuteButton';
-import { LETTER_COLORS } from '../theme/palette';
+import { LETTER_COLORS, letterHex } from '../theme/palette';
 import { scoreBarModel } from '../core/scoreBar';
 
 interface GameInit {
@@ -162,13 +162,13 @@ export class GameScene extends Phaser.Scene {
       fontFamily: 'Nunito, system-ui, sans-serif',
     };
     this.previewLeft = this.add
-      .text(12, 158, '', { ...previewStyle, color: '#5effa0', align: 'left' })
+      .text(12, 158, '', { ...previewStyle, color: '#ffffff', align: 'left' })
       .setOrigin(0, 0)
       .setScrollFactor(0)
       .setDepth(20)
       .setAlpha(0);
     this.previewRight = this.add
-      .text(GAME.width - 12, 158, '', { ...previewStyle, color: '#ff8a99', align: 'right' })
+      .text(GAME.width - 12, 158, '', { ...previewStyle, color: '#ffffff', align: 'right' })
       .setOrigin(1, 0)
       .setScrollFactor(0)
       .setDepth(20)
@@ -334,8 +334,8 @@ export class GameScene extends Phaser.Scene {
   private updatePreview(questionIdx: number): void {
     const q = this.questions[questionIdx];
     if (!q) return;
-    this.previewLeft.setText(`◀ ${t(`q.${q.id}.yes` as StringKey)}`);
-    this.previewRight.setText(`${t(`q.${q.id}.no` as StringKey)} ▶`);
+    this.previewLeft.setText(`◀ ${t(`q.${q.id}.yes` as StringKey)}`).setColor(letterHex(q.yes.side));
+    this.previewRight.setText(`${t(`q.${q.id}.no` as StringKey)} ▶`).setColor(letterHex(q.no.side));
   }
 
   private updateLevelLabel(): void {
