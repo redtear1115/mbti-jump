@@ -40,7 +40,9 @@ export class Platform extends Phaser.Physics.Arcade.Sprite {
     p.kind = 'question';
     p.side = opts.side;
     p.questionId = opts.questionId;
-    p.setTint(LETTER_COLORS[opts.side]); // 依 MBTI 字母上色（取代固定紅/綠）
+    // 依 MBTI 字母上色（取代固定紅/綠）。假設底圖為中性色（QUESTION_KEY 白底）；
+    // 若日後為 platformYes/No 加入彩色點陣圖，需改為中性圖或移除此 tint 以免疊色。
+    p.setTint(LETTER_COLORS[opts.side]);
     scene.add
       .text(x, y, opts.label, {
         fontSize: '18px',
