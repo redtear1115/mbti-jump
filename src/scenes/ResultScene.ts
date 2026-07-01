@@ -7,6 +7,7 @@ import type { StringKey } from '../i18n/t';
 import { Button } from '../ui/Button';
 import { MuteButton } from '../ui/MuteButton';
 import { groupOf, groupColorOf } from '../core/temperament';
+import { recordPlay } from '../core/profile';
 
 interface ResultInit {
   score: ScoreTracker;
@@ -19,6 +20,7 @@ export class ResultScene extends Phaser.Scene {
 
   create(data: ResultInit) {
     const type = data.score.result();
+    recordPlay(type, data.score.allTallies());
     const desc = describeType(type);
     const group = groupOf(type);
     const groupHex = '#' + groupColorOf(type).toString(16).padStart(6, '0');
@@ -79,6 +81,16 @@ export class ResultScene extends Phaser.Scene {
       bg: 0xd9a521,
       bgHover: 0xf0b93a,
       onClick: () => this.scene.start('Start'),
+    });
+
+    new Button(this, cx, 640, t('trend.cta'), {
+      width: 240,
+      height: 50,
+      fontSize: 18,
+      bg: 0x4298b4,
+      bgHover: 0x54aec9,
+      bgDown: 0x3a86a0,
+      onClick: () => this.scene.start('Trend'),
     });
 
     new MuteButton(this, GAME.width - 26, 26);
