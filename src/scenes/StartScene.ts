@@ -1,11 +1,13 @@
 import Phaser from 'phaser';
 import { GAME } from '../config/gameConfig';
 import { ScoreTracker } from '../core/ScoreTracker';
-import { t } from '../i18n/t';
+import { t, tf } from '../i18n/t';
 import { getLocale, setLocale } from '../i18n/store';
 import { SUPPORTED_LOCALES, LOCALE_LABELS } from '../i18n/locales';
 import { Button } from '../ui/Button';
 import { MuteButton } from '../ui/MuteButton';
+import { getInvite } from '../core/invite';
+import { groupColorOf } from '../core/temperament';
 
 type OrientationPermissionApi = {
   requestPermission?: () => Promise<'granted' | 'denied'>;
@@ -37,6 +39,21 @@ export class StartScene extends Phaser.Scene {
         fontFamily: 'Nunito, system-ui, sans-serif',
       })
       .setOrigin(0.5);
+
+    // 好友邀請打招呼（tagline 與語言選單之間）
+    const friend = getInvite();
+    if (friend) {
+      const friendHex = '#' + groupColorOf(friend).toString(16).padStart(6, '0');
+      this.add
+        .text(cx, 302, tf('invite.greeting', [friend]), {
+          fontSize: '15px',
+          color: friendHex,
+          align: 'center',
+          wordWrap: { width: GAME.width - 60 },
+          fontFamily: 'Nunito, system-ui, sans-serif',
+        })
+        .setOrigin(0.5);
+    }
 
     // 語言選單：橫排小按鈕，當前語言高亮，點選即切換並重繪
     this.add
