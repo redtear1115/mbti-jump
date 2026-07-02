@@ -24,10 +24,18 @@ describe('playerColorFor', () => {
     expect(playerColorFor(['E'])).toBe(0xc9b0c6);
   });
 
-  it('lands at 75% of the four-letter average after four locks', () => {
-    // INFP: I 2e6d86, N 6e79b0, F 33a474, P e09a3a → avg (108,137,121)
-    // t=0.75: r=192-63=129, g=174-27.75≈146, b=226-78.75≈147 → 0x819293
-    expect(playerColorFor(['I', 'N', 'F', 'P'])).toBe(0x819293);
+  it('lands at 75% of the group color after four locks (avoids muddy-gray average)', () => {
+    // INFP → diplomat group color 0x33a474 (51,164,116); base (192,174,226); t=0.75
+    // r=192-105.75=86.25→86, g=174-7.5=166.5→167, b=226-82.5=143.5→144 → 0x56a790
+    expect(playerColorFor(['I', 'N', 'F', 'P'])).toBe(0x56a790);
+  });
+
+  it('still uses the average path for three locked letters', () => {
+    // I 2e6d86, N 6e79b0, F 33a474 → avg r=69, g≈131.33→131, b=142
+    // t=0.75*3/4=0.5625: r=192-123*0.5625≈123, g=174-43*0.5625≈150, b=226-84*0.5625≈179 → 0x7b96b3
+    const three = playerColorFor(['I', 'N', 'F']);
+    expect(three).toBe(0x7b96b3);
+    expect(three).not.toBe(playerColorFor(['I', 'N', 'F', 'P']));
   });
 
   it('each channel stays between base and target', () => {

@@ -68,7 +68,7 @@ export class StartScene extends Phaser.Scene {
           fontSize: '15px',
           color: friendHex,
           align: 'center',
-          wordWrap: { width: GAME.width - 60 },
+          wordWrap: { width: GAME.width - 60, useAdvancedWrap: true },
           fontFamily: 'Nunito, system-ui, sans-serif',
         })
         .setOrigin(0.5);

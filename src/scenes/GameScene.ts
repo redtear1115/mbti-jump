@@ -127,7 +127,7 @@ export class GameScene extends Phaser.Scene {
         fontStyle: 'bold',
         color: '#ffffff',
         align: 'center',
-        wordWrap: { width: GAME.width - 24 },
+        wordWrap: { width: GAME.width - 24, useAdvancedWrap: true },
         fontFamily: 'Fredoka, system-ui, sans-serif',
       })
       .setOrigin(0.5, 0)

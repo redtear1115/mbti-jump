@@ -1,5 +1,6 @@
 import { LETTER_COLORS } from '../theme/palette';
 import type { Letter } from '../config/questions';
+import { groupColorOf } from './temperament';
 
 /** 果凍怪基底色（百變怪淡紫）。 */
 export const PLAYER_BASE_COLOR = 0xc0aee2;
@@ -15,11 +16,16 @@ export function lerpColor(a: number, b: number, t: number): number {
 
 /**
  * 已鎖定字母 → 果凍怪身體色。
- * 基底紫向「已鎖字母色的 RGB 平均」靠近 0.75*k/4：
- * 四關鎖完 = 75% 字母混色 + 25% 基底（保留角色識別）。
+ * 0-3 碼：基底紫向「已鎖字母色的 RGB 平均」靠近 0.75*k/4（k=已鎖數）。
+ * 四碼鎖完：改向「四碼所屬族群色」靠近 0.75，避免四色互補平均後偏灰
+ * （例：INFP 四色平均會塌成 0x819293 的灰綠，改用族群色 0x33a474 混色更有識別度）。
  */
 export function playerColorFor(letters: Letter[]): number {
   if (letters.length === 0) return PLAYER_BASE_COLOR;
+  const n = letters.length;
+  if (n === 4) {
+    return lerpColor(PLAYER_BASE_COLOR, groupColorOf(letters.join('')), 0.75);
+  }
   let r = 0;
   let g = 0;
   let b = 0;
@@ -29,7 +35,6 @@ export function playerColorFor(letters: Letter[]): number {
     g += (c >> 8) & 0xff;
     b += c & 0xff;
   }
-  const n = letters.length;
   const avg = (Math.round(r / n) << 16) | (Math.round(g / n) << 8) | Math.round(b / n);
   return lerpColor(PLAYER_BASE_COLOR, avg, 0.75 * (n / 4));
 }

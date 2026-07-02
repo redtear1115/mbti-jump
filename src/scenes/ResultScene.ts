@@ -137,7 +137,7 @@ export class ResultScene extends Phaser.Scene {
         fontSize: '18px',
         color: '#ffffff',
         align: 'center',
-        wordWrap: { width: GAME.width - 60 },
+        wordWrap: { width: GAME.width - 60, useAdvancedWrap: true },
         fontFamily: 'Nunito, system-ui, sans-serif',
       })
       .setOrigin(0.5);
@@ -150,7 +150,7 @@ export class ResultScene extends Phaser.Scene {
           fontSize: '16px',
           color: '#ffe066',
           align: 'center',
-          wordWrap: { width: GAME.width - 60 },
+          wordWrap: { width: GAME.width - 60, useAdvancedWrap: true },
           fontFamily: 'Nunito, system-ui, sans-serif',
         })
         .setOrigin(0.5);
