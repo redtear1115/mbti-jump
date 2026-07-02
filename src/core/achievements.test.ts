@@ -57,3 +57,38 @@ describe('achievements', () => {
     expect(newlyUnlocked(plays, ['first_play', 'persistent', 'creature_of_habit'])).toEqual([]);
   });
 });
+
+describe('progress', () => {
+  const byId = new Map(ACHIEVEMENTS.map((a) => [a.id, a]));
+  const prog = (id: string, plays: PlayRecord[]) => byId.get(id)!.progress!(plays);
+
+  it('event-based achievements have no progress', () => {
+    expect(byId.get('decisive')!.progress).toBeUndefined();
+    expect(byId.get('torn')!.progress).toBeUndefined();
+  });
+
+  it('play-count achievements count plays and cap at target', () => {
+    expect(prog('first_play', [])).toEqual({ current: 0, target: 1 });
+    expect(prog('first_play', repeat(mk('ENFP'), 3))).toEqual({ current: 1, target: 1 });
+    expect(prog('persistent', repeat(mk('ENFP'), 4))).toEqual({ current: 4, target: 10 });
+    expect(prog('persistent', repeat(mk('ENFP'), 12))).toEqual({ current: 10, target: 10 });
+    expect(prog('dedicated', repeat(mk('ENFP'), 25))).toEqual({ current: 25, target: 25 });
+  });
+
+  it('collector counts distinct types', () => {
+    expect(prog('collector', [mk('ENFP'), mk('ENFP'), mk('INTJ')])).toEqual({ current: 2, target: 16 });
+    expect(prog('collector', ALL16.map((t) => mk(t)))).toEqual({ current: 16, target: 16 });
+  });
+
+  it('four_realms counts distinct groups', () => {
+    // ENFP=diplomat, INTJ=analyst → 2 族群
+    expect(prog('four_realms', [mk('ENFP'), mk('INTJ')])).toEqual({ current: 2, target: 4 });
+    expect(prog('four_realms', [mk('ENFP'), mk('INTJ'), mk('ISTJ'), mk('ESTP')])).toEqual({ current: 4, target: 4 });
+  });
+
+  it('creature_of_habit tracks max same-type count', () => {
+    expect(prog('creature_of_habit', [])).toEqual({ current: 0, target: 3 });
+    expect(prog('creature_of_habit', [mk('ENFP'), mk('INTJ'), mk('ENFP')])).toEqual({ current: 2, target: 3 });
+    expect(prog('creature_of_habit', repeat(mk('ENFP'), 5))).toEqual({ current: 3, target: 3 });
+  });
+});

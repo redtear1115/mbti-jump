@@ -5,11 +5,30 @@ import { DIMENSIONS } from '../config/questions';
 export interface Achievement {
   id: string;
   check: (plays: readonly PlayRecord[]) => boolean;
+  /** 可計數成就的進度（current 以 target 封頂）；事件型成就（decisive/torn）不提供。 */
+  progress?: (plays: readonly PlayRecord[]) => { current: number; target: number };
 }
 
 function distinctTypes(plays: readonly PlayRecord[]): Set<string> {
   return new Set(plays.map((p) => p.type));
 }
+
+function distinctGroups(plays: readonly PlayRecord[]): Set<string> {
+  return new Set(plays.map((p) => groupOf(p.type)));
+}
+
+function maxSameTypeCount(plays: readonly PlayRecord[]): number {
+  const counts = new Map<string, number>();
+  let max = 0;
+  for (const p of plays) {
+    const c = (counts.get(p.type) ?? 0) + 1;
+    counts.set(p.type, c);
+    if (c > max) max = c;
+  }
+  return max;
+}
+
+const capped = (current: number, target: number) => ({ current: Math.min(current, target), target });
 
 /** 是否有任一場的任一維度 tally 符合 pred(first, second)。 */
 function anyDimension(
@@ -26,32 +45,14 @@ function anyDimension(
 }
 
 export const ACHIEVEMENTS: Achievement[] = [
-  { id: 'first_play', check: (p) => p.length >= 1 },
-  { id: 'persistent', check: (p) => p.length >= 10 },
-  { id: 'dedicated', check: (p) => p.length >= 25 },
-  { id: 'collector', check: (p) => distinctTypes(p).size >= 16 },
-  {
-    id: 'four_realms',
-    check: (p) => {
-      const groups = new Set<string>();
-      for (const play of p) groups.add(groupOf(play.type));
-      return groups.size >= 4;
-    },
-  },
+  { id: 'first_play', check: (p) => p.length >= 1, progress: (p) => capped(p.length, 1) },
+  { id: 'persistent', check: (p) => p.length >= 10, progress: (p) => capped(p.length, 10) },
+  { id: 'dedicated', check: (p) => p.length >= 25, progress: (p) => capped(p.length, 25) },
+  { id: 'collector', check: (p) => distinctTypes(p).size >= 16, progress: (p) => capped(distinctTypes(p).size, 16) },
+  { id: 'four_realms', check: (p) => distinctGroups(p).size >= 4, progress: (p) => capped(distinctGroups(p).size, 4) },
   { id: 'decisive', check: (p) => anyDimension(p, (a, b) => (a === 5 && b === 0) || (a === 0 && b === 5)) },
   { id: 'torn', check: (p) => anyDimension(p, (a, b) => a + b === 5 && Math.abs(a - b) === 1) },
-  {
-    id: 'creature_of_habit',
-    check: (p) => {
-      const counts = new Map<string, number>();
-      for (const play of p) {
-        const c = (counts.get(play.type) ?? 0) + 1;
-        counts.set(play.type, c);
-        if (c >= 3) return true;
-      }
-      return false;
-    },
-  },
+  { id: 'creature_of_habit', check: (p) => maxSameTypeCount(p) >= 3, progress: (p) => capped(maxSameTypeCount(p), 3) },
 ];
 
 export function unlockedIds(plays: readonly PlayRecord[]): Set<string> {
