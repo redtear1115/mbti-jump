@@ -35,6 +35,20 @@ export const ES: Record<StringKey, string> = {
   'result.saved': 'Guardado ✓',
   'result.saveFail': 'Error al guardar',
   'card.tagline': 'MBTI Jump — salta y descubre tu personalidad',
+
+  // --- 分享閉環（needs-review: AI 草稿，待母語校稿） ---
+  'og.title': 'MBTI Jump — ¡Soy {0}!',
+  'og.cta': '¿Qué tipo eres? ¡Salta y descúbrelo!',
+  'share.action': 'Compartir resultado ↗',
+  'share.doneFallback': 'Copiado ✓ Tarjeta descargada',
+  'share.fail': 'Error al compartir',
+  'invite.greeting': 'Tu amigo es {0}: ¡mide vuestra compatibilidad!',
+  'compare.0': 'Tú y {0} no compartís ninguna letra: ¡complementos perfectos!',
+  'compare.1': 'Tú y {0} compartís 1 letra: chispas de mundos distintos.',
+  'compare.2': 'Tú y {0} compartís 2 letras: mitad parecidos, mitad sorpresa.',
+  'compare.3': 'Tú y {0} compartís 3 letras: ¡almas afines!',
+  'compare.4': '¡{0} y tú sois del mismo tipo: almas gemelas!',
+
   'trend.title': 'Tus tendencias',
   'trend.cta': 'Tendencias 📊',
   'trend.totalPlays': 'Jugado {0} veces',

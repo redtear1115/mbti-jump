@@ -34,6 +34,20 @@ export const ZH_HANT: Record<StringKey, string> = {
   'result.saved': '已下載 ✓',
   'result.saveFail': '下載失敗',
   'card.tagline': 'MBTI Jump · 玩一場，跳出你的人格',
+
+  // --- 分享閉環 ---
+  'og.title': 'MBTI Jump — 我是 {0}！',
+  'og.cta': '你是什麼型？跳跳看就知道！',
+  'share.action': '分享結果 ↗',
+  'share.doneFallback': '已複製 ✓ 卡片已下載',
+  'share.fail': '分享失敗',
+  'invite.greeting': '你的朋友是 {0}，測測你們合不合！',
+  'compare.0': '你和 {0} 四個字母全不同——完美互補！',
+  'compare.1': '你和 {0} 有 1 個字母相同——來自不同世界的火花。',
+  'compare.2': '你和 {0} 有 2 個字母相同——一半相似、一半驚喜。',
+  'compare.3': '你和 {0} 有 3 個字母相同——靈魂近親！',
+  'compare.4': '你和 {0} 是同型——根本靈魂雙胞胎！',
+
   'trend.title': '你的趨勢',
   'trend.cta': '趨勢 📊',
   'trend.totalPlays': '已玩 {0} 次',

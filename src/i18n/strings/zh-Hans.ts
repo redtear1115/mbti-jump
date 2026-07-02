@@ -34,6 +34,20 @@ export const ZH_HANS: Record<StringKey, string> = {
   'result.saved': '已下载 ✓',
   'result.saveFail': '下载失败',
   'card.tagline': 'MBTI Jump · 玩一场，跳出你的人格',
+
+  // --- 分享闭环 ---
+  'og.title': 'MBTI Jump — 我是 {0}！',
+  'og.cta': '你是什么型？跳跳看就知道！',
+  'share.action': '分享结果 ↗',
+  'share.doneFallback': '已复制 ✓ 卡片已下载',
+  'share.fail': '分享失败',
+  'invite.greeting': '你的朋友是 {0}，测测你们合不合！',
+  'compare.0': '你和 {0} 四个字母全不同——完美互补！',
+  'compare.1': '你和 {0} 有 1 个字母相同——来自不同世界的火花。',
+  'compare.2': '你和 {0} 有 2 个字母相同——一半相似、一半惊喜。',
+  'compare.3': '你和 {0} 有 3 个字母相同——灵魂近亲！',
+  'compare.4': '你和 {0} 是同型——简直灵魂双胞胎！',
+
   'trend.title': '你的趋势',
   'trend.cta': '趋势 📊',
   'trend.totalPlays': '已玩 {0} 次',
