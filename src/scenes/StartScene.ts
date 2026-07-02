@@ -8,6 +8,9 @@ import { Button } from '../ui/Button';
 import { MuteButton } from '../ui/MuteButton';
 import { getInvite } from '../core/invite';
 import { groupColorOf } from '../core/temperament';
+import { ensurePlayerTexture } from '../entities/Player';
+import { PLAYER_BASE_COLOR } from '../core/playerColor';
+import { prefersReducedMotion } from '../ui/reducedMotion';
 
 type OrientationPermissionApi = {
   requestPermission?: () => Promise<'granted' | 'denied'>;
@@ -22,6 +25,23 @@ export class StartScene extends Phaser.Scene {
     this.cameras.main.setBackgroundColor('#1a1c2c');
     const cx = GAME.width / 2;
     const current = getLocale();
+
+    // Hero 果凍怪：標題上方 idle 呼吸（reduced-motion 靜態）
+    // 一律用 proc texture；若日後重新引入點陣 player 資產，需比照 Player 的 ASSET_KEYS fallback
+    const hero = this.add
+      .image(cx, 92, ensurePlayerTexture(this, PLAYER_BASE_COLOR))
+      .setScale(1.8);
+    if (!prefersReducedMotion()) {
+      this.tweens.add({
+        targets: hero,
+        scaleY: { from: 1.8 * 0.94, to: 1.8 * 1.03 },
+        y: { from: 96, to: 88 },
+        duration: 1200,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
+    }
 
     this.add
       .text(cx, 170, t('start.title'), {
@@ -49,7 +69,7 @@ export class StartScene extends Phaser.Scene {
           fontSize: '15px',
           color: friendHex,
           align: 'center',
-          wordWrap: { width: GAME.width - 60 },
+          wordWrap: { width: GAME.width - 60, useAdvancedWrap: true },
           fontFamily: 'Nunito, system-ui, sans-serif',
         })
         .setOrigin(0.5);

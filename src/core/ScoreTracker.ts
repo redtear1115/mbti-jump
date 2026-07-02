@@ -54,6 +54,11 @@ export class ScoreTracker {
     return this.locked.size;
   }
 
+  /** 已鎖定維度的字母，依 DIMENSIONS 順序（未鎖定略過）。 */
+  lockedLetters(): Letter[] {
+    return DIMENSIONS.filter((d) => this.locked.has(d)).map((d) => this.locked.get(d)!);
+  }
+
   /** 當前關某維度兩側的即時票數 [第一字母, 第二字母]，供 HUD 顯示目前取向。 */
   tallyFor(d: Dimension): [number, number] {
     const [a, b] = LETTERS_OF[d];

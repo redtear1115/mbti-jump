@@ -15,6 +15,7 @@ import { chipRect } from '../core/hud';
 import { t, tf } from '../i18n/t';
 import type { StringKey } from '../i18n/t';
 import { prefersReducedMotion } from '../ui/reducedMotion';
+import { playerColorFor } from '../core/playerColor';
 import { Sfx } from '../audio/Sfx';
 import { MuteButton } from '../ui/MuteButton';
 import { scoreBarModel } from '../core/scoreBar';
@@ -101,7 +102,7 @@ export class GameScene extends Phaser.Scene {
       this.spawnNextRow();
     }
 
-    this.player = new Player(this, GAME.width / 2, GAME.height - 90);
+    this.player = new Player(this, GAME.width / 2, GAME.height - 90, playerColorFor(this.score.lockedLetters()));
     this.player.bounce();
 
     this.physics.add.collider(
@@ -126,7 +127,7 @@ export class GameScene extends Phaser.Scene {
         fontStyle: 'bold',
         color: '#ffffff',
         align: 'center',
-        wordWrap: { width: GAME.width - 24 },
+        wordWrap: { width: GAME.width - 24, useAdvancedWrap: true },
         fontFamily: 'Fredoka, system-ui, sans-serif',
       })
       .setOrigin(0.5, 0)
@@ -166,7 +167,7 @@ export class GameScene extends Phaser.Scene {
       fontSize: '17px',
       fontStyle: 'bold',
       color: PALETTE.textOn,
-      wordWrap: { width: GAME.width * 0.44 },
+      wordWrap: { width: GAME.width * 0.44, useAdvancedWrap: true },
       fontFamily: 'Nunito, system-ui, sans-serif',
     };
     this.chipLeft = this.add.graphics().setScrollFactor(0).setDepth(19.5).setAlpha(0);
@@ -424,6 +425,7 @@ export class GameScene extends Phaser.Scene {
     // 平手時以玩家當下水平位置決定：靠左(Yes側)→第一字母、靠右(No側)→第二字母。
     const tieBreak = this.player.x < GAME.width / 2 ? 'first' : 'second';
     this.score.completeLevel(DIMENSIONS[this.dimIndex], tieBreak);
+    this.player.recolor(playerColorFor(this.score.lockedLetters())); // 第 4 次鎖定的 pop 會被立即切場吃掉——刻意保留：預先生成最終色 texture 供 ResultScene 快取命中
     Sfx.play('advance');
     this.advanceDimension();
   }
@@ -470,7 +472,7 @@ export class GameScene extends Phaser.Scene {
         align: 'center',
         stroke: '#000000',
         strokeThickness: 5,
-        wordWrap: { width: GAME.width - 40 },
+        wordWrap: { width: GAME.width - 40, useAdvancedWrap: true },
         fontFamily: 'Fredoka, system-ui, sans-serif',
       })
       .setOrigin(0.5)

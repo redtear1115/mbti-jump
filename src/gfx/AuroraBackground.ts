@@ -2,8 +2,7 @@ import Phaser from 'phaser';
 import { GAME } from '../config/gameConfig';
 import { LETTER_COLORS } from '../theme/palette';
 import { DIMENSIONS, LETTERS_OF } from '../config/questions';
-
-const GLOW_KEY = 'aurora-glow';
+import { ensureGlowTexture } from './glowTexture';
 
 /**
  * 兩團維度色柔光緩慢飄移的程序背景（無美術資產）。
@@ -15,10 +14,10 @@ export class AuroraBackground {
   private glowB: Phaser.GameObjects.Image;
 
   constructor(scene: Phaser.Scene, reducedMotion: boolean) {
-    ensureGlowTexture(scene);
+    const glowKey = ensureGlowTexture(scene);
     const mk = () =>
       scene.add
-        .image(0, 0, GLOW_KEY)
+        .image(0, 0, glowKey)
         .setScrollFactor(0)
         .setDepth(-11)
         .setBlendMode(Phaser.BlendModes.SCREEN)
@@ -57,20 +56,4 @@ export class AuroraBackground {
     this.glowA.setTint(LETTER_COLORS[a]);
     this.glowB.setTint(LETTER_COLORS[b]);
   }
-}
-
-function ensureGlowTexture(scene: Phaser.Scene): void {
-  if (scene.textures.exists(GLOW_KEY)) return;
-  const size = 256;
-  const canvas = scene.textures.createCanvas(GLOW_KEY, size, size);
-  if (!canvas) return;
-  const ctx = canvas.getContext();
-  const grd = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-  // 亮度整體 ×0.85（P0 可讀性：前景圖底分離），氛圍仍在
-  grd.addColorStop(0, 'rgba(255,255,255,0.765)');
-  grd.addColorStop(0.5, 'rgba(255,255,255,0.272)');
-  grd.addColorStop(1, 'rgba(255,255,255,0)');
-  ctx.fillStyle = grd;
-  ctx.fillRect(0, 0, size, size);
-  canvas.refresh();
 }

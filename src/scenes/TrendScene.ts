@@ -37,7 +37,7 @@ export class TrendScene extends Phaser.Scene {
           fontSize: '18px',
           color: '#ffffffcc',
           align: 'center',
-          wordWrap: { width: GAME.width - 60 },
+          wordWrap: { width: GAME.width - 60, useAdvancedWrap: true },
         })
         .setOrigin(0.5);
     } else {

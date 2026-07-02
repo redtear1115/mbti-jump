@@ -122,3 +122,19 @@ describe('ScoreTracker', () => {
     expect(s.allTallies().SN).toEqual([0, 0]);
   });
 });
+
+describe('lockedLetters', () => {
+  it('is empty before any lock', () => {
+    expect(new ScoreTracker().lockedLetters()).toEqual([]);
+  });
+
+  it('returns letters in DIMENSIONS order as levels lock', () => {
+    const s = new ScoreTracker();
+    s.recordAnswer('I');
+    s.completeLevel('EI');
+    expect(s.lockedLetters()).toEqual(['I']);
+    s.recordAnswer('N');
+    s.completeLevel('SN');
+    expect(s.lockedLetters()).toEqual(['I', 'N']);
+  });
+});

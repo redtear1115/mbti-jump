@@ -16,6 +16,11 @@ import { renderShareCard, canvasToBlob, downloadBlob } from '../share/shareCard'
 import { getLocale } from '../i18n/store';
 import { getInvite } from '../core/invite';
 import { sharedLetters, compareKey } from '../core/compare';
+import { ensureGlowTexture } from '../gfx/glowTexture';
+import { ensurePlayerTexture } from '../entities/Player';
+import { playerColorFor } from '../core/playerColor';
+import { letterHex } from '../theme/palette';
+import type { Letter } from '../config/questions';
 
 interface ResultInit {
   score: ScoreTracker;
@@ -37,18 +42,36 @@ export class ResultScene extends Phaser.Scene {
     const desc = describeType(type);
     const group = groupOf(type);
     const groupHex = '#' + groupColorOf(type).toString(16).padStart(6, '0');
-    this.cameras.main.setBackgroundColor('#1a1c2c');
+    this.cameras.main.setBackgroundColor('#101018');
     const cx = GAME.width / 2;
+    const reduce = prefersReducedMotion();
+
+    // 族群色 radial glow（與分享卡同視覺語言）
+    this.add
+      .image(cx, 300, ensureGlowTexture(this))
+      .setDisplaySize(900, 900)
+      .setBlendMode(Phaser.BlendModes.SCREEN)
+      .setTint(groupColorOf(type));
+
+    // 最終色果凍怪：你的顏色，elastic pop 入場
+    // 一律用 proc texture；若日後重新引入點陣 player 資產，需比照 Player 的 ASSET_KEYS fallback
+    const jelly = this.add
+      .image(cx, 120, ensurePlayerTexture(this, playerColorFor(type.split('') as Letter[])))
+      .setScale(2);
+    if (!reduce) {
+      jelly.setScale(0);
+      this.tweens.add({ targets: jelly, scale: 2, duration: 500, ease: 'Back.easeOut' });
+    }
 
     this.add
-      .text(cx, 180, t('result.heading'), {
-        fontSize: '18px',
+      .text(cx, 48, t('result.heading'), {
+        fontSize: '16px',
         color: '#ffffffaa',
         fontFamily: 'Fredoka, system-ui, sans-serif',
       })
       .setOrigin(0.5);
     this.add
-      .text(cx, 250, type, {
+      .text(cx, 210, type, {
         fontSize: '72px',
         color: groupHex,
         fontStyle: 'bold',
@@ -56,18 +79,66 @@ export class ResultScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
     this.add
-      .text(cx, 320, tf('result.groupLabel', [t(`group.${group}` as StringKey)]), {
+      .text(cx, 268, tf('result.groupLabel', [t(`group.${group}` as StringKey)]), {
         fontFamily: 'Fredoka, system-ui, sans-serif',
         fontSize: '20px',
         color: groupHex,
       })
       .setOrigin(0.5);
+
+    // 四維度傾向條（分享卡視覺的 Phaser 版；divider 由中點動畫到實際位置）
+    const model = buildShareCardModel(type, data.score.allTallies(), getLocale());
+    const barGfx = this.add.graphics();
+    const barX = cx - 130;
+    const barW = 260;
+    const barH = 16;
+    const topY = 310;
+    const pitch = 30;
+    model.dims.forEach((d, i) => {
+      const y = topY + i * pitch + barH / 2;
+      const labelStyle = {
+        fontSize: '13px',
+        fontStyle: 'bold',
+        fontFamily: 'Nunito, system-ui, sans-serif',
+      };
+      this.add
+        .text(barX - 10, y, d.leftLetter, { ...labelStyle, color: letterHex(d.leftLetter) })
+        .setOrigin(1, 0.5);
+      this.add
+        .text(barX + barW + 10, y, d.rightLetter, { ...labelStyle, color: letterHex(d.rightLetter) })
+        .setOrigin(0, 0.5);
+    });
+    const drawBars = (progress: number) => {
+      barGfx.clear();
+      model.dims.forEach((d, i) => {
+        const y = topY + i * pitch;
+        barGfx.fillGradientStyle(d.leftColor, d.rightColor, d.leftColor, d.rightColor, 1);
+        barGfx.fillRoundedRect(barX, y, barW, barH, 8);
+        const frac = 0.5 + (d.dividerFrac - 0.5) * progress;
+        barGfx.fillStyle(0xffffff, 1);
+        barGfx.fillRect(barX + frac * barW - 2, y - 2, 4, barH + 4);
+      });
+    };
+    if (reduce) {
+      drawBars(1);
+    } else {
+      const anim = { p: 0 };
+      drawBars(0);
+      this.tweens.add({
+        targets: anim,
+        p: 1,
+        duration: 400,
+        ease: 'Cubic.easeOut',
+        onUpdate: () => drawBars(anim.p),
+      });
+    }
+
     this.add
-      .text(cx, 390, desc, {
+      .text(cx, 470, desc, {
         fontSize: '18px',
         color: '#ffffff',
         align: 'center',
-        wordWrap: { width: GAME.width - 60 },
+        wordWrap: { width: GAME.width - 60, useAdvancedWrap: true },
         fontFamily: 'Nunito, system-ui, sans-serif',
       })
       .setOrigin(0.5);
@@ -76,17 +147,17 @@ export class ResultScene extends Phaser.Scene {
     const friend = getInvite();
     if (friend) {
       this.add
-        .text(cx, 458, tf(compareKey(sharedLetters(type, friend)), [friend]), {
+        .text(cx, 535, tf(compareKey(sharedLetters(type, friend)), [friend]), {
           fontSize: '16px',
           color: '#ffe066',
           align: 'center',
-          wordWrap: { width: GAME.width - 60 },
+          wordWrap: { width: GAME.width - 60, useAdvancedWrap: true },
           fontFamily: 'Nunito, system-ui, sans-serif',
         })
         .setOrigin(0.5);
     }
 
-    const shareBtn = new Button(this, cx, 530, t('share.action'), {
+    const shareBtn = new Button(this, cx, 585, t('share.action'), {
       width: 240,
       height: 54,
       fontSize: 20,
@@ -125,7 +196,7 @@ export class ResultScene extends Phaser.Scene {
       },
     });
 
-    new Button(this, cx, 610, t('result.again'), {
+    new Button(this, cx, 650, t('result.again'), {
       width: 240,
       height: 54,
       fontSize: 20,
@@ -134,7 +205,7 @@ export class ResultScene extends Phaser.Scene {
       onClick: () => this.scene.start('Start'),
     });
 
-    new Button(this, cx, 680, t('trend.cta'), {
+    new Button(this, cx, 712, t('trend.cta'), {
       width: 240,
       height: 50,
       fontSize: 18,
