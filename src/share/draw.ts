@@ -28,6 +28,33 @@ export function roundRect(
   ctx.closePath();
 }
 
+/** CJK 統一表意文字、假名及全形標點範圍：這些字元視為獨立斷行單位（不需空白）。 */
+const CJK_RE = /[⺀-鿿぀-ヿㇰ-ㇿ豈-﫿！-｠]/;
+
+/** 將文字切成斷行單位：CJK 字元各自成一個 token，拉丁文字則保留完整單字（以空白分隔）。 */
+function tokenize(text: string): { value: string; cjk: boolean }[] {
+  const tokens: { value: string; cjk: boolean }[] = [];
+  let buf = '';
+  const flush = () => {
+    if (buf) {
+      tokens.push({ value: buf, cjk: false });
+      buf = '';
+    }
+  };
+  for (const ch of text) {
+    if (CJK_RE.test(ch)) {
+      flush();
+      tokens.push({ value: ch, cjk: true });
+    } else if (/\s/.test(ch)) {
+      flush();
+    } else {
+      buf += ch;
+    }
+  }
+  flush();
+  return tokens;
+}
+
 export function wrapText(
   ctx: CanvasRenderingContext2D,
   text: string,
@@ -36,14 +63,15 @@ export function wrapText(
   maxWidth: number,
   lineHeight: number,
 ): void {
-  const words = text.split(/\s+/);
+  const tokens = tokenize(text);
   let line = '';
   let yy = y;
-  for (const word of words) {
-    const test = line ? `${line} ${word}` : word;
+  for (const token of tokens) {
+    const joiner = line && !token.cjk ? ' ' : '';
+    const test = line ? `${line}${joiner}${token.value}` : token.value;
     if (ctx.measureText(test).width > maxWidth && line) {
       ctx.fillText(line, cx, yy);
-      line = word;
+      line = token.value;
       yy += lineHeight;
     } else {
       line = test;
