@@ -146,9 +146,7 @@ export class GameScene extends Phaser.Scene {
     const scoreLabelStyle = {
       fontSize: '14px',
       fontStyle: 'bold',
-      color: '#ffffff',
-      stroke: '#000000',
-      strokeThickness: 3,
+      color: PALETTE.textOn,
       fontFamily: 'Nunito, system-ui, sans-serif',
     };
     this.scoreLeft = this.add
@@ -374,12 +372,15 @@ export class GameScene extends Phaser.Scene {
     this.levelLabel.setText(tf('level.label', [this.dimIndex + 1, t(`dim.${dimCode}` as StringKey)]));
   }
 
-  /** 依目前維度票數重繪得分條（雙色漸變底＋白色分隔線＋兩側高對比票數）。 */
+  /** 依目前維度票數重繪得分條（雙色漸變底＋字母色圓章票數＋加粗分隔線與圓頭旋鈕）。 */
   private drawScoreBar(): void {
     const dimCode = DIMENSIONS[this.dimIndex];
     const [a, b] = LETTERS_OF[dimCode];
     const [na, nb] = this.score.tallyFor(dimCode);
     const m = scoreBarModel(a, na, b, nb);
+
+    this.scoreLeft.setText(m.leftLabel);
+    this.scoreRight.setText(m.rightLabel);
 
     const w = 200;
     const h = 22;
@@ -389,12 +390,27 @@ export class GameScene extends Phaser.Scene {
     g.clear();
     g.fillGradientStyle(LETTER_COLORS[a], LETTER_COLORS[b], LETTER_COLORS[a], LETTER_COLORS[b], 1);
     g.fillRoundedRect(x0, y0, w, h, 11);
+
+    // 兩端字母色圓章（深字由 scoreLeft/Right text 疊在 depth 21）
+    const badge = (text: Phaser.GameObjects.Text, letter: Letter) => {
+      const textLeft = text.originX === 1 ? text.x - text.displayWidth : text.x;
+      const textTop = text.y - text.displayHeight / 2;
+      const r = chipRect(textLeft, textTop, text.displayWidth, text.displayHeight, {
+        padX: 8,
+        padY: 3,
+        r: (text.displayHeight + 6) / 2,
+      });
+      g.fillStyle(LETTER_COLORS[letter], 1);
+      g.fillRoundedRect(r.x, r.y, r.w, r.h, r.r);
+    };
+    badge(this.scoreLeft, a);
+    badge(this.scoreRight, b);
+
+    // 加粗分隔線＋頂端圓頭旋鈕
     const dx = x0 + m.dividerFrac * w;
     g.fillStyle(0xffffff, 1);
-    g.fillRect(dx - 1.5, y0 - 2, 3, h + 4);
-
-    this.scoreLeft.setText(m.leftLabel);
-    this.scoreRight.setText(m.rightLabel);
+    g.fillRect(dx - 2.5, y0 - 2, 5, h + 4);
+    g.fillCircle(dx, y0 - 2, 4);
   }
 
   private completeCurrentDimension(): void {
