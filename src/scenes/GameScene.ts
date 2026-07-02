@@ -93,7 +93,7 @@ export class GameScene extends Phaser.Scene {
     this.platforms = this.physics.add.staticGroup();
 
     // 起始平台（玩家正下方）
-    this.spawnY = GAME.height - 40;
+    this.spawnY = 600; // 起始平台移到底部 HUD 卡（646 起）之上
     this.addNormalPlatform(GAME.width / 2, this.spawnY);
 
     // 預先往上鋪一段
@@ -102,7 +102,8 @@ export class GameScene extends Phaser.Scene {
       this.spawnNextRow();
     }
 
-    this.player = new Player(this, GAME.width / 2, GAME.height - 90, playerColorFor(this.score.lockedLetters()));
+    this.player = new Player(this, GAME.width / 2, 550, playerColorFor(this.score.lockedLetters()));
+    this.player.setDepth(19.2); // 高於 HUD 底卡(19)、低於 chips(19.5)/HUD 文字(20)：低空與墜落時仍可見
     this.player.bounce();
 
     this.physics.add.collider(
@@ -122,7 +123,7 @@ export class GameScene extends Phaser.Scene {
     hudScrim.fillRoundedRect(0, 646, GAME.width, 154, { tl: 16, tr: 16, bl: 0, br: 0 });
 
     this.banner = this.add
-      .text(GAME.width / 2, 664, '', {
+      .text(GAME.width / 2, 660, '', {
         fontSize: '24px',
         fontStyle: 'bold',
         color: '#ffffff',

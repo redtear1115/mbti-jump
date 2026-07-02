@@ -77,7 +77,7 @@ export class AchievementScene extends Phaser.Scene {
         .setDisplaySize(18, 18)
         .setTint(on ? 0x0f1220 : 0x8888aa);
 
-      this.add
+      const nameText = this.add
         .text(x + 52, y + 22, t(`ach.${a.id}.name` as StringKey), {
           fontFamily: TITLE_FONT,
           fontSize: '15px',
@@ -85,8 +85,9 @@ export class AchievementScene extends Phaser.Scene {
           wordWrap: { width: CARD_W - 60, useAdvancedWrap: true },
         })
         .setOrigin(0, 0);
+      const descY = Math.max(y + 56, nameText.y + nameText.displayHeight + 6);
       this.add
-        .text(x + 14, y + 56, t(`ach.${a.id}.desc` as StringKey), {
+        .text(x + 14, descY, t(`ach.${a.id}.desc` as StringKey), {
           fontFamily: BODY_FONT,
           fontSize: '11px',
           color: on ? '#ffffffcc' : '#ffffff44',
