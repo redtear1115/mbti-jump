@@ -417,8 +417,9 @@ import { DIMENSIONS, LETTERS_OF } from '../config/questions';
 const GLOW_KEY = 'aurora-glow';
 
 /**
- * 深底上兩團維度色柔光緩慢飄移的程序背景（無美術資產）。
- * 兩團柔光以 SCREEN 疊加在深色相機底上；retint 依維度換色。
+ * 兩團維度色柔光緩慢飄移的程序背景（無美術資產）。
+ * 以 SCREEN 疊加在相機底色上，深度 -11 → 位於既有氛圍背景（星點 -10、
+ * 飛蟲/天象 -9）之後，只做「顏色暈染」不遮擋其上元素。retint 依維度換色。
  */
 export class AuroraBackground {
   private glowA: Phaser.GameObjects.Image;
@@ -430,7 +431,7 @@ export class AuroraBackground {
       scene.add
         .image(0, 0, GLOW_KEY)
         .setScrollFactor(0)
-        .setDepth(-10)
+        .setDepth(-11)
         .setBlendMode(Phaser.BlendModes.SCREEN)
         .setDisplaySize(GAME.width * 1.7, GAME.width * 1.7);
     this.glowA = mk();
@@ -485,14 +486,12 @@ function ensureGlowTexture(scene: Phaser.Scene): void {
 }
 ```
 
-- [ ] **Step 2: GameScene 整合（移除 LEVEL_BG 純色，改用極光）**
+- [ ] **Step 2: GameScene 整合（與既有氛圍背景並存）**
+
+> 重要：`main` 已有一套氛圍背景（`src/gfx/Background.ts`：星點/飛蟲/每維度天象），透過 `this.background = new Background(this)` 與 `this.background.setDimension(dimIndex)` 驅動。**不得移除或改動這些**。本步驟只「額外疊加」極光顏色暈染，並**保留** `LEVEL_BG` 相機底色。
 
 在 `src/scenes/GameScene.ts`：
-移除已不再使用的 import：
-```ts
-import { LEVEL_BG } from '../theme/palette';
-```
-新增：
+保留現有 `import { LEVEL_BG } from '../theme/palette';` 與 `import { Background } from '../gfx/Background';` 不動。新增 import：
 ```ts
 import { AuroraBackground } from '../gfx/AuroraBackground';
 ```
@@ -500,23 +499,26 @@ import { AuroraBackground } from '../gfx/AuroraBackground';
 ```ts
   private aurora!: AuroraBackground;
 ```
-在 `create()` 中把
+在 `create()` 中，把既有這兩行
 ```ts
-    this.cameras.main.setBackgroundColor(LEVEL_BG[this.dimIndex]);
     this.background = new Background(this);
+    this.background.setDimension(this.dimIndex);
 ```
-改為：
+改為（在氛圍背景**之前**先建立極光，使極光位於底層；氛圍背景與 setDimension 呼叫維持不變）：
 ```ts
-    this.cameras.main.setBackgroundColor(0x141a24); // 深底，色彩由極光提供
     this.aurora = new AuroraBackground(this, this.reducedMotion);
     this.aurora.retint(this.dimIndex);
     this.background = new Background(this);
+    this.background.setDimension(this.dimIndex);
 ```
-在 `advanceDimension()` 中把
+（`this.cameras.main.setBackgroundColor(LEVEL_BG[this.dimIndex]);` 該行**保持不動**。）
+
+在 `advanceDimension()` 中，於既有這兩行
 ```ts
     this.cameras.main.setBackgroundColor(LEVEL_BG[this.dimIndex]);
+    this.background.setDimension(this.dimIndex);
 ```
-改為：
+之後加入一行極光換色（前兩行不動）：
 ```ts
     this.aurora.retint(this.dimIndex);
 ```
@@ -524,11 +526,11 @@ import { AuroraBackground } from '../gfx/AuroraBackground';
 - [ ] **Step 3: 型別檢查 + 測試不回歸**
 
 Run: `npx tsc --noEmit && npm run test`
-Expected: tsc exit 0（確認 `LEVEL_BG` 已無殘留引用，否則 `noUnusedLocals` 會報錯）；`Tests 91 passed`
+Expected: tsc exit 0；`Tests 91 passed`
 
 - [ ] **Step 4: 實機驗證**
 
-Run: `npm run dev`。確認背景為深底 + 兩團維度色柔光緩慢飄移；換維度時柔光換色。若系統開啟「減少動態」，柔光應靜止於對角位置。
+Run: `npm run dev`。確認：既有星點/飛蟲/天象仍在，且背景多了兩團維度色柔光在最底層緩慢飄移、換維度時柔光換色；柔光位於氛圍元素之後、不遮擋它們。若系統開啟「減少動態」，柔光應靜止於對角位置。
 
 - [ ] **Step 5: Commit**
 

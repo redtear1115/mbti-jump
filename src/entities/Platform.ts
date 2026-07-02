@@ -2,12 +2,12 @@ import Phaser from 'phaser';
 import { GAME } from '../config/gameConfig';
 import type { Letter } from '../config/questions';
 import { ASSET_KEYS } from '../config/assets';
+import { LETTER_COLORS } from '../theme/palette';
 
 export type PlatformKind = 'normal' | 'question';
 
 const NORMAL_KEY = 'platform-normal';
-const YES_KEY = 'platform-yes';
-const NO_KEY = 'platform-no';
+const QUESTION_KEY = 'platform-question'; // 中性白底，供依字母 tint
 
 export class Platform extends Phaser.Physics.Arcade.Sprite {
   kind: PlatformKind = 'normal';
@@ -34,13 +34,15 @@ export class Platform extends Phaser.Physics.Arcade.Sprite {
     opts: { side: Letter; questionId: string; label: string; isYes: boolean },
   ): Platform {
     const realKey = opts.isYes ? ASSET_KEYS.platformYes : ASSET_KEYS.platformNo;
-    const procKey = opts.isYes ? YES_KEY : NO_KEY;
-    const key = scene.textures.exists(realKey) ? realKey : procKey;
-    if (key === procKey) ensureTextures(scene);
+    const key = scene.textures.exists(realKey) ? realKey : QUESTION_KEY;
+    if (key === QUESTION_KEY) ensureTextures(scene);
     const p = new Platform(scene, x, y, key);
     p.kind = 'question';
     p.side = opts.side;
     p.questionId = opts.questionId;
+    // 依 MBTI 字母上色（取代固定紅/綠）。假設底圖為中性色（QUESTION_KEY 白底）；
+    // 若日後為 platformYes/No 加入彩色點陣圖，需改為中性圖或移除此 tint 以免疊色。
+    p.setTint(LETTER_COLORS[opts.side]);
     scene.add
       .text(x, y, opts.label, {
         fontSize: '18px',
@@ -73,6 +75,5 @@ function ensureTextures(scene: Phaser.Scene): void {
     g.destroy();
   };
   make(NORMAL_KEY, 0x5d6b9e);
-  make(YES_KEY, 0x38b764); // 綠 = Yes
-  make(NO_KEY, 0xb13e53); // 紅 = No
+  make(QUESTION_KEY, 0xffffff); // 中性白底，實際顏色由 setTint 決定
 }

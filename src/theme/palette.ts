@@ -1,3 +1,5 @@
+import type { Letter } from '../config/questions';
+
 /** 語意色票。數字色供 Phaser Graphics/背景；字串色供 Text style。 */
 export const PALETTE = {
   // 16Personalities 四族群色（基底）
@@ -21,3 +23,16 @@ export const PALETTE = {
 export const LEVEL_BG: readonly [number, number, number, number] = [
   0x2e3a59, 0x3a2e59, 0x594a2e, 0x2e594a,
 ];
+
+/** 八字母語意色（由四族群原色混出，brainstorm 方案 B）。供答案台階、得分條、分享卡沿用。 */
+export const LETTER_COLORS: Record<Letter, number> = {
+  E: 0xf0b84a, I: 0x2e6d86, // 外向暖黃 / 內向深藍
+  S: 0x8fb14a, N: 0x6e79b0, // 務實黃綠 / 抽象紫藍
+  T: 0x8a5fa0, F: 0x33a474, // 邏輯紫 / 和諧綠
+  J: 0x3a9a9a, P: 0xe09a3a, // 秩序青 / 隨性橙
+};
+
+/** 字母色的 CSS 字串版，供 Phaser Text style 使用。 */
+export function letterHex(letter: Letter): string {
+  return '#' + LETTER_COLORS[letter].toString(16).padStart(6, '0');
+}
