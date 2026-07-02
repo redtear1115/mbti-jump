@@ -66,8 +66,3 @@ export function downloadBlob(blob: Blob, filename: string): void {
   a.click();
   URL.revokeObjectURL(url);
 }
-
-/** @deprecated Task 12（結果頁分享鈕合併）後移除；目前 ResultScene 仍使用。 */
-export async function downloadCard(canvas: HTMLCanvasElement, filename: string): Promise<void> {
-  downloadBlob(await canvasToBlob(canvas), filename);
-}

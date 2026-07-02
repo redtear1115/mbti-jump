@@ -24,15 +24,9 @@ export const ZH_HANT: Record<StringKey, string> = {
   'gameover.retry': '重玩本關 ↻',
 
   'result.heading': '你的人格類型',
-  'result.copy': '複製結果 ⎘',
-  'result.copied': '已複製 ✓',
-  'result.copyFail': '複製失敗 — 請手動選取',
   'result.again': '再玩一次 ↻',
   'result.share': '我的 MBTI 是 {0}！{1} 來玩 MBTI Jump：{2}',
   'result.groupLabel': '你屬於{0}',
-  'result.saveCard': '下載分享卡 🖼',
-  'result.saved': '已下載 ✓',
-  'result.saveFail': '下載失敗',
   'card.tagline': 'MBTI Jump · 玩一場，跳出你的人格',
 
   // --- 分享閉環 ---

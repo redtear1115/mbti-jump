@@ -25,15 +25,9 @@ export const ES: Record<StringKey, string> = {
   'gameover.retry': 'Repetir nivel ↻',
 
   'result.heading': 'Tu tipo de personalidad',
-  'result.copy': 'Copiar resultado ⎘',
-  'result.copied': 'Copiado ✓',
-  'result.copyFail': 'Error al copiar — selecciona manualmente',
   'result.again': 'Jugar otra vez ↻',
   'result.share': '¡Mi MBTI es {0}! {1} Juega a MBTI Jump: {2}',
   'result.groupLabel': 'Eres {0}',
-  'result.saveCard': 'Guardar tarjeta 🖼',
-  'result.saved': 'Guardado ✓',
-  'result.saveFail': 'Error al guardar',
   'card.tagline': 'MBTI Jump — salta y descubre tu personalidad',
 
   // --- 分享閉環（needs-review: AI 草稿，待母語校稿） ---

@@ -29,15 +29,9 @@ export const EN = {
 
   // --- 結算 ---
   'result.heading': 'Your personality type',
-  'result.copy': 'Copy result ⎘',
-  'result.copied': 'Copied ✓',
-  'result.copyFail': 'Copy failed — select manually',
   'result.again': 'Play again ↻',
   'result.share': 'My MBTI is {0}! {1} Play MBTI Jump: {2}',
   'result.groupLabel': 'You are {0}',
-  'result.saveCard': 'Save card 🖼',
-  'result.saved': 'Saved ✓',
-  'result.saveFail': 'Save failed',
   'card.tagline': 'MBTI Jump — jump out your personality',
 
   // --- 分享閉環 ---
