@@ -104,16 +104,21 @@ export class ResultScene extends Phaser.Scene {
           };
           if (nav.share && nav.canShare?.({ files: [file] })) {
             try {
-              await nav.share({ files: [file], text });
+              await nav.share({ files: [file], text, url: shareUrl });
               return;
             } catch (e) {
               if ((e as Error).name === 'AbortError') return; // 使用者取消：不動鈕面
               // 其他分享錯誤 → 落到下方複製＋下載 fallback
             }
           }
-          await navigator.clipboard.writeText(text);
+          // 先下載（不需權限），再嘗試複製；複製失敗也不影響已完成的下載
           downloadBlob(blob, `mbti-jump-${type}.png`);
-          shareBtn.setLabel(t('share.doneFallback'));
+          try {
+            await navigator.clipboard.writeText(text);
+            shareBtn.setLabel(t('share.doneFallback'));
+          } catch {
+            shareBtn.setLabel(t('share.downloadedOnly'));
+          }
         } catch {
           shareBtn.setLabel(t('share.fail'));
         }

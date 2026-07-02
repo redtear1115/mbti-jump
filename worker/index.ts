@@ -57,7 +57,7 @@ export default {
       .transform(index);
 
     const res = new Response(rewritten.body, rewritten);
-    res.headers.set('cache-control', 'public, max-age=3600');
+    res.headers.set('cache-control', 'public, max-age=300');
     return res;
   },
 };

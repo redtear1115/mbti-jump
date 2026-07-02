@@ -35,6 +35,7 @@ export const ES: Record<StringKey, string> = {
   'og.cta': '¿Qué tipo eres? ¡Salta y descúbrelo!',
   'share.action': 'Compartir resultado ↗',
   'share.doneFallback': 'Copiado ✓ Tarjeta descargada',
+  'share.downloadedOnly': 'Tarjeta descargada ✓ (copia fallida)',
   'share.fail': 'Error al compartir',
   'invite.greeting': 'Tu amigo es {0}: ¡mide vuestra compatibilidad!',
   'compare.0': 'Tú y {0} no compartís ninguna letra: ¡complementos perfectos!',

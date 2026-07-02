@@ -39,6 +39,7 @@ export const EN = {
   'og.cta': 'What type are you? Jump to find out!',
   'share.action': 'Share result ↗',
   'share.doneFallback': 'Copied ✓ Card downloaded',
+  'share.downloadedOnly': 'Card downloaded ✓ (copy failed)',
   'share.fail': 'Share failed',
   'invite.greeting': 'Your friend is {0} — jump in and see how you two match!',
   'compare.0': 'You and {0} share no letters — perfect complements!',

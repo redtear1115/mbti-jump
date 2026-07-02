@@ -34,6 +34,7 @@ export const ZH_HANT: Record<StringKey, string> = {
   'og.cta': '你是什麼型？跳跳看就知道！',
   'share.action': '分享結果 ↗',
   'share.doneFallback': '已複製 ✓ 卡片已下載',
+  'share.downloadedOnly': '卡片已下載 ✓（複製失敗）',
   'share.fail': '分享失敗',
   'invite.greeting': '你的朋友是 {0}，測測你們合不合！',
   'compare.0': '你和 {0} 四個字母全不同——完美互補！',

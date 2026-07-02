@@ -35,6 +35,7 @@ export const JA: Record<StringKey, string> = {
   'og.cta': 'あなたは何タイプ？ジャンプして確かめよう！',
   'share.action': '結果をシェア ↗',
   'share.doneFallback': 'コピー済み ✓ カード保存済み',
+  'share.downloadedOnly': 'カード保存済み ✓（コピー失敗）',
   'share.fail': 'シェアに失敗しました',
   'invite.greeting': '友だちは{0}。相性をチェックしよう！',
   'compare.0': '{0}とは4文字すべて違う——完璧な補完関係！',
