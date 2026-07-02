@@ -58,7 +58,11 @@
 - [x] **P0 遊戲內可讀性** ✅（spec `2026-07-02-mbti-jump-p0-readability-design.md`，7 tasks，final review 抓到 chip 顯隱閾值與彈跳物理衝突的閃爍 bug，已修＋re-review READY，已部署）：
       HUD 一體式深色卡＋題目去描邊、答案預覽實心字母色 chip（顯示 latch）、台階頂亮線/底暗帶、
       得分條字母圓章＋加粗分隔線、極光降亮 15%。新增 `core/hud.ts` chipRect 純函式。
-- [ ] P1 記憶點：開始頁 hero 果凍怪、結果頁視覺升級（分享舞台）、果凍怪隨維度混色
+- [x] **P1 記憶點** ✅（spec `2026-07-02-mbti-jump-p1-hero-design.md`，7 tasks，final review READY，已部署）：
+      開始頁呼吸 hero 果凍怪、果凍怪隨鎖定維度混色（`core/playerColor.ts` 純函式＋texture 帶色重生成）、
+      結果頁分享舞台（族群色 glow＋最終色果凍怪＋動畫維度條）。驗證期修正：Phaser CJK 斷行
+      （`useAdvancedWrap` 全站補齊）、四字母平均趨灰 → 最終色改「基底→族群色 75%」。
+      小尾巴（延後）：結果頁最長 locale 字串的垂直空間偏緊（desc 3 行＋對比 2 行時距按鈕 ~3px）。
 - [ ] P2 次級畫面：成就徽章化＋總進度、趨勢空狀態、按鈕一致性、emoji icon 換向量
 - [ ] P3 小項：桌面 letterbox 妝點、語言 chips/靜音鈕觸控目標、海鷗形狀
 
