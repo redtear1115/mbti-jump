@@ -7,7 +7,7 @@ import { LETTER_COLORS } from '../theme/palette';
 export type PlatformKind = 'normal' | 'question';
 
 const NORMAL_KEY = 'platform-normal';
-const QUESTION_KEY = 'platform-question'; // 中性白底，供依字母 tint
+const QUESTION_KEY = 'platform-question'; // 中性灰白底，供依字母 tint
 
 export class Platform extends Phaser.Physics.Arcade.Sprite {
   kind: PlatformKind = 'normal';
@@ -66,14 +66,23 @@ export class Platform extends Phaser.Physics.Arcade.Sprite {
 }
 
 function ensureTextures(scene: Phaser.Scene): void {
-  const make = (key: string, color: number) => {
+  const W = GAME.platformWidth;
+  const H = GAME.platformHeight;
+  const R = 6;
+  /** 立體化台階底：主體色＋頂邊 2px 亮線＋底部 3px 暗帶（圖底分離）。 */
+  const make = (key: string, body: number, topLine: number) => {
     if (scene.textures.exists(key)) return;
     const g = scene.make.graphics({ x: 0, y: 0 }, false);
-    g.fillStyle(color, 1);
-    g.fillRoundedRect(0, 0, GAME.platformWidth, GAME.platformHeight, 6);
-    g.generateTexture(key, GAME.platformWidth, GAME.platformHeight);
+    g.fillStyle(body, 1);
+    g.fillRoundedRect(0, 0, W, H, R);
+    g.fillStyle(topLine, 1);
+    g.fillRect(R, 0, W - R * 2, 2);
+    g.fillStyle(0x000000, 0.25);
+    g.fillRect(R, H - 3, W - R * 2, 3);
+    g.generateTexture(key, W, H);
     g.destroy();
   };
-  make(NORMAL_KEY, 0x5d6b9e);
-  make(QUESTION_KEY, 0xffffff); // 中性白底，實際顏色由 setTint 決定
+  make(NORMAL_KEY, 0x3d4a7a, 0x8fa0d8);
+  // 中性灰白底＋純白頂線：setTint 後頂線成為「比體色亮一階」的立體亮邊
+  make(QUESTION_KEY, 0xe8e8e8, 0xffffff);
 }
