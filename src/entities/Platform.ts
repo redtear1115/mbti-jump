@@ -51,7 +51,7 @@ export class Platform extends Phaser.Physics.Arcade.Sprite {
         align: 'center',
         stroke: '#000000',
         strokeThickness: 4,
-        wordWrap: { width: GAME.platformWidth + 60 },
+        wordWrap: { width: GAME.platformWidth + 60, useAdvancedWrap: true },
       })
       .setOrigin(0.5, 0.5)
       .setDepth(5);

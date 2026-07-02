@@ -54,6 +54,7 @@ export class ResultScene extends Phaser.Scene {
       .setTint(groupColorOf(type));
 
     // 最終色果凍怪：你的顏色，elastic pop 入場
+    // 一律用 proc texture；若日後重新引入點陣 player 資產，需比照 Player 的 ASSET_KEYS fallback
     const jelly = this.add
       .image(cx, 120, ensurePlayerTexture(this, playerColorFor(type.split('') as Letter[])))
       .setScale(2);

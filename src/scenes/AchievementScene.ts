@@ -41,7 +41,7 @@ export class AchievementScene extends Phaser.Scene {
           fontFamily: BODY_FONT,
           fontSize: '13px',
           color: on ? '#ffffffcc' : '#ffffff44',
-          wordWrap: { width: GAME.width - 90 },
+          wordWrap: { width: GAME.width - 90, useAdvancedWrap: true },
         })
         .setOrigin(0, 0.5);
       y += 80;

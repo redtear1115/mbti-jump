@@ -19,6 +19,8 @@ export function lerpColor(a: number, b: number, t: number): number {
  * 0-3 碼：基底紫向「已鎖字母色的 RGB 平均」靠近 0.75*k/4（k=已鎖數）。
  * 四碼鎖完：改向「四碼所屬族群色」靠近 0.75，避免四色互補平均後偏灰
  * （例：INFP 四色平均會塌成 0x819293 的灰綠，改用族群色 0x33a474 混色更有識別度）。
+ *
+ * letters 需依 DIMENSIONS 順序（4 字母時以 join 推導型別/族群）。
  */
 export function playerColorFor(letters: Letter[]): number {
   if (letters.length === 0) return PLAYER_BASE_COLOR;
