@@ -1,5 +1,6 @@
 {
   "name": "mbti-jump",
+  "account_id": "c0fdc56af91423b181796c3f7c44afcc",
   "main": "worker/index.ts",
   "compatibility_date": "2026-07-01",
   "assets": {

@@ -57,8 +57,15 @@
 ## Tier 3 — 內容 & 上線
 - [ ] `ja`/`es` 譯文母語校稿（目前 AI 草稿，已標 `needs-review`）
 - [ ] 人格文案深度（現為四字母組句；可升級 16 型各自文案）
-- [ ] 部署 Vercel / Cloudflare Pages（靜態 `dist/`）
-- [ ] 分享頁 OG image（可能需輕量邊緣函式）
+- [x] 部署 Cloudflare Workers ✅ `mbti-jump.southern-light.dev`（Worker＋assets，`wrangler deploy`）
+- [x] 分享頁 OG image ✅ 分享閉環完成（2026-07-02，spec `2026-07-02-mbti-jump-share-loop-design.md`，13 tasks，final review READY）：
+      `/t/<TYPE>?lang=<locale>` 邀請連結 + Worker HTMLRewriter 注入 16 型×5 語 OG meta +
+      81 張預生成 1200×630 OG PNG（`npm run generate:og`，CJK 斷行/字型 fallback 已處理）+
+      index.html 預設 OG + 結果頁單一 Web Share 鈕（桌機 fallback：先下載再複製）+
+      好友打招呼與結果對比行（重合字母數五檔文案）。
+      後續小尾巴（final review minor，非阻斷）：OG 字型堆疊 per-locale（zh-Hans 現用 TC 字形）、
+      route regex 與 invite.ts 重複、index.html 預設 meta 為 zh-Hant 單語、
+      scripts/fonts 三個 Noto TTF ~40MB 進版控（可改 gitignore＋下載步驟）。
 
 ## 需要你的部分
 - [ ] **實機試玩確認手感**：無縫維度轉場節奏、分叉間距、難度（自動化無法代替真人手感測試）
