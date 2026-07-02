@@ -2,8 +2,8 @@ import { LETTER_COLORS } from '../theme/palette';
 import type { Letter } from '../config/questions';
 import { groupColorOf } from './temperament';
 
-/** 果凍怪基底色（百變怪淡紫）。 */
-export const PLAYER_BASE_COLOR = 0xc0aee2;
+/** 果凍怪基底色（微暖白——從白紙開始，四關染成你的顏色）。 */
+export const PLAYER_BASE_COLOR = 0xf0f0f4;
 
 /** RGB 各通道線性插值（t 0..1），逐通道四捨五入。 */
 export function lerpColor(a: number, b: number, t: number): number {
