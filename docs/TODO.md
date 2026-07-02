@@ -54,6 +54,14 @@
   - 小尾巴（延後）：氛圍元素數量/顏色可再依喜好微調
 - Tier 2 延後小項（final review 記錄，非阻斷）：Button hover/down 色入色票、BootScene 載入指示、Platform proc-key 常數清理。
 
+## UI/UX 改進路線（2026-07-02 審查，spec/plan 見 docs/superpowers/）
+- [x] **P0 遊戲內可讀性** ✅（spec `2026-07-02-mbti-jump-p0-readability-design.md`，7 tasks，final review 抓到 chip 顯隱閾值與彈跳物理衝突的閃爍 bug，已修＋re-review READY，已部署）：
+      HUD 一體式深色卡＋題目去描邊、答案預覽實心字母色 chip（顯示 latch）、台階頂亮線/底暗帶、
+      得分條字母圓章＋加粗分隔線、極光降亮 15%。新增 `core/hud.ts` chipRect 純函式。
+- [ ] P1 記憶點：開始頁 hero 果凍怪、結果頁視覺升級（分享舞台）、果凍怪隨維度混色
+- [ ] P2 次級畫面：成就徽章化＋總進度、趨勢空狀態、按鈕一致性、emoji icon 換向量
+- [ ] P3 小項：桌面 letterbox 妝點、語言 chips/靜音鈕觸控目標、海鷗形狀
+
 ## Tier 3 — 內容 & 上線
 - [ ] `ja`/`es` 譯文母語校稿（目前 AI 草稿，已標 `needs-review`）
 - [ ] 人格文案深度（現為四字母組句；可升級 16 型各自文案）
