@@ -66,8 +66,9 @@ function ensureGlowTexture(scene: Phaser.Scene): void {
   if (!canvas) return;
   const ctx = canvas.getContext();
   const grd = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-  grd.addColorStop(0, 'rgba(255,255,255,0.9)');
-  grd.addColorStop(0.5, 'rgba(255,255,255,0.32)');
+  // 亮度整體 ×0.85（P0 可讀性：前景圖底分離），氛圍仍在
+  grd.addColorStop(0, 'rgba(255,255,255,0.765)');
+  grd.addColorStop(0.5, 'rgba(255,255,255,0.272)');
   grd.addColorStop(1, 'rgba(255,255,255,0)');
   ctx.fillStyle = grd;
   ctx.fillRect(0, 0, size, size);
