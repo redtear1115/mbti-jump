@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { GAME } from '../config/gameConfig';
-import { LEVEL_BG, PALETTE, LETTER_COLORS, letterHex } from '../theme/palette';
+import { LEVEL_BG, PALETTE, LETTER_COLORS } from '../theme/palette';
 import { Background } from '../gfx/Background';
 import { AuroraBackground } from '../gfx/AuroraBackground';
 import { Player } from '../entities/Player';
@@ -10,7 +10,8 @@ import { ScoreTracker } from '../core/ScoreTracker';
 import { shouldAutoComplete } from '../core/progression';
 import { DIMENSIONS, LETTERS_OF, questionsForDimension } from '../config/questions';
 import { pickQuestions } from '../core/pickQuestions';
-import type { QuestionDef } from '../config/questions';
+import type { QuestionDef, Letter } from '../config/questions';
+import { chipRect } from '../core/hud';
 import { t, tf } from '../i18n/t';
 import type { StringKey } from '../i18n/t';
 import { prefersReducedMotion } from '../ui/reducedMotion';
@@ -47,6 +48,9 @@ export class GameScene extends Phaser.Scene {
   private scoreRight!: Phaser.GameObjects.Text; // 右側票數
   private previewLeft!: Phaser.GameObjects.Text;
   private previewRight!: Phaser.GameObjects.Text;
+  private chipLeft!: Phaser.GameObjects.Graphics;
+  private chipRight!: Phaser.GameObjects.Graphics;
+  private previewShown = false;
   private lastForkY = -Infinity; // 目前維度最後一題分叉的 y
   private forks: { qIndex: number; y: number }[] = [];
   private shownQuestionIdx = -1;
@@ -75,6 +79,7 @@ export class GameScene extends Phaser.Scene {
     this.forks = [];
     this.shownQuestionIdx = -1;
     this.score.resetCurrentLevel();
+    this.previewShown = false;
   }
 
   create() {
@@ -162,19 +167,20 @@ export class GameScene extends Phaser.Scene {
     const previewStyle = {
       fontSize: '17px',
       fontStyle: 'bold',
-      stroke: '#000000',
-      strokeThickness: 4,
+      color: PALETTE.textOn,
       wordWrap: { width: GAME.width * 0.44 },
       fontFamily: 'Nunito, system-ui, sans-serif',
     };
+    this.chipLeft = this.add.graphics().setScrollFactor(0).setDepth(19.5).setAlpha(0);
+    this.chipRight = this.add.graphics().setScrollFactor(0).setDepth(19.5).setAlpha(0);
     this.previewLeft = this.add
-      .text(12, 158, '', { ...previewStyle, color: '#ffffff', align: 'left' })
+      .text(12, 158, '', { ...previewStyle, align: 'left' })
       .setOrigin(0, 0)
       .setScrollFactor(0)
       .setDepth(20)
       .setAlpha(0);
     this.previewRight = this.add
-      .text(GAME.width - 12, 158, '', { ...previewStyle, color: '#ffffff', align: 'right' })
+      .text(GAME.width - 12, 158, '', { ...previewStyle, align: 'right' })
       .setOrigin(1, 0)
       .setScrollFactor(0)
       .setDepth(20)
@@ -209,14 +215,9 @@ export class GameScene extends Phaser.Scene {
         this.updatePreview(fork.qIndex);
       }
       const dist = this.player.y - fork.y;
-      const alpha = this.reducedMotion
-        ? 1
-        : Phaser.Math.Clamp((GAME.height * 1.5 - dist) / (GAME.height * 0.6), 0, 1);
-      this.previewLeft.setAlpha(alpha);
-      this.previewRight.setAlpha(alpha);
+      this.setPreviewVisible(dist < GAME.height * 1.5);
     } else {
-      this.previewLeft.setAlpha(0);
-      this.previewRight.setAlpha(0);
+      this.setPreviewVisible(false);
     }
 
     // 跳過題目的保險：本維度所有分叉都生成後，玩家明顯爬過最後一題分叉，
@@ -340,8 +341,32 @@ export class GameScene extends Phaser.Scene {
   private updatePreview(questionIdx: number): void {
     const q = this.questions[questionIdx];
     if (!q) return;
-    this.previewLeft.setText(`◀ ${t(`q.${q.id}.yes` as StringKey)}`).setColor(letterHex(q.yes.side));
-    this.previewRight.setText(`${t(`q.${q.id}.no` as StringKey)} ▶`).setColor(letterHex(q.no.side));
+    this.previewLeft.setText(`◀ ${t(`q.${q.id}.yes` as StringKey)}`);
+    this.previewRight.setText(`${t(`q.${q.id}.no` as StringKey)} ▶`);
+    this.drawPreviewChip(this.chipLeft, this.previewLeft, q.yes.side);
+    this.drawPreviewChip(this.chipRight, this.previewRight, q.no.side);
+  }
+
+  /** 依文字實際包框重畫膠囊底（字母色實心、深字在上）。 */
+  private drawPreviewChip(gfx: Phaser.GameObjects.Graphics, text: Phaser.GameObjects.Text, side: Letter): void {
+    gfx.clear();
+    if (!text.text) return;
+    const textLeft = text.originX === 1 ? text.x - text.displayWidth : text.x;
+    const r = chipRect(textLeft, text.y, text.displayWidth, text.displayHeight);
+    gfx.fillStyle(LETTER_COLORS[side], 1);
+    gfx.fillRoundedRect(r.x, r.y, r.w, r.h, r.r);
+  }
+
+  /** 預覽（文字＋chip）快速顯隱：200ms 淡入淡出；reduced-motion 直接切換。 */
+  private setPreviewVisible(visible: boolean): void {
+    if (visible === this.previewShown) return;
+    this.previewShown = visible;
+    const targets = [this.previewLeft, this.previewRight, this.chipLeft, this.chipRight];
+    if (this.reducedMotion) {
+      targets.forEach((t) => t.setAlpha(visible ? 1 : 0));
+      return;
+    }
+    this.tweens.add({ targets, alpha: visible ? 1 : 0, duration: 200 });
   }
 
   private updateLevelLabel(): void {
