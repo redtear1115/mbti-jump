@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { GAME } from '../config/gameConfig';
-import { LEVEL_BG } from '../theme/palette';
+import { LEVEL_BG, PALETTE, LETTER_COLORS } from '../theme/palette';
 import { Background } from '../gfx/Background';
 import { AuroraBackground } from '../gfx/AuroraBackground';
 import { Player } from '../entities/Player';
@@ -10,13 +10,13 @@ import { ScoreTracker } from '../core/ScoreTracker';
 import { shouldAutoComplete } from '../core/progression';
 import { DIMENSIONS, LETTERS_OF, questionsForDimension } from '../config/questions';
 import { pickQuestions } from '../core/pickQuestions';
-import type { QuestionDef } from '../config/questions';
+import type { QuestionDef, Letter } from '../config/questions';
+import { chipRect } from '../core/hud';
 import { t, tf } from '../i18n/t';
 import type { StringKey } from '../i18n/t';
 import { prefersReducedMotion } from '../ui/reducedMotion';
 import { Sfx } from '../audio/Sfx';
 import { MuteButton } from '../ui/MuteButton';
-import { LETTER_COLORS, letterHex } from '../theme/palette';
 import { scoreBarModel } from '../core/scoreBar';
 
 interface GameInit {
@@ -48,6 +48,9 @@ export class GameScene extends Phaser.Scene {
   private scoreRight!: Phaser.GameObjects.Text; // 右側票數
   private previewLeft!: Phaser.GameObjects.Text;
   private previewRight!: Phaser.GameObjects.Text;
+  private chipLeft!: Phaser.GameObjects.Graphics;
+  private chipRight!: Phaser.GameObjects.Graphics;
+  private previewShown = false;
   private lastForkY = -Infinity; // 目前維度最後一題分叉的 y
   private forks: { qIndex: number; y: number }[] = [];
   private shownQuestionIdx = -1;
@@ -76,6 +79,7 @@ export class GameScene extends Phaser.Scene {
     this.forks = [];
     this.shownQuestionIdx = -1;
     this.score.resetCurrentLevel();
+    this.previewShown = false;
   }
 
   create() {
@@ -111,14 +115,17 @@ export class GameScene extends Phaser.Scene {
     this.controls = new Controls(this);
     this.controls.start();
 
+    // HUD 底襯：資訊層（題目/關卡/得分條）與遊戲層分家，亮背景下仍可讀
+    const hudScrim = this.add.graphics().setScrollFactor(0).setDepth(19);
+    hudScrim.fillStyle(PALETTE.surface, 0.72);
+    hudScrim.fillRoundedRect(0, 0, GAME.width, 154, { tl: 0, tr: 0, bl: 16, br: 16 });
+
     this.banner = this.add
       .text(GAME.width / 2, 40, '', {
         fontSize: '24px',
         fontStyle: 'bold',
         color: '#ffffff',
         align: 'center',
-        stroke: '#000000',
-        strokeThickness: 4,
         wordWrap: { width: GAME.width - 24 },
         fontFamily: 'Fredoka, system-ui, sans-serif',
       })
@@ -139,9 +146,7 @@ export class GameScene extends Phaser.Scene {
     const scoreLabelStyle = {
       fontSize: '14px',
       fontStyle: 'bold',
-      color: '#ffffff',
-      stroke: '#000000',
-      strokeThickness: 3,
+      color: PALETTE.textOn,
       fontFamily: 'Nunito, system-ui, sans-serif',
     };
     this.scoreLeft = this.add
@@ -160,19 +165,20 @@ export class GameScene extends Phaser.Scene {
     const previewStyle = {
       fontSize: '17px',
       fontStyle: 'bold',
-      stroke: '#000000',
-      strokeThickness: 4,
+      color: PALETTE.textOn,
       wordWrap: { width: GAME.width * 0.44 },
       fontFamily: 'Nunito, system-ui, sans-serif',
     };
+    this.chipLeft = this.add.graphics().setScrollFactor(0).setDepth(19.5).setAlpha(0);
+    this.chipRight = this.add.graphics().setScrollFactor(0).setDepth(19.5).setAlpha(0);
     this.previewLeft = this.add
-      .text(12, 158, '', { ...previewStyle, color: '#ffffff', align: 'left' })
+      .text(12, 158, '', { ...previewStyle, align: 'left' })
       .setOrigin(0, 0)
       .setScrollFactor(0)
       .setDepth(20)
       .setAlpha(0);
     this.previewRight = this.add
-      .text(GAME.width - 12, 158, '', { ...previewStyle, color: '#ffffff', align: 'right' })
+      .text(GAME.width - 12, 158, '', { ...previewStyle, align: 'right' })
       .setOrigin(1, 0)
       .setScrollFactor(0)
       .setDepth(20)
@@ -205,16 +211,15 @@ export class GameScene extends Phaser.Scene {
         this.shownQuestionIdx = fork.qIndex;
         this.updateBanner(fork.qIndex);
         this.updatePreview(fork.qIndex);
+        this.setPreviewVisible(false, true); // 換題瞬間隱藏，等接近新分叉再亮
       }
+      // 進入提示範圍後鎖住顯示（彈跳會反覆穿越閾值，不能用即時距離開關）
       const dist = this.player.y - fork.y;
-      const alpha = this.reducedMotion
-        ? 1
-        : Phaser.Math.Clamp((GAME.height * 1.5 - dist) / (GAME.height * 0.6), 0, 1);
-      this.previewLeft.setAlpha(alpha);
-      this.previewRight.setAlpha(alpha);
+      if (dist < GAME.height * 1.5) {
+        this.setPreviewVisible(true);
+      }
     } else {
-      this.previewLeft.setAlpha(0);
-      this.previewRight.setAlpha(0);
+      this.setPreviewVisible(false);
     }
 
     // 跳過題目的保險：本維度所有分叉都生成後，玩家明顯爬過最後一題分叉，
@@ -338,8 +343,33 @@ export class GameScene extends Phaser.Scene {
   private updatePreview(questionIdx: number): void {
     const q = this.questions[questionIdx];
     if (!q) return;
-    this.previewLeft.setText(`◀ ${t(`q.${q.id}.yes` as StringKey)}`).setColor(letterHex(q.yes.side));
-    this.previewRight.setText(`${t(`q.${q.id}.no` as StringKey)} ▶`).setColor(letterHex(q.no.side));
+    this.previewLeft.setText(`◀ ${t(`q.${q.id}.yes` as StringKey)}`);
+    this.previewRight.setText(`${t(`q.${q.id}.no` as StringKey)} ▶`);
+    this.drawPreviewChip(this.chipLeft, this.previewLeft, q.yes.side);
+    this.drawPreviewChip(this.chipRight, this.previewRight, q.no.side);
+  }
+
+  /** 依文字實際包框重畫膠囊底（字母色實心、深字在上）。 */
+  private drawPreviewChip(gfx: Phaser.GameObjects.Graphics, text: Phaser.GameObjects.Text, side: Letter): void {
+    gfx.clear();
+    if (!text.text) return;
+    const textLeft = text.originX === 1 ? text.x - text.displayWidth : text.x;
+    const r = chipRect(textLeft, text.y, text.displayWidth, text.displayHeight);
+    gfx.fillStyle(LETTER_COLORS[side], 1);
+    gfx.fillRoundedRect(r.x, r.y, r.w, r.h, r.r);
+  }
+
+  /** 預覽（文字＋chip）顯隱：200ms 淡入淡出；snap 或 reduced-motion 時直接切換。 */
+  private setPreviewVisible(visible: boolean, snap = false): void {
+    if (visible === this.previewShown) return;
+    this.previewShown = visible;
+    const targets = [this.previewLeft, this.previewRight, this.chipLeft, this.chipRight];
+    this.tweens.killTweensOf(targets);
+    if (snap || this.reducedMotion) {
+      targets.forEach((obj) => obj.setAlpha(visible ? 1 : 0));
+      return;
+    }
+    this.tweens.add({ targets, alpha: visible ? 1 : 0, duration: 200 });
   }
 
   private updateLevelLabel(): void {
@@ -347,12 +377,15 @@ export class GameScene extends Phaser.Scene {
     this.levelLabel.setText(tf('level.label', [this.dimIndex + 1, t(`dim.${dimCode}` as StringKey)]));
   }
 
-  /** 依目前維度票數重繪得分條（雙色漸變底＋白色分隔線＋兩側高對比票數）。 */
+  /** 依目前維度票數重繪得分條（雙色漸變底＋字母色圓章票數＋加粗分隔線與圓頭旋鈕）。 */
   private drawScoreBar(): void {
     const dimCode = DIMENSIONS[this.dimIndex];
     const [a, b] = LETTERS_OF[dimCode];
     const [na, nb] = this.score.tallyFor(dimCode);
     const m = scoreBarModel(a, na, b, nb);
+
+    this.scoreLeft.setText(m.leftLabel);
+    this.scoreRight.setText(m.rightLabel);
 
     const w = 200;
     const h = 22;
@@ -362,12 +395,27 @@ export class GameScene extends Phaser.Scene {
     g.clear();
     g.fillGradientStyle(LETTER_COLORS[a], LETTER_COLORS[b], LETTER_COLORS[a], LETTER_COLORS[b], 1);
     g.fillRoundedRect(x0, y0, w, h, 11);
+
+    // 兩端字母色圓章（深字由 scoreLeft/Right text 疊在 depth 21）
+    const badge = (text: Phaser.GameObjects.Text, letter: Letter) => {
+      const textLeft = text.originX === 1 ? text.x - text.displayWidth : text.x;
+      const textTop = text.y - text.displayHeight / 2;
+      const r = chipRect(textLeft, textTop, text.displayWidth, text.displayHeight, {
+        padX: 8,
+        padY: 3,
+        r: (text.displayHeight + 6) / 2,
+      });
+      g.fillStyle(LETTER_COLORS[letter], 1);
+      g.fillRoundedRect(r.x, r.y, r.w, r.h, r.r);
+    };
+    badge(this.scoreLeft, a);
+    badge(this.scoreRight, b);
+
+    // 加粗分隔線＋頂端圓頭旋鈕
     const dx = x0 + m.dividerFrac * w;
     g.fillStyle(0xffffff, 1);
-    g.fillRect(dx - 1.5, y0 - 2, 3, h + 4);
-
-    this.scoreLeft.setText(m.leftLabel);
-    this.scoreRight.setText(m.rightLabel);
+    g.fillRect(dx - 2.5, y0 - 2, 5, h + 4);
+    g.fillCircle(dx, y0 - 2, 4);
   }
 
   private completeCurrentDimension(): void {
