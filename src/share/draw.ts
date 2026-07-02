@@ -72,24 +72,3 @@ export function drawDimBars(
     y += opts.barH + opts.gap;
   }
 }
-
-export function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
-  return new Promise((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (!blob) {
-        reject(new Error('toBlob returned null'));
-        return;
-      }
-      resolve(blob);
-    }, 'image/png');
-  });
-}
-
-export function downloadBlob(blob: Blob, filename: string): void {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}
