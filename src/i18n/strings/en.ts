@@ -29,16 +29,25 @@ export const EN = {
 
   // --- 結算 ---
   'result.heading': 'Your personality type',
-  'result.copy': 'Copy result ⎘',
-  'result.copied': 'Copied ✓',
-  'result.copyFail': 'Copy failed — select manually',
   'result.again': 'Play again ↻',
   'result.share': 'My MBTI is {0}! {1} Play MBTI Jump: {2}',
   'result.groupLabel': 'You are {0}',
-  'result.saveCard': 'Save card 🖼',
-  'result.saved': 'Saved ✓',
-  'result.saveFail': 'Save failed',
   'card.tagline': 'MBTI Jump — jump out your personality',
+
+  // --- 分享閉環 ---
+  'og.title': "MBTI Jump — I'm {0}!",
+  'og.cta': 'What type are you? Jump to find out!',
+  'share.action': 'Share result ↗',
+  'share.doneFallback': 'Copied ✓ Card downloaded',
+  'share.downloadedOnly': 'Card downloaded ✓ (copy failed)',
+  'share.fail': 'Share failed',
+  'invite.greeting': 'Your friend is {0} — jump in and see how you two match!',
+  'compare.0': 'You and {0} share no letters — perfect complements!',
+  'compare.1': 'You and {0} share 1 letter — sparks from different worlds.',
+  'compare.2': 'You and {0} share 2 letters — half alike, half surprising.',
+  'compare.3': 'You and {0} share 3 letters — kindred spirits!',
+  'compare.4': 'Same type as your friend {0} — soulmates!',
+
   'trend.title': 'Your Trends',
   'trend.cta': 'Trends 📊',
   'trend.totalPlays': 'Played {0} times',

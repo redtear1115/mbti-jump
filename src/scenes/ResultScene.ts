@@ -12,8 +12,10 @@ import { newlyUnlocked } from '../core/achievements';
 import { getSeenIds, markSeen } from '../core/achievementStore';
 import { prefersReducedMotion } from '../ui/reducedMotion';
 import { buildShareCardModel } from '../share/shareCardModel';
-import { renderShareCard, downloadCard } from '../share/shareCard';
+import { renderShareCard, canvasToBlob, downloadBlob } from '../share/shareCard';
 import { getLocale } from '../i18n/store';
+import { getInvite } from '../core/invite';
+import { sharedLetters, compareKey } from '../core/compare';
 
 interface ResultInit {
   score: ScoreTracker;
@@ -70,41 +72,60 @@ export class ResultScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
-    const copyBtn = new Button(this, cx, 505, t('result.copy'), {
-      width: 240,
-      height: 54,
-      fontSize: 20,
-      onClick: async () => {
-        const text = tf('result.share', [type, desc, location.href]);
-        try {
-          await navigator.clipboard.writeText(text);
-          copyBtn.setLabel(t('result.copied'));
-        } catch {
-          copyBtn.setLabel(t('result.copyFail'));
-        }
-      },
-    });
+    // 好友對比（有邀請時）
+    const friend = getInvite();
+    if (friend) {
+      this.add
+        .text(cx, 458, tf(compareKey(sharedLetters(type, friend)), [friend]), {
+          fontSize: '16px',
+          color: '#ffe066',
+          align: 'center',
+          wordWrap: { width: GAME.width - 60 },
+          fontFamily: 'Nunito, system-ui, sans-serif',
+        })
+        .setOrigin(0.5);
+    }
 
-    const saveBtn = new Button(this, cx, 575, t('result.saveCard'), {
+    const shareBtn = new Button(this, cx, 530, t('share.action'), {
       width: 240,
       height: 54,
       fontSize: 20,
-      bg: 0x33a474,
-      bgHover: 0x3fb886,
-      bgDown: 0x2b8a61,
       onClick: async () => {
+        const locale = getLocale();
+        const shareUrl = `${location.origin}/t/${type}?lang=${locale}`;
+        const text = tf('result.share', [type, desc, shareUrl]);
         try {
-          const model = buildShareCardModel(type, data.score.allTallies(), getLocale());
+          const model = buildShareCardModel(type, data.score.allTallies(), locale);
           const canvas = renderShareCard(model);
-          await downloadCard(canvas, `mbti-jump-${type}.png`);
-          saveBtn.setLabel(t('result.saved'));
+          const blob = await canvasToBlob(canvas);
+          const file = new File([blob], `mbti-jump-${type}.png`, { type: 'image/png' });
+          const nav = navigator as Navigator & {
+            canShare?: (d: ShareData) => boolean;
+          };
+          if (nav.share && nav.canShare?.({ files: [file] })) {
+            try {
+              await nav.share({ files: [file], text, url: shareUrl });
+              return;
+            } catch (e) {
+              if ((e as Error).name === 'AbortError') return; // 使用者取消：不動鈕面
+              // 其他分享錯誤 → 落到下方複製＋下載 fallback
+            }
+          }
+          // 先下載（不需權限），再嘗試複製；複製失敗也不影響已完成的下載
+          downloadBlob(blob, `mbti-jump-${type}.png`);
+          try {
+            await navigator.clipboard.writeText(text);
+            shareBtn.setLabel(t('share.doneFallback'));
+          } catch {
+            shareBtn.setLabel(t('share.downloadedOnly'));
+          }
         } catch {
-          saveBtn.setLabel(t('result.saveFail'));
+          shareBtn.setLabel(t('share.fail'));
         }
       },
     });
 
-    new Button(this, cx, 645, t('result.again'), {
+    new Button(this, cx, 610, t('result.again'), {
       width: 240,
       height: 54,
       fontSize: 20,
@@ -113,7 +134,7 @@ export class ResultScene extends Phaser.Scene {
       onClick: () => this.scene.start('Start'),
     });
 
-    new Button(this, cx, 710, t('trend.cta'), {
+    new Button(this, cx, 680, t('trend.cta'), {
       width: 240,
       height: 50,
       fontSize: 18,
