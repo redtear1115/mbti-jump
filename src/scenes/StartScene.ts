@@ -136,6 +136,7 @@ export class StartScene extends Phaser.Scene {
       bg: 0x4298b4, // 藍，區分主 CTA
       bgHover: 0x54aec9,
       bgDown: 0x3a86a0,
+      icon: 'chart',
       onClick: () => this.scene.start('Trend'),
     });
 
@@ -146,6 +147,7 @@ export class StartScene extends Phaser.Scene {
       bg: 0x88619a, // 紫，區分其他鈕
       bgHover: 0x9d78ae,
       bgDown: 0x76527f,
+      icon: 'trophy',
       onClick: () => this.scene.start('Achievements'),
     });
   }

@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 import { PALETTE } from '../theme/palette';
+import { ensureIconTexture } from './icons';
+import type { IconKind } from './icons';
 
 export interface ButtonOptions {
   onClick: () => void;
@@ -11,6 +13,7 @@ export interface ButtonOptions {
   bgDown?: number; // 按下底色
   textColor?: string;
   radius?: number;
+  icon?: IconKind; // 文字左側 16px 向量 icon（tint 同文字色）
 }
 
 /**
@@ -53,6 +56,19 @@ export class Button {
       .setOrigin(0.5)
       .setDepth(11);
     this.draw(this.bg);
+
+    if (opts.icon) {
+      const tintColor = Phaser.Display.Color.HexStringToColor(opts.textColor ?? PALETTE.textOn).color;
+      const iconImg = scene.add
+        .image(0, y, ensureIconTexture(scene, opts.icon))
+        .setDisplaySize(16, 16)
+        .setTint(tintColor)
+        .setDepth(11);
+      // icon(16) + 間距(6) + 文字：整體置中；帶 icon 的鈕不支援 setLabel 重排
+      const totalW = 16 + 6 + this.label.width;
+      iconImg.setX(x - totalW / 2 + 8);
+      this.label.setOrigin(0, 0.5).setX(x - totalW / 2 + 22);
+    }
 
     this.zone = scene.add
       .zone(x, y, this.w, this.h) // Zone 原點預設 (0.5, 0.5)，命中區與視覺對齊
