@@ -11,6 +11,7 @@ import { t } from '../src/i18n/t';
 GlobalFonts.registerFromPath('scripts/fonts/Fredoka-Bold.ttf', 'Fredoka');
 GlobalFonts.registerFromPath('scripts/fonts/Nunito-Regular.ttf', 'Nunito');
 GlobalFonts.registerFromPath('scripts/fonts/NotoSansTC.ttf', 'Noto Sans TC');
+GlobalFonts.registerFromPath('scripts/fonts/NotoSansSC.ttf', 'Noto Sans SC');
 GlobalFonts.registerFromPath('scripts/fonts/NotoSansJP.ttf', 'Noto Sans JP');
 
 /** 預生成圖無真實 tallies：每維度朝該型別字母偏 4:1（dividerFrac 0.8/0.2）。 */

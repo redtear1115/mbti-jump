@@ -23,15 +23,15 @@ export function drawOgCard(ctx: CanvasRenderingContext2D, model: ShareCardModel)
 
   // 左半：型別大字＋族群名
   ctx.fillStyle = hex(model.groupColor);
-  ctx.font = "800 200px Fredoka, 'Noto Sans TC', 'Noto Sans JP', sans-serif";
+  ctx.font = "800 200px Fredoka, 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans JP', sans-serif";
   ctx.fillText(model.type, OG_W * 0.3, OG_H * 0.48);
   ctx.fillStyle = '#ffffffcc';
-  ctx.font = "600 40px Fredoka, 'Noto Sans TC', 'Noto Sans JP', sans-serif";
+  ctx.font = "600 40px Fredoka, 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans JP', sans-serif";
   ctx.fillText(model.groupName, OG_W * 0.3, OG_H * 0.58);
 
   // 右半：描述（換行）＋四維度條
   ctx.fillStyle = '#ffffff';
-  ctx.font = "400 30px Nunito, 'Noto Sans TC', 'Noto Sans JP', sans-serif";
+  ctx.font = "400 30px Nunito, 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans JP', sans-serif";
   wrapText(ctx, model.description, OG_W * 0.72, OG_H * 0.22, OG_W * 0.4, 42);
   drawDimBars(ctx, model.dims, {
     x: OG_W * 0.55, y: OG_H * 0.52, w: OG_W * 0.34, barH: 24, gap: 16,
@@ -39,7 +39,7 @@ export function drawOgCard(ctx: CanvasRenderingContext2D, model: ShareCardModel)
 
   // 底部標語
   ctx.fillStyle = '#ffffff88';
-  ctx.font = "400 26px Nunito, 'Noto Sans TC', 'Noto Sans JP', sans-serif";
+  ctx.font = "400 26px Nunito, 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans JP', sans-serif";
   ctx.fillText(model.tagline, OG_W / 2, OG_H - 30);
 }
 
@@ -56,7 +56,7 @@ export function drawOgDefault(ctx: CanvasRenderingContext2D, tagline: string): v
 
   ctx.textAlign = 'center';
   ctx.fillStyle = hex(PALETTE.accent);
-  ctx.font = "800 120px Fredoka, 'Noto Sans TC', 'Noto Sans JP', sans-serif";
+  ctx.font = "800 120px Fredoka, 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans JP', sans-serif";
   ctx.fillText('MBTI Jump', OG_W / 2, OG_H * 0.45);
 
   const groupColors = [PALETTE.explorer, PALETTE.diplomat, PALETTE.analyst, PALETTE.sentinel];
@@ -68,6 +68,6 @@ export function drawOgDefault(ctx: CanvasRenderingContext2D, tagline: string): v
   });
 
   ctx.fillStyle = '#ffffffcc';
-  ctx.font = "400 34px Nunito, 'Noto Sans TC', 'Noto Sans JP', sans-serif";
+  ctx.font = "400 34px Nunito, 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans JP', sans-serif";
   ctx.fillText(tagline, OG_W / 2, OG_H * 0.74);
 }
