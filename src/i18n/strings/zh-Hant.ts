@@ -44,7 +44,7 @@ export const ZH_HANT: Record<StringKey, string> = {
   'compare.4': '你和 {0} 是同型——根本靈魂雙胞胎！',
 
   'trend.title': '你的趨勢',
-  'trend.cta': '趨勢 📊',
+  'trend.cta': '趨勢',
   'trend.totalPlays': '已玩 {0} 次',
   'trend.topType': '最常出現',
   'trend.recent': '最近',
@@ -55,8 +55,9 @@ export const ZH_HANT: Record<StringKey, string> = {
   'common.back': '◀ 返回',
 
   'ach.title': '成就',
-  'ach.cta': '成就 🏆',
-  'ach.unlocked': '🏆 解鎖：{0}',
+  'ach.progress': '已解鎖 {0}/{1}',
+  'ach.cta': '成就',
+  'ach.unlocked': '解鎖：{0}',
   'ach.first_play.name': '初次啟程',
   'ach.first_play.desc': '完成第一場遊戲',
   'ach.persistent.name': '樂此不疲',

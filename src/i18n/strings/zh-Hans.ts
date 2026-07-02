@@ -44,7 +44,7 @@ export const ZH_HANS: Record<StringKey, string> = {
   'compare.4': '你和 {0} 是同型——简直灵魂双胞胎！',
 
   'trend.title': '你的趋势',
-  'trend.cta': '趋势 📊',
+  'trend.cta': '趋势',
   'trend.totalPlays': '已玩 {0} 次',
   'trend.topType': '最常出现',
   'trend.recent': '最近',
@@ -55,8 +55,9 @@ export const ZH_HANS: Record<StringKey, string> = {
   'common.back': '◀ 返回',
 
   'ach.title': '成就',
-  'ach.cta': '成就 🏆',
-  'ach.unlocked': '🏆 解锁：{0}',
+  'ach.progress': '已解锁 {0}/{1}',
+  'ach.cta': '成就',
+  'ach.unlocked': '解锁：{0}',
   'ach.first_play.name': '初次启程',
   'ach.first_play.desc': '完成第一场游戏',
   'ach.persistent.name': '乐此不疲',

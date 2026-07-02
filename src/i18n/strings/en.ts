@@ -49,7 +49,7 @@ export const EN = {
   'compare.4': 'Same type as your friend {0} — soulmates!',
 
   'trend.title': 'Your Trends',
-  'trend.cta': 'Trends 📊',
+  'trend.cta': 'Trends',
   'trend.totalPlays': 'Played {0} times',
   'trend.topType': 'Most often',
   'trend.recent': 'Recent',
@@ -61,8 +61,9 @@ export const EN = {
 
   // --- 成就 ---
   'ach.title': 'Achievements',
-  'ach.cta': 'Achievements 🏆',
-  'ach.unlocked': '🏆 Unlocked: {0}',
+  'ach.progress': 'Unlocked {0}/{1}',
+  'ach.cta': 'Achievements',
+  'ach.unlocked': 'Unlocked: {0}',
   'ach.first_play.name': 'First Steps',
   'ach.first_play.desc': 'Finish your first game',
   'ach.persistent.name': 'Persistent',
