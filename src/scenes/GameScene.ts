@@ -211,9 +211,13 @@ export class GameScene extends Phaser.Scene {
         this.shownQuestionIdx = fork.qIndex;
         this.updateBanner(fork.qIndex);
         this.updatePreview(fork.qIndex);
+        this.setPreviewVisible(false, true); // 換題瞬間隱藏，等接近新分叉再亮
       }
+      // 進入提示範圍後鎖住顯示（彈跳會反覆穿越閾值，不能用即時距離開關）
       const dist = this.player.y - fork.y;
-      this.setPreviewVisible(dist < GAME.height * 1.5);
+      if (dist < GAME.height * 1.5) {
+        this.setPreviewVisible(true);
+      }
     } else {
       this.setPreviewVisible(false);
     }
@@ -355,13 +359,14 @@ export class GameScene extends Phaser.Scene {
     gfx.fillRoundedRect(r.x, r.y, r.w, r.h, r.r);
   }
 
-  /** 預覽（文字＋chip）快速顯隱：200ms 淡入淡出；reduced-motion 直接切換。 */
-  private setPreviewVisible(visible: boolean): void {
+  /** 預覽（文字＋chip）顯隱：200ms 淡入淡出；snap 或 reduced-motion 時直接切換。 */
+  private setPreviewVisible(visible: boolean, snap = false): void {
     if (visible === this.previewShown) return;
     this.previewShown = visible;
     const targets = [this.previewLeft, this.previewRight, this.chipLeft, this.chipRight];
-    if (this.reducedMotion) {
-      targets.forEach((t) => t.setAlpha(visible ? 1 : 0));
+    this.tweens.killTweensOf(targets);
+    if (snap || this.reducedMotion) {
+      targets.forEach((obj) => obj.setAlpha(visible ? 1 : 0));
       return;
     }
     this.tweens.add({ targets, alpha: visible ? 1 : 0, duration: 200 });
