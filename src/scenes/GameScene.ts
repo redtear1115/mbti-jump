@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { GAME } from '../config/gameConfig';
-import { LEVEL_BG } from '../theme/palette';
+import { LEVEL_BG, PALETTE, LETTER_COLORS, letterHex } from '../theme/palette';
 import { Background } from '../gfx/Background';
 import { AuroraBackground } from '../gfx/AuroraBackground';
 import { Player } from '../entities/Player';
@@ -16,7 +16,6 @@ import type { StringKey } from '../i18n/t';
 import { prefersReducedMotion } from '../ui/reducedMotion';
 import { Sfx } from '../audio/Sfx';
 import { MuteButton } from '../ui/MuteButton';
-import { LETTER_COLORS, letterHex } from '../theme/palette';
 import { scoreBarModel } from '../core/scoreBar';
 
 interface GameInit {
@@ -111,14 +110,17 @@ export class GameScene extends Phaser.Scene {
     this.controls = new Controls(this);
     this.controls.start();
 
+    // HUD 底襯：資訊層（題目/關卡/得分條）與遊戲層分家，亮背景下仍可讀
+    const hudScrim = this.add.graphics().setScrollFactor(0).setDepth(19);
+    hudScrim.fillStyle(PALETTE.surface, 0.72);
+    hudScrim.fillRoundedRect(0, 0, GAME.width, 154, { tl: 0, tr: 0, bl: 16, br: 16 });
+
     this.banner = this.add
       .text(GAME.width / 2, 40, '', {
         fontSize: '24px',
         fontStyle: 'bold',
         color: '#ffffff',
         align: 'center',
-        stroke: '#000000',
-        strokeThickness: 4,
         wordWrap: { width: GAME.width - 24 },
         fontFamily: 'Fredoka, system-ui, sans-serif',
       })
