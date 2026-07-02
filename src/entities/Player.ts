@@ -2,8 +2,9 @@ import Phaser from 'phaser';
 import { GAME } from '../config/gameConfig';
 import { ASSET_KEYS } from '../config/assets';
 import { prefersReducedMotion } from '../ui/reducedMotion';
+import { PLAYER_BASE_COLOR } from '../core/playerColor';
 
-const PROC_KEY = 'player-proc';
+const PROC_KEY_PREFIX = 'player-proc-';
 const TEX_W = 48;
 const TEX_H = 44;
 
@@ -11,9 +12,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private reduced = prefersReducedMotion();
   private wobble?: Phaser.Tweens.Tween;
 
-  constructor(scene: Phaser.Scene, x: number, y: number) {
-    const key = scene.textures.exists(ASSET_KEYS.player) ? ASSET_KEYS.player : PROC_KEY;
-    if (key === PROC_KEY) ensureTexture(scene);
+  constructor(scene: Phaser.Scene, x: number, y: number, color: number = PLAYER_BASE_COLOR) {
+    const key = scene.textures.exists(ASSET_KEYS.player)
+      ? ASSET_KEYS.player
+      : ensurePlayerTexture(scene, color);
     super(scene, x, y, key);
     scene.add.existing(this);
     scene.physics.add.existing(this);
@@ -42,19 +44,38 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     });
   }
 
+  /** 依混色結果換膚（texture 帶色重生成）＋彈性 pop；點陣資產模式 no-op。 */
+  recolor(color: number): void {
+    if (this.scene.textures.exists(ASSET_KEYS.player)) return;
+    this.setTexture(ensurePlayerTexture(this.scene, color));
+    if (this.reduced) return;
+    this.wobble?.stop();
+    this.setScale(1.18);
+    this.wobble = this.scene.tweens.add({
+      targets: this,
+      scaleX: 1,
+      scaleY: 1,
+      duration: 300,
+      ease: 'Back.easeOut',
+    });
+  }
+
   wrapHorizontally(): void {
     if (this.x < 0) this.x = GAME.width;
     else if (this.x > GAME.width) this.x = 0;
   }
 }
 
-/** 程式美術：百變怪（Ditto）風格——淡紫液體怪，頂部有波浪凸起，點點眼 + 寬扁微笑。 */
-function ensureTexture(scene: Phaser.Scene): void {
-  if (scene.textures.exists(PROC_KEY)) return;
+/**
+ * 程式美術：百變怪風格淡紫液體怪（帶 body 色參數）。
+ * texture key 依色值快取（player-proc-<hex>）；眼/嘴深色與白高光不隨 body 色變。
+ */
+export function ensurePlayerTexture(scene: Phaser.Scene, bodyColor: number): string {
+  const key = PROC_KEY_PREFIX + bodyColor.toString(16).padStart(6, '0');
+  if (scene.textures.exists(key)) return key;
   const g = scene.make.graphics({ x: 0, y: 0 }, false);
-  const body = 0xc0aee2; // 百變怪淡紫
   // 由多個重疊圓形聯集出「有波浪凸起」的不定形身體
-  g.fillStyle(body, 1);
+  g.fillStyle(bodyColor, 1);
   g.fillCircle(24, 28, 17); // 主體
   g.fillEllipse(24, 33, 42, 22); // 加寬下半身
   g.fillCircle(11, 16, 7); // 左上尖凸
@@ -75,6 +96,7 @@ function ensureTexture(scene: Phaser.Scene): void {
   g.beginPath();
   g.arc(25, 16, 14, Phaser.Math.DegToRad(55), Phaser.Math.DegToRad(125));
   g.strokePath();
-  g.generateTexture(PROC_KEY, TEX_W, TEX_H);
+  g.generateTexture(key, TEX_W, TEX_H);
   g.destroy();
+  return key;
 }

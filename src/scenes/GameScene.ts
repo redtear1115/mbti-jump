@@ -15,6 +15,7 @@ import { chipRect } from '../core/hud';
 import { t, tf } from '../i18n/t';
 import type { StringKey } from '../i18n/t';
 import { prefersReducedMotion } from '../ui/reducedMotion';
+import { playerColorFor } from '../core/playerColor';
 import { Sfx } from '../audio/Sfx';
 import { MuteButton } from '../ui/MuteButton';
 import { scoreBarModel } from '../core/scoreBar';
@@ -101,7 +102,7 @@ export class GameScene extends Phaser.Scene {
       this.spawnNextRow();
     }
 
-    this.player = new Player(this, GAME.width / 2, GAME.height - 90);
+    this.player = new Player(this, GAME.width / 2, GAME.height - 90, playerColorFor(this.score.lockedLetters()));
     this.player.bounce();
 
     this.physics.add.collider(
@@ -424,6 +425,7 @@ export class GameScene extends Phaser.Scene {
     // 平手時以玩家當下水平位置決定：靠左(Yes側)→第一字母、靠右(No側)→第二字母。
     const tieBreak = this.player.x < GAME.width / 2 ? 'first' : 'second';
     this.score.completeLevel(DIMENSIONS[this.dimIndex], tieBreak);
+    this.player.recolor(playerColorFor(this.score.lockedLetters()));
     Sfx.play('advance');
     this.advanceDimension();
   }
