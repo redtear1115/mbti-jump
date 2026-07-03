@@ -80,7 +80,7 @@ export function wrapText(
   if (line) ctx.fillText(line, cx, yy);
 }
 
-/** 四維度傾向條：左右字母色漸變 + 白色分隔線（分享卡直式與 OG 橫式共用）。 */
+/** 四維度傾向條：分隔線左右各填純字母色（分段實色，無跨色漸變）＋白色分隔線。 */
 export function drawDimBars(
   ctx: CanvasRenderingContext2D,
   dims: ShareDim[],
@@ -88,12 +88,21 @@ export function drawDimBars(
 ): void {
   let y = opts.y;
   for (const d of dims) {
-    const grd = ctx.createLinearGradient(opts.x, 0, opts.x + opts.w, 0);
-    grd.addColorStop(0, hex(d.leftColor));
-    grd.addColorStop(1, hex(d.rightColor));
-    ctx.fillStyle = grd;
+    // 整條先填右色，再以 clip 把左段蓋上左色（clip 保證圓角邊緣乾淨）
+    ctx.fillStyle = hex(d.rightColor);
     roundRect(ctx, opts.x, y, opts.w, opts.barH, opts.barH / 2);
     ctx.fill();
+    const lw = d.dividerFrac * opts.w;
+    if (lw > 0) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(opts.x, y, lw, opts.barH);
+      ctx.clip();
+      ctx.fillStyle = hex(d.leftColor);
+      roundRect(ctx, opts.x, y, opts.w, opts.barH, opts.barH / 2);
+      ctx.fill();
+      ctx.restore();
+    }
     const dx = opts.x + d.dividerFrac * opts.w;
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(dx - 2, y - 3, 4, opts.barH + 6);

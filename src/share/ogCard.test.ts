@@ -22,6 +22,10 @@ function mockCtx() {
     arc: () => {},
     closePath: () => {},
     fill: () => {},
+    save: () => {},
+    restore: () => {},
+    rect: () => {},
+    clip: () => {},
   };
   return { ctx: ctx as unknown as CanvasRenderingContext2D, texts };
 }
