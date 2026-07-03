@@ -1,7 +1,7 @@
 import type { Locale } from '../i18n/locales';
 import { t } from '../i18n/t';
 import type { StringKey } from '../i18n/t';
-import { describeType } from '../config/personalities';
+import { describeType, typeName } from '../config/personalities';
 import { groupOf, groupColorOf } from '../core/temperament';
 import { DIMENSIONS, LETTERS_OF } from '../config/questions';
 import type { Dimension, Letter } from '../config/questions';
@@ -44,7 +44,7 @@ export function buildShareCardModel(
   });
   return {
     type,
-    groupName: t(`group.${group}` as StringKey, locale),
+    groupName: `${typeName(type, locale)} · ${t(`group.${group}` as StringKey, locale)}`,
     groupColor: groupColorOf(type),
     description: describeType(type, locale),
     dims,

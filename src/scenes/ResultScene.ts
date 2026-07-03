@@ -6,7 +6,7 @@ import { t, tf } from '../i18n/t';
 import type { StringKey } from '../i18n/t';
 import { Button } from '../ui/Button';
 import { MuteButton } from '../ui/MuteButton';
-import { groupOf, groupColorOf } from '../core/temperament';
+import { groupColorOf } from '../core/temperament';
 import { recordPlay, getPlays } from '../core/profile';
 import { newlyUnlocked } from '../core/achievements';
 import { getSeenIds, markSeen } from '../core/achievementStore';
@@ -40,7 +40,6 @@ export class ResultScene extends Phaser.Scene {
       markSeen(fresh);
     }
     const desc = describeType(type);
-    const group = groupOf(type);
     const groupHex = '#' + groupColorOf(type).toString(16).padStart(6, '0');
     this.cameras.main.setBackgroundColor('#101018');
     const cx = GAME.width / 2;
@@ -78,16 +77,16 @@ export class ResultScene extends Phaser.Scene {
         fontFamily: 'Fredoka, system-ui, sans-serif',
       })
       .setOrigin(0.5);
+
+    // 四維度傾向條（分享卡視覺的 Phaser 版；divider 由中點動畫到實際位置）
+    const model = buildShareCardModel(type, data.score.allTallies(), getLocale());
     this.add
-      .text(cx, 268, tf('result.groupLabel', [t(`group.${group}` as StringKey)]), {
+      .text(cx, 268, model.groupName, {
         fontFamily: 'Fredoka, system-ui, sans-serif',
         fontSize: '20px',
         color: groupHex,
       })
       .setOrigin(0.5);
-
-    // 四維度傾向條（分享卡視覺的 Phaser 版；divider 由中點動畫到實際位置）
-    const model = buildShareCardModel(type, data.score.allTallies(), getLocale());
     const barGfx = this.add.graphics();
     const barX = cx - 130;
     const barW = 260;

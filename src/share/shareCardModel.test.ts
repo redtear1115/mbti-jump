@@ -25,7 +25,8 @@ describe('buildShareCardModel', () => {
 
   it('resolves group name, description and tagline via i18n', () => {
     const m = buildShareCardModel('ENFP', tallies, 'en');
-    expect(m.groupName).toBe('a Diplomat');
+    expect(m.groupName).toContain('·');
+    expect(m.groupName).toContain('a Diplomat');
     expect(m.description.length).toBeGreaterThan(0);
     expect(m.tagline.length).toBeGreaterThan(0);
   });

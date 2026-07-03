@@ -31,7 +31,6 @@ export const EN = {
   'result.heading': 'Your personality type',
   'result.again': 'Play again ↻',
   'result.share': 'My MBTI is {0}! {1} Play MBTI Jump: {2}',
-  'result.groupLabel': 'You are {0}',
   'card.tagline': 'MBTI Jump — jump out your personality',
 
   // --- 分享閉環 ---

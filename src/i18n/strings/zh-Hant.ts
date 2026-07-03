@@ -26,7 +26,6 @@ export const ZH_HANT: Record<StringKey, string> = {
   'result.heading': '你的人格類型',
   'result.again': '再玩一次 ↻',
   'result.share': '我的 MBTI 是 {0}！{1} 來玩 MBTI Jump：{2}',
-  'result.groupLabel': '你屬於{0}',
   'card.tagline': 'MBTI Jump · 玩一場，跳出你的人格',
 
   // --- 分享閉環 ---

@@ -27,7 +27,6 @@ export const ES: Record<StringKey, string> = {
   'result.heading': 'Tu tipo de personalidad',
   'result.again': 'Jugar otra vez ↻',
   'result.share': '¡Mi MBTI es {0}! {1} Juega a MBTI Jump: {2}',
-  'result.groupLabel': 'Eres {0}',
   'card.tagline': 'MBTI Jump — salta y descubre tu personalidad',
 
   // --- 分享閉環（needs-review: AI 草稿，待母語校稿） ---

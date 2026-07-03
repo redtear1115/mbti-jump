@@ -27,7 +27,6 @@ export const JA: Record<StringKey, string> = {
   'result.heading': 'あなたの性格タイプ',
   'result.again': 'もう一度遊ぶ ↻',
   'result.share': '私の MBTI は {0}！{1} MBTI Jump で遊ぼう：{2}',
-  'result.groupLabel': 'あなたは{0}',
   'card.tagline': 'MBTI Jump — 跳んで性格を発見',
 
   // --- 分享閉環（needs-review: AI 草稿，待母語校稿） ---
