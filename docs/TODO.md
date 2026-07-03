@@ -81,6 +81,12 @@
       退役 `compare.0–4`。Final review（字型度量）修正：zh 配對句去 × 空格收 2 行、en ESFJ 描述砍句、
       en/es 改「{0} of 4 letters」避免複數、邀請區座標留餘裕。
 
+## 主角美術（2026-07-04，spec `2026-07-04-mbti-jump-jelly-player-design.md`，5 tasks，已部署）
+- [x] **主角改晶亮果凍水滴** ✅：材質重繪（高光＋邊光＋底陰影＋暗邊，明暗相對身體色→白基底與四關染色都成立）、
+      跳躍全速度驅動拉伸/壓扁＋落地阻尼晃動＋水平微傾（`core/jelly.ts` `jellyStretch` 純函式）、
+      開始頁/結果頁落地投影。碰撞體 36×36 與混色機制不動。過程小尾巴：T2 首版誤動 vitest 全域設定，
+      已改為把純函式移到無 Phaser 的 `core/jelly.ts` 並完整還原基礎設施。
+
 ## Tier 3 — 內容 & 上線
 - [ ] `ja`/`es` 譯文母語校稿（目前 AI 草稿，已標 `needs-review`；含新增的型別文案與配對句）
 - [x] 部署 Cloudflare Workers ✅ `mbti-jump.southern-light.dev`（Worker＋assets，`wrangler deploy`）
