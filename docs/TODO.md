@@ -68,7 +68,10 @@
       按鈕族統一（destructive 紅/次級深灰）、向量 icon（`ui/icons.ts` trophy/lock/chart）取代 emoji、
       GameScene HUD 下移至底部（上方視野全開；玩家 depth 19.2 保持可見）、基底色改微暖白 0xf0f0f4。
       Final review 修正：玩家出生點/深度、es 成就名兩行撞描述、banner 間距。
-- [ ] P3 小項：桌面 letterbox 妝點、語言 chips/靜音鈕觸控目標、海鷗形狀
+- [x] **P3 打磨** ✅（spec `2026-07-03-mbti-jump-p3-polish-design.md`，6 tasks，final review 1 fix 後 READY，已部署 2026-07-03）：
+      傾向條三處改分段實色（使用者回饋漸變中段髒——遊戲得分條/結果頁/分享卡＋OG 共用繪製，80 張 OG 重生成）、
+      桌面 letterbox（漸變底＋懸浮圓角 canvas）、語言 chips 與靜音鈕 ≥44pt（靜音鈕換向量喇叭 icon，emoji icon 全清）、
+      海鷗 30×14 M 形。Final review 修正：5–0 全票時左段方角突出膠囊（full-pill guard）＋ IconKind 窮舉保護。
 
 ## Tier 3 — 內容 & 上線
 - [ ] `ja`/`es` 譯文母語校稿（目前 AI 草稿，已標 `needs-review`）
