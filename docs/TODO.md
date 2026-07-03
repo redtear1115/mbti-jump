@@ -63,7 +63,11 @@
       結果頁分享舞台（族群色 glow＋最終色果凍怪＋動畫維度條）。驗證期修正：Phaser CJK 斷行
       （`useAdvancedWrap` 全站補齊）、四字母平均趨灰 → 最終色改「基底→族群色 75%」。
       小尾巴（延後）：結果頁最長 locale 字串的垂直空間偏緊（desc 3 行＋對比 2 行時距按鈕 ~3px）。
-- [ ] P2 次級畫面：成就徽章化＋總進度、趨勢空狀態、按鈕一致性、emoji icon 換向量
+- [x] **P2 次級畫面＋HUD 下移＋白色基底** ✅（spec `2026-07-02-mbti-jump-p2-secondary-design.md`，9 tasks，final review 3 fixes 後 READY，已部署 2026-07-03）：
+      成就頁兩欄徽章卡（`Achievement.progress` 純函式＋每卡/總進度條）、趨勢空狀態（果凍怪＋一鍵開局）、
+      按鈕族統一（destructive 紅/次級深灰）、向量 icon（`ui/icons.ts` trophy/lock/chart）取代 emoji、
+      GameScene HUD 下移至底部（上方視野全開；玩家 depth 19.2 保持可見）、基底色改微暖白 0xf0f0f4。
+      Final review 修正：玩家出生點/深度、es 成就名兩行撞描述、banner 間距。
 - [ ] P3 小項：桌面 letterbox 妝點、語言 chips/靜音鈕觸控目標、海鷗形狀
 
 ## Tier 3 — 內容 & 上線
