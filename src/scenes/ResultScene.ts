@@ -6,7 +6,7 @@ import { t, tf } from '../i18n/t';
 import type { StringKey } from '../i18n/t';
 import { Button } from '../ui/Button';
 import { MuteButton } from '../ui/MuteButton';
-import { groupColorOf } from '../core/temperament';
+import { groupColorOf, groupOf } from '../core/temperament';
 import { recordPlay, getPlays } from '../core/profile';
 import { newlyUnlocked } from '../core/achievements';
 import { getSeenIds, markSeen } from '../core/achievementStore';
@@ -15,11 +15,11 @@ import { buildShareCardModel } from '../share/shareCardModel';
 import { renderShareCard, canvasToBlob, downloadBlob } from '../share/shareCard';
 import { getLocale } from '../i18n/store';
 import { getInvite } from '../core/invite';
-import { sharedLetters, compareKey } from '../core/compare';
+import { sharedLetters, pairKey } from '../core/compare';
 import { ensureGlowTexture } from '../gfx/glowTexture';
 import { ensurePlayerTexture } from '../entities/Player';
 import { playerColorFor } from '../core/playerColor';
-import { letterHex } from '../theme/palette';
+import { LETTER_COLORS, PALETTE, letterHex } from '../theme/palette';
 import type { Letter } from '../config/questions';
 
 interface ResultInit {
@@ -152,21 +152,24 @@ export class ResultScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
-    // 好友對比（有邀請時）
+    // 好友對比（有邀請時）：族群配對句＋四維度字母對照列
     const friend = getInvite();
     if (friend) {
       this.add
-        .text(cx, 535, tf(compareKey(sharedLetters(type, friend)), [friend]), {
-          fontSize: '16px',
-          color: '#ffe066',
+        .text(cx, 522, tf(pairKey(groupOf(type), groupOf(friend)), [sharedLetters(type, friend)]), {
+          fontSize: '14px',
+          color: '#ffffff',
           align: 'center',
-          wordWrap: { width: GAME.width - 60, useAdvancedWrap: true },
+          wordWrap: { width: GAME.width - 50, useAdvancedWrap: true },
           fontFamily: 'Nunito, system-ui, sans-serif',
         })
         .setOrigin(0.5);
+      this.drawCompareRow(cx, 552, type, friend);
     }
 
-    const shareBtn = new Button(this, cx, 585, t('share.action'), {
+    const btnY = friend ? [595, 658, 718] : [585, 650, 712];
+
+    const shareBtn = new Button(this, cx, btnY[0], t('share.action'), {
       width: 240,
       height: 54,
       fontSize: 20,
@@ -205,7 +208,7 @@ export class ResultScene extends Phaser.Scene {
       },
     });
 
-    new Button(this, cx, 650, t('result.again'), {
+    new Button(this, cx, btnY[1], t('result.again'), {
       width: 240,
       height: 54,
       fontSize: 20,
@@ -214,7 +217,7 @@ export class ResultScene extends Phaser.Scene {
       onClick: () => this.scene.start('Start'),
     });
 
-    new Button(this, cx, 712, t('trend.cta'), {
+    new Button(this, cx, btnY[2], t('trend.cta'), {
       width: 240,
       height: 50,
       fontSize: 18,
@@ -259,5 +262,37 @@ export class ResultScene extends Phaser.Scene {
         onComplete: () => label.destroy(),
       });
     });
+  }
+
+  /** 四維度字母對照：同字母 → 一顆亮色章＋金框；異字母 → 我的彩色章＋好友灰章並列。 */
+  private drawCompareRow(cx: number, y: number, mine: string, theirs: string): void {
+    const g = this.add.graphics();
+    const chipH = 22;
+    const font = {
+      fontSize: '14px',
+      fontStyle: 'bold',
+      fontFamily: 'Nunito, system-ui, sans-serif',
+    };
+    const gap = 16;
+    const widths = [0, 1, 2, 3].map((i) => (mine[i] === theirs[i] ? 30 : 50));
+    let x = cx - (widths.reduce((a, b) => a + b, 0) + gap * 3) / 2;
+    for (let i = 0; i < 4; i++) {
+      const same = mine[i] === theirs[i];
+      if (same) {
+        g.fillStyle(LETTER_COLORS[mine[i] as Letter], 1);
+        g.fillRoundedRect(x, y - chipH / 2, 30, chipH, chipH / 2);
+        g.lineStyle(2, PALETTE.accent, 1);
+        g.strokeRoundedRect(x, y - chipH / 2, 30, chipH, chipH / 2);
+        this.add.text(x + 15, y, mine[i], { ...font, color: PALETTE.textOn }).setOrigin(0.5);
+      } else {
+        g.fillStyle(LETTER_COLORS[mine[i] as Letter], 1);
+        g.fillRoundedRect(x, y - chipH / 2, 24, chipH, chipH / 2);
+        this.add.text(x + 12, y, mine[i], { ...font, color: PALETTE.textOn }).setOrigin(0.5);
+        g.fillStyle(0xffffff, 0.13);
+        g.fillRoundedRect(x + 26, y - chipH / 2, 24, chipH, chipH / 2);
+        this.add.text(x + 38, y, theirs[i], { ...font, color: '#8888aa' }).setOrigin(0.5);
+      }
+      x += widths[i] + gap;
+    }
   }
 }

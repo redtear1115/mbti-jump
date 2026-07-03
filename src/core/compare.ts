@@ -10,11 +10,6 @@ export function sharedLetters(a: string, b: string): number {
   return n;
 }
 
-/** 重合數 → 對比文案 key（compare.0 ~ compare.4）。 */
-export function compareKey(shared: number): StringKey {
-  return `compare.${shared}` as StringKey;
-}
-
 const PAIR_ORDER: readonly Group[] = ['explorer', 'diplomat', 'analyst', 'sentinel'];
 
 /** 兩族群 → 配對文案 key（無序：依 PAIR_ORDER 正規化，共 10 種）。 */

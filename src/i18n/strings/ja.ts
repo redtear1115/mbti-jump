@@ -37,11 +37,6 @@ export const JA: Record<StringKey, string> = {
   'share.downloadedOnly': 'カード保存済み ✓（コピー失敗）',
   'share.fail': 'シェアに失敗しました',
   'invite.greeting': '友だちは{0}。相性をチェックしよう！',
-  'compare.0': '{0}とは4文字すべて違う——完璧な補完関係！',
-  'compare.1': '{0}と1文字が同じ——異なる世界の火花。',
-  'compare.2': '{0}と2文字が同じ——半分似て半分サプライズ。',
-  'compare.3': '{0}と3文字が同じ——魂の近縁！',
-  'compare.4': '{0}と同じタイプ——ソウルメイト！',
 
   // --- 族群配對文案（needs-review: AI 草稿，待母語校稿） ---
   'pair.explorer_explorer': '探検家 × 探検家——思い立ったら即出発のふたり、冒険の途中で支え合う（同じ文字は {0} 個）',

@@ -37,11 +37,6 @@ export const ES: Record<StringKey, string> = {
   'share.downloadedOnly': 'Tarjeta descargada ✓ (copia fallida)',
   'share.fail': 'Error al compartir',
   'invite.greeting': 'Tu amigo es {0}: ¡mide vuestra compatibilidad!',
-  'compare.0': 'Tú y {0} no compartís ninguna letra: ¡complementos perfectos!',
-  'compare.1': 'Tú y {0} compartís 1 letra: chispas de mundos distintos.',
-  'compare.2': 'Tú y {0} compartís 2 letras: mitad parecidos, mitad sorpresa.',
-  'compare.3': 'Tú y {0} compartís 3 letras: ¡almas afines!',
-  'compare.4': '¡{0} y tú sois del mismo tipo: almas gemelas!',
 
   // --- 族群配對文案（needs-review: AI 草稿，待母語校稿） ---
   'pair.explorer_explorer': 'Explorador × Explorador — dos personas de "vámonos ya", cubriéndose en cada aventura ({0} letras en común)',

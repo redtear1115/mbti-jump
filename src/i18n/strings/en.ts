@@ -41,11 +41,6 @@ export const EN = {
   'share.downloadedOnly': 'Card downloaded ✓ (copy failed)',
   'share.fail': 'Share failed',
   'invite.greeting': 'Your friend is {0} — jump in and see how you two match!',
-  'compare.0': 'You and {0} share no letters — perfect complements!',
-  'compare.1': 'You and {0} share 1 letter — sparks from different worlds.',
-  'compare.2': 'You and {0} share 2 letters — half alike, half surprising.',
-  'compare.3': 'You and {0} share 3 letters — kindred spirits!',
-  'compare.4': 'Same type as your friend {0} — soulmates!',
 
   // --- Group pairing copy ---
   'pair.explorer_explorer': 'Explorer × Explorer — two "let\'s just go" people covering each other on every adventure ({0} letters in common)',
