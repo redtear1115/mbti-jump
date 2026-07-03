@@ -80,15 +80,6 @@ export const ZH_HANS: Record<StringKey, string> = {
   'group.analyst': '分析师',
   'group.sentinel': '守护者',
 
-  'trait.E': '从人群中获得能量',
-  'trait.I': '在独处中充电',
-  'trait.S': '相信具体可见',
-  'trait.N': '追逐各种可能',
-  'trait.T': '用逻辑衡量',
-  'trait.F': '以感受为先',
-  'trait.J': '喜欢计划与确定',
-  'trait.P': '享受保持弹性',
-
   // --- 16 型专属文案 ---
   'type.INTJ.name': '沉默军师',
   'type.INTJ.desc': '你早就推演完三步后的局，只是懒得解释。朋友不多，但每个都经过严格审核。',
@@ -122,8 +113,6 @@ export const ZH_HANS: Record<StringKey, string> = {
   'type.ESTP.desc': '先做再说是你的座右铭，计划是别人的事。危机现场最冷静的人，通常是你。',
   'type.ESFP.name': '派对主角',
   'type.ESFP.desc': '你一进场，气氛就自动调亮两度。人生是舞台，你从不怯场。',
-
-  'personality.template': '你{0}、{1}、{2}，也{3}。',
 
   'q.ei_1.text': '空闲的周末你比较想…',
   'q.ei_1.yes': '约一群人出去',

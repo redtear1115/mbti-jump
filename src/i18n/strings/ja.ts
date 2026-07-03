@@ -81,15 +81,6 @@ export const JA: Record<StringKey, string> = {
   'group.analyst': '分析家',
   'group.sentinel': '番人',
 
-  'trait.E': '人と関わって元気が出る',
-  'trait.I': '一人の時間で充電する',
-  'trait.S': '具体的なものを信じる',
-  'trait.N': '可能性を追い求める',
-  'trait.T': '論理で判断する',
-  'trait.F': '気持ちを大切にする',
-  'trait.J': '計画と決着を好む',
-  'trait.P': '柔軟さを楽しむ',
-
   // --- 16 型專屬文案（needs-review: AI 草稿，待母語校稿） ---
   'type.INTJ.name': '静かなる軍師',
   'type.INTJ.desc': '三手先まで読み終えているのに、説明するのが面倒なだけ。友達は少ないが、全員厳選済み。',
@@ -123,8 +114,6 @@ export const JA: Record<StringKey, string> = {
   'type.ESTP.desc': '「まずやってみる」が座右の銘、計画は他人の仕事。危機の現場で一番冷静なのは、たいてい君。',
   'type.ESFP.name': 'パーティーの主役',
   'type.ESFP.desc': '君が入場すると、場の明るさが二段階上がる。人生は舞台、物怖じしたことなし。',
-
-  'personality.template': 'あなたは{0}、{1}、{2}、そして{3}。',
 
   'q.ei_1.text': '休日の過ごし方、どっち？',
   'q.ei_1.yes': 'みんなで出かける',

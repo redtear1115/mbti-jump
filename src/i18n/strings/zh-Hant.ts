@@ -80,15 +80,6 @@ export const ZH_HANT: Record<StringKey, string> = {
   'group.analyst': '分析師',
   'group.sentinel': '守護者',
 
-  'trait.E': '從人群中獲得能量',
-  'trait.I': '在獨處中充電',
-  'trait.S': '相信具體可見',
-  'trait.N': '追逐各種可能',
-  'trait.T': '用邏輯衡量',
-  'trait.F': '以感受為先',
-  'trait.J': '喜歡計畫與確定',
-  'trait.P': '享受保持彈性',
-
   // --- 16 型專屬文案 ---
   'type.INTJ.name': '沉默軍師',
   'type.INTJ.desc': '你早就推演完三步後的局，只是懶得解釋。朋友不多，但每個都經過嚴格審核。',
@@ -122,8 +113,6 @@ export const ZH_HANT: Record<StringKey, string> = {
   'type.ESTP.desc': '先做再說是你的座右銘，計畫是別人的事。危機現場最冷靜的人，通常是你。',
   'type.ESFP.name': '派對主角',
   'type.ESFP.desc': '你一進場，氣氛就自動調亮兩度。人生是舞台，你從不怯場。',
-
-  'personality.template': '你{0}、{1}、{2}，也{3}。',
 
   'q.ei_1.text': '空閒的週末你比較想…',
   'q.ei_1.yes': '揪一群人出去',

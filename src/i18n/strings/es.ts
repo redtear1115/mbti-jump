@@ -81,15 +81,6 @@ export const ES: Record<StringKey, string> = {
   'group.analyst': 'un Analista',
   'group.sentinel': 'un Centinela',
 
-  'trait.E': 'te llenas de energía con la gente',
-  'trait.I': 'te recargas en soledad',
-  'trait.S': 'confías en lo concreto',
-  'trait.N': 'persigues posibilidades',
-  'trait.T': 'decides con lógica',
-  'trait.F': 'te guías por el corazón',
-  'trait.J': 'prefieres planear y cerrar temas',
-  'trait.P': 'disfrutas la flexibilidad',
-
   // --- 16 型專屬文案（needs-review: AI 草稿，待母語校稿） ---
   'type.INTJ.name': 'El Estratega Silencioso',
   'type.INTJ.desc': 'Ya calculaste las próximas tres jugadas; explicarlas te parece ineficiente. Pocos amigos, todos rigurosamente seleccionados.',
@@ -123,8 +114,6 @@ export const ES: Record<StringKey, string> = {
   'type.ESTP.desc': 'Primero hacer, planear nunca. En una crisis real, el más tranquilo de la sala eres tú.',
   'type.ESFP.name': 'El Protagonista',
   'type.ESFP.desc': 'Entras y la sala sube dos niveles de brillo. La vida es un escenario y nunca has tenido pánico escénico.',
-
-  'personality.template': 'Tú {0}, {1}, {2} y {3}.',
 
   'q.ei_1.text': 'En un fin de semana libre, prefieres…',
   'q.ei_1.yes': 'Salir con un grupo',

@@ -87,16 +87,6 @@ export const EN = {
   'group.analyst': 'an Analyst',
   'group.sentinel': 'a Sentinel',
 
-  // --- 人格字母特質（組句用）---
-  'trait.E': 'draw energy from people',
-  'trait.I': 'recharge in solitude',
-  'trait.S': 'trust what is concrete',
-  'trait.N': 'chase possibilities',
-  'trait.T': 'weigh things by logic',
-  'trait.F': 'lead with the heart',
-  'trait.J': 'like plans and closure',
-  'trait.P': 'enjoy staying flexible',
-
   // --- 16 型專屬文案 ---
   'type.INTJ.name': 'The Silent Strategist',
   'type.INTJ.desc': "You've already played out the next three moves — explaining them just feels inefficient. Small circle, rigorously vetted.",
@@ -130,8 +120,6 @@ export const EN = {
   'type.ESTP.desc': 'Do first, plan never. In a real crisis, the calmest person in the room is somehow you.',
   'type.ESFP.name': 'The Main Character',
   'type.ESFP.desc': "You walk in and the room brightens two notches. Life is a stage, and you've never known stage fright.",
-
-  'personality.template': 'You {0}, {1}, {2}, and {3}.',
 
   // --- 題目（EI）---
   'q.ei_1.text': 'On a free weekend, you would rather…',
