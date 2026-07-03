@@ -5,8 +5,8 @@ import { prefersReducedMotion } from '../ui/reducedMotion';
 import { PLAYER_BASE_COLOR } from '../core/playerColor';
 
 const PROC_KEY_PREFIX = 'player-proc-';
-const TEX_W = 48;
-const TEX_H = 44;
+const TEX_W = 54;
+const TEX_H = 50;
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
   private reduced = prefersReducedMotion();
@@ -67,35 +67,52 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 }
 
 /**
- * 程式美術：百變怪風格淡紫液體怪（帶 body 色參數）。
- * texture key 依色值快取（player-proc-<hex>）；眼/嘴深色與白高光不隨 body 色變。
+ * 程式美術：晶亮果凍水滴（帶 body 色參數）。
+ * 明暗相對身體色：高光/邊光白 alpha、底陰影/暗邊黑 alpha、眼嘴固定深墨色。
+ * → 同函式對白基底與任一染色都成立。texture key 依色值快取。
  */
 export function ensurePlayerTexture(scene: Phaser.Scene, bodyColor: number): string {
   const key = PROC_KEY_PREFIX + bodyColor.toString(16).padStart(6, '0');
   if (scene.textures.exists(key)) return key;
   const g = scene.make.graphics({ x: 0, y: 0 }, false);
-  // 由多個重疊圓形聯集出「有波浪凸起」的不定形身體
+  const cx = 27;
+  const cy = 26;
+  const rx = 22; // 身體水平半徑
+  const ry = 20; // 身體垂直半徑
+
+  // 1. 身體（圓潤水滴橢圓）
   g.fillStyle(bodyColor, 1);
-  g.fillCircle(24, 28, 17); // 主體
-  g.fillEllipse(24, 33, 42, 22); // 加寬下半身
-  g.fillCircle(11, 16, 7); // 左上尖凸
-  g.fillCircle(20, 11, 8); // 中左凸
-  g.fillCircle(30, 12, 8); // 中右凸
-  g.fillCircle(39, 17, 7); // 右上圓凸
-  g.fillCircle(7, 25, 6); // 左側
-  g.fillCircle(42, 27, 6); // 右側小凸
-  // 頂部高光（果凍感）
-  g.fillStyle(0xffffff, 0.16);
-  g.fillEllipse(19, 18, 22, 11);
-  // 眼睛：兩個深色小圓點
+  g.fillEllipse(cx, cy, rx * 2, ry * 2);
+
+  // 2. 底部半月陰影（體積）
+  g.fillStyle(0x000000, 0.1);
+  g.fillEllipse(cx, cy + ry * 0.32, rx * 1.6, ry * 1.2);
+
+  // 3. 柔和暗邊（亮背景上仍分得出輪廓）
+  g.lineStyle(1.2, 0x000000, 0.16);
+  g.strokeEllipse(cx, cy, rx * 2, ry * 2);
+
+  // 4. 主高光（左上大片）＋右上小閃點
+  g.fillStyle(0xffffff, 0.85);
+  g.fillEllipse(cx - rx * 0.34, cy - ry * 0.42, rx * 0.6, ry * 0.34);
+  g.fillStyle(0xffffff, 0.9);
+  g.fillEllipse(cx + rx * 0.32, cy - ry * 0.44, rx * 0.2, ry * 0.14);
+
+  // 5. 上緣邊光（透亮玻璃/水珠光澤）
+  g.lineStyle(rx * 0.12, 0xffffff, 0.22);
+  g.beginPath();
+  g.arc(cx, cy - ry * 0.06, rx * 0.86, Phaser.Math.DegToRad(208), Phaser.Math.DegToRad(332));
+  g.strokePath();
+
+  // 6. 臉：兩點深墨色眼＋寬淺微笑
   g.fillStyle(0x2a2340, 1);
-  g.fillCircle(19, 24, 2.3);
-  g.fillCircle(31, 24, 2.3);
-  // 嘴巴：寬而淺的微笑線（百變怪招牌憨笑）
+  g.fillCircle(cx - rx * 0.26, cy - ry * 0.02, 2.4);
+  g.fillCircle(cx + rx * 0.26, cy - ry * 0.02, 2.4);
   g.lineStyle(2, 0x2a2340, 1);
   g.beginPath();
-  g.arc(25, 16, 14, Phaser.Math.DegToRad(55), Phaser.Math.DegToRad(125));
+  g.arc(cx, cy + ry * 0.12, rx * 0.5, Phaser.Math.DegToRad(35), Phaser.Math.DegToRad(145));
   g.strokePath();
+
   g.generateTexture(key, TEX_W, TEX_H);
   g.destroy();
   return key;
