@@ -62,6 +62,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       } else {
         const damp = Math.cos(p * Math.PI * 3) * Math.exp(-p * 4);
         this.setScale(1 + 0.35 * damp, 1 - 0.32 * damp);
+        this.syncBodySize();
         this.applyLean(body.velocity.x, dt);
         return;
       }
@@ -74,7 +75,14 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       this.scaleX + (target.scaleX - this.scaleX) * a,
       this.scaleY + (target.scaleY - this.scaleY) * a,
     );
+    this.syncBodySize();
     this.applyLean(body.velocity.x, dt);
+  }
+
+  /** 反補償視覺 scale，讓 Arcade body 維持真正 36×36（Phaser body 會隨 sprite scale 縮放）。 */
+  private syncBodySize(): void {
+    const body = this.body as Phaser.Physics.Arcade.Body;
+    body.setSize(36 / Math.abs(this.scaleX), 36 / Math.abs(this.scaleY));
   }
 
   private applyLean(vx: number, dt: number): void {
