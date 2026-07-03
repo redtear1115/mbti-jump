@@ -92,7 +92,7 @@ export class StartScene extends Phaser.Scene {
           // 固定寬度 + 置中 → 每個語系膠囊等寬，間距一致
           fixedWidth: 76,
           align: 'center',
-          padding: { x: 6, y: 12 },
+          padding: { x: 10, y: 14 },
           fontFamily: 'Nunito, system-ui, sans-serif',
         })
         .setOrigin(0.5)

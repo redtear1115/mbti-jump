@@ -23,9 +23,20 @@
     <meta property="og:url" content="https://mbti-jump.southern-light.dev/" />
     <meta name="twitter:card" content="summary_large_image" />
     <style>
-      html, body { margin: 0; height: 100%; background: #1a1c2c; overflow: hidden; }
+      html, body {
+        margin: 0;
+        height: 100%;
+        background: radial-gradient(circle at 50% 38%, #232640 0%, #14162a 55%, #0d0e1c 100%);
+        overflow: hidden;
+      }
       #app { width: 100vw; height: 100vh; }
       canvas { display: block; }
+      @media (min-width: 500px) {
+        #app canvas {
+          border-radius: 18px;
+          box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+        }
+      }
     </style>
   </head>
   <body>
