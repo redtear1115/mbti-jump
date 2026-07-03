@@ -43,6 +43,18 @@ export const ES: Record<StringKey, string> = {
   'compare.3': 'Tú y {0} compartís 3 letras: ¡almas afines!',
   'compare.4': '¡{0} y tú sois del mismo tipo: almas gemelas!',
 
+  // --- 族群配對文案（needs-review: AI 草稿，待母語校稿） ---
+  'pair.explorer_explorer': 'Explorador × Explorador — dos personas de "vámonos ya", cubriéndose en cada aventura ({0} letras en común)',
+  'pair.explorer_diplomat': 'Diplomático × Explorador — ideales más acción: el mundo debería preocuparse un poco ({0} letras en común)',
+  'pair.explorer_analyst': 'Analista × Explorador — el que piensa hondo y el que corre rápido, cómicamente complementarios ({0} letras en común)',
+  'pair.explorer_sentinel': 'Centinela × Explorador — uno pisa el acelerador, otro sujeta el volante: equilibrio perfecto ({0} letras en común)',
+  'pair.diplomat_diplomat': 'Diplomático × Diplomático — dos corazones cálidos charlando hasta el amanecer ({0} letras en común)',
+  'pair.diplomat_analyst': 'Diplomático × Analista — el soñador lo sueña, el lógico lo hace realidad ({0} letras en común)',
+  'pair.diplomat_sentinel': 'Diplomático × Centinela — uno dibuja el plano, otro pone los cimientos: ternura estable ({0} letras en común)',
+  'pair.analyst_analyst': 'Analista × Analista — compitiendo en ingenio con gusto; hasta sus peleas parecen seminarios ({0} letras en común)',
+  'pair.analyst_sentinel': 'Analista × Centinela — estrategia más ejecución, el dúo que lo consigue todo ({0} letras en común)',
+  'pair.sentinel_sentinel': 'Centinela × Centinela — fiable con fiable; hasta sus agendas coinciden ({0} letras en común)',
+
   'trend.title': 'Tus tendencias',
   'trend.cta': 'Tendencias',
   'trend.totalPlays': 'Jugado {0} veces',

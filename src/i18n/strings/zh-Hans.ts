@@ -42,6 +42,18 @@ export const ZH_HANS: Record<StringKey, string> = {
   'compare.3': '你和 {0} 有 3 个字母相同——灵魂近亲！',
   'compare.4': '你和 {0} 是同型——简直灵魂双胞胎！',
 
+  // --- 族群配对文案 ---
+  'pair.explorer_explorer': '探险家 × 探险家——说走就走的两个人，冒险路上互相接应（你们有 {0} 个字母相同）',
+  'pair.explorer_diplomat': '外交官 × 探险家——理想加上行动力，随时可能改变世界（你们有 {0} 个字母相同）',
+  'pair.explorer_analyst': '分析师 × 探险家——想得深遇上跑得快，互补到有点好笑（你们有 {0} 个字母相同）',
+  'pair.explorer_sentinel': '守护者 × 探险家——一个踩油门、一个握方向盘，刚好平衡（你们有 {0} 个字母相同）',
+  'pair.diplomat_diplomat': '外交官 × 外交官——两颗真心互相取暖，聊到天亮都嫌不够（你们有 {0} 个字母相同）',
+  'pair.diplomat_analyst': '外交官 × 分析师——理想派负责做梦，逻辑派负责让梦成真（你们有 {0} 个字母相同）',
+  'pair.diplomat_sentinel': '外交官 × 守护者——一个画蓝图、一个盖地基，稳稳的温柔（你们有 {0} 个字母相同）',
+  'pair.analyst_analyst': '分析师 × 分析师——斗智斗得很开心，吵架都像学术研讨（你们有 {0} 个字母相同）',
+  'pair.analyst_sentinel': '分析师 × 守护者——策略遇上执行，最强的落地组合（你们有 {0} 个字母相同）',
+  'pair.sentinel_sentinel': '守护者 × 守护者——可靠遇上可靠，行程表都对得整整齐齐（你们有 {0} 个字母相同）',
+
   'trend.title': '你的趋势',
   'trend.cta': '趋势',
   'trend.totalPlays': '已玩 {0} 次',

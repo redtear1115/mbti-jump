@@ -47,6 +47,18 @@ export const EN = {
   'compare.3': 'You and {0} share 3 letters — kindred spirits!',
   'compare.4': 'Same type as your friend {0} — soulmates!',
 
+  // --- Group pairing copy ---
+  'pair.explorer_explorer': 'Explorer × Explorer — two "let\'s just go" people covering each other on every adventure ({0} letters in common)',
+  'pair.explorer_diplomat': 'Diplomat × Explorer — ideals plus action; the world should be a little worried ({0} letters in common)',
+  'pair.explorer_analyst': 'Analyst × Explorer — deep thinker meets fast mover, almost comically complementary ({0} letters in common)',
+  'pair.explorer_sentinel': 'Sentinel × Explorer — one hits the gas, one holds the wheel; perfectly balanced ({0} letters in common)',
+  'pair.diplomat_diplomat': 'Diplomat × Diplomat — two warm hearts talking till sunrise and still not done ({0} letters in common)',
+  'pair.diplomat_analyst': 'Diplomat × Analyst — the dreamer dreams it, the logician makes it real ({0} letters in common)',
+  'pair.diplomat_sentinel': 'Diplomat × Sentinel — one sketches the blueprint, one lays the foundation; steady tenderness ({0} letters in common)',
+  'pair.analyst_analyst': 'Analyst × Analyst — happily out-thinking each other; even your fights sound like seminars ({0} letters in common)',
+  'pair.analyst_sentinel': 'Analyst × Sentinel — strategy meets execution, the ultimate get-it-done duo ({0} letters in common)',
+  'pair.sentinel_sentinel': 'Sentinel × Sentinel — reliable meets reliable; even your calendars line up ({0} letters in common)',
+
   'trend.title': 'Your Trends',
   'trend.cta': 'Trends',
   'trend.totalPlays': 'Played {0} times',

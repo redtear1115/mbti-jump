@@ -43,6 +43,18 @@ export const JA: Record<StringKey, string> = {
   'compare.3': '{0}と3文字が同じ——魂の近縁！',
   'compare.4': '{0}と同じタイプ——ソウルメイト！',
 
+  // --- 族群配對文案（needs-review: AI 草稿，待母語校稿） ---
+  'pair.explorer_explorer': '探検家 × 探検家——思い立ったら即出発のふたり、冒険の途中で支え合う（同じ文字は {0} 個）',
+  'pair.explorer_diplomat': '外交官 × 探検家——理想に行動力が加われば、世界が変わるかもしれない（同じ文字は {0} 個）',
+  'pair.explorer_analyst': '分析家 × 探検家——深く考える人と速く動く人、面白いほど補い合う（同じ文字は {0} 個）',
+  'pair.explorer_sentinel': '番人 × 探検家——ひとりがアクセル、ひとりがハンドル。ちょうどいいバランス（同じ文字は {0} 個）',
+  'pair.diplomat_diplomat': '外交官 × 外交官——ふたつの真心が温め合い、朝まで話しても足りない（同じ文字は {0} 個）',
+  'pair.diplomat_analyst': '外交官 × 分析家——夢見る係と、夢を実現する係（同じ文字は {0} 個）',
+  'pair.diplomat_sentinel': '外交官 × 番人——ひとりが青写真を描き、ひとりが土台を築く。安定のやさしさ（同じ文字は {0} 個）',
+  'pair.analyst_analyst': '分析家 × 分析家——知恵比べが楽しくて、喧嘩さえ学会みたい（同じ文字は {0} 個）',
+  'pair.analyst_sentinel': '分析家 × 番人——戦略と実行、最強の実現コンビ（同じ文字は {0} 個）',
+  'pair.sentinel_sentinel': '番人 × 番人——頼れる同士、スケジュール帳までぴったり揃う（同じ文字は {0} 個）',
+
   'trend.title': 'あなたの傾向',
   'trend.cta': '傾向',
   'trend.totalPlays': '{0} 回プレイ',
