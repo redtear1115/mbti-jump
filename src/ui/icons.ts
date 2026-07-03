@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 
-export type IconKind = 'trophy' | 'lock' | 'chart';
+export type IconKind = 'trophy' | 'lock' | 'chart' | 'sound-on' | 'sound-off';
 
 /** 程式繪製 24×24 白色 icon texture（使用端 setTint 上色）。同 kind 快取。 */
 export function ensureIconTexture(scene: Phaser.Scene, kind: IconKind): string {
@@ -21,7 +21,25 @@ export function ensureIconTexture(scene: Phaser.Scene, kind: IconKind): string {
     g.strokePath();
     g.fillStyle(0xffffff, 1);
     g.fillRoundedRect(5, 9, 14, 11, 3);
-  } else {
+  } else if (kind === 'sound-on' || kind === 'sound-off') {
+    // 喇叭：箱體＋錐面
+    g.fillRect(3, 9, 5, 6);
+    g.fillTriangle(8, 12, 13, 5, 13, 19);
+    if (kind === 'sound-on') {
+      // 兩道聲波弧
+      g.lineStyle(2, 0xffffff, 1);
+      g.beginPath();
+      g.arc(14, 12, 4, Phaser.Math.DegToRad(-50), Phaser.Math.DegToRad(50));
+      g.strokePath();
+      g.beginPath();
+      g.arc(14, 12, 7.5, Phaser.Math.DegToRad(-50), Phaser.Math.DegToRad(50));
+      g.strokePath();
+    } else {
+      // 斜線（靜音）
+      g.lineStyle(2.2, 0xffffff, 1);
+      g.lineBetween(15, 6, 22, 18);
+    }
+  } else if (kind === 'chart') {
     // chart：三根高低長條
     g.fillRect(4, 12, 4, 8);
     g.fillRect(10, 7, 4, 13);
