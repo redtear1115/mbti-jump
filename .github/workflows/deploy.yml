@@ -36,7 +36,10 @@ jobs:
       - name: Build
         run: npm run build
 
+      # 用官方 action 部署：它在 runner 上乾淨安裝對應平台的 wrangler，
+      # 避免 npm ci 在 Linux 上缺 macOS 產生之 lockfile 的平台專屬二進位（workerd-linux-64）。
       - name: Deploy to Cloudflare Workers
-        run: npx wrangler deploy
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          wranglerVersion: '4.106.0'
