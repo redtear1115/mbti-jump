@@ -7,6 +7,11 @@ import { computeTrends } from '../core/trends';
 import { groupColorOf } from '../core/temperament';
 import { t, tf } from '../i18n/t';
 import { MuteButton } from '../ui/MuteButton';
+import { Button } from '../ui/Button';
+import { ensurePlayerTexture } from '../entities/Player';
+import { PLAYER_BASE_COLOR } from '../core/playerColor';
+import { ScoreTracker } from '../core/ScoreTracker';
+import { requestTiltPermission } from '../input/tiltPermission';
 
 const TITLE_FONT = 'Fredoka, system-ui, sans-serif';
 const BODY_FONT = 'Nunito, system-ui, sans-serif';
@@ -31,8 +36,10 @@ export class TrendScene extends Phaser.Scene {
     const trends = computeTrends(getPlays());
 
     if (trends.totalPlays === 0) {
+      // 空狀態：果凍怪＋文案＋直接開局（少走一步回開始頁）
+      this.add.image(cx, 300, ensurePlayerTexture(this, PLAYER_BASE_COLOR)).setScale(1.6);
       this.add
-        .text(cx, GAME.height / 2 - 40, t('trend.empty'), {
+        .text(cx, 400, t('trend.empty'), {
           fontFamily: BODY_FONT,
           fontSize: '18px',
           color: '#ffffffcc',
@@ -40,6 +47,15 @@ export class TrendScene extends Phaser.Scene {
           wordWrap: { width: GAME.width - 60, useAdvancedWrap: true },
         })
         .setOrigin(0.5);
+      new Button(this, cx, 480, t('start.cta'), {
+        width: 240,
+        height: 54,
+        fontSize: 20,
+        onClick: async () => {
+          await requestTiltPermission();
+          this.scene.start('Game', { score: new ScoreTracker() });
+        },
+      });
     } else {
       this.add
         .text(cx, 108, tf('trend.totalPlays', [trends.totalPlays]), { fontFamily: BODY_FONT, fontSize: '18px', color: PALETTE.textMuted })
@@ -65,27 +81,38 @@ export class TrendScene extends Phaser.Scene {
       });
     }
 
-    // 清除鈕（兩步確認）
-    const clearBtn = this.add
-      .text(cx, 690, t('trend.clear'), { fontFamily: BODY_FONT, fontSize: '16px', color: '#ffb0bd', backgroundColor: '#ffffff11', padding: { x: 14, y: 8 } })
-      .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true });
-    clearBtn.on('pointerup', () => {
-      if (!this.clearArmed) {
-        this.clearArmed = true;
-        clearBtn.setText(t('trend.clearConfirm'));
-        return;
-      }
-      clearPlays();
-      this.scene.restart();
-    });
+    // 清除鈕（兩步確認；空狀態無可清）
+    if (trends.totalPlays > 0) {
+      const clearBtn = new Button(this, cx, 690, t('trend.clear'), {
+        width: 200,
+        height: 46,
+        fontSize: 16,
+        bg: PALETTE.no,
+        bgHover: 0xc95568,
+        bgDown: 0x9a3145,
+        textColor: '#ffffff',
+        onClick: () => {
+          if (!this.clearArmed) {
+            this.clearArmed = true;
+            clearBtn.setLabel(t('trend.clearConfirm'));
+            return;
+          }
+          clearPlays();
+          this.scene.restart();
+        },
+      });
+    }
 
-    // 返回
-    const backBtn = this.add
-      .text(cx, 748, t('common.back'), { fontFamily: BODY_FONT, fontSize: '18px', color: '#ffffff', backgroundColor: '#ffffff11', padding: { x: 16, y: 8 } })
-      .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true });
-    backBtn.on('pointerup', () => this.scene.start('Start'));
+    new Button(this, cx, 748, t('common.back'), {
+      width: 160,
+      height: 46,
+      fontSize: 16,
+      bg: PALETTE.surfaceAlt,
+      bgHover: 0x3a3e58,
+      bgDown: 0x22243a,
+      textColor: '#ffffff',
+      onClick: () => this.scene.start('Start'),
+    });
   }
 
   /** 一維度的偏向比例條：左標 a 與 firstPct，右標 b 與 secondPct。 */

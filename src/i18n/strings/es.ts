@@ -45,7 +45,7 @@ export const ES: Record<StringKey, string> = {
   'compare.4': '¡{0} y tú sois del mismo tipo: almas gemelas!',
 
   'trend.title': 'Tus tendencias',
-  'trend.cta': 'Tendencias 📊',
+  'trend.cta': 'Tendencias',
   'trend.totalPlays': 'Jugado {0} veces',
   'trend.topType': 'Más frecuente',
   'trend.recent': 'Reciente',
@@ -56,8 +56,9 @@ export const ES: Record<StringKey, string> = {
   'common.back': '◀ Atrás',
 
   'ach.title': 'Logros',
-  'ach.cta': 'Logros 🏆',
-  'ach.unlocked': '🏆 Desbloqueado: {0}',
+  'ach.progress': 'Desbloqueados {0}/{1}',
+  'ach.cta': 'Logros',
+  'ach.unlocked': 'Desbloqueado: {0}',
   'ach.first_play.name': 'Primeros pasos',
   'ach.first_play.desc': 'Termina tu primera partida',
   'ach.persistent.name': 'Persistente',

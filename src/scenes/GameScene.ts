@@ -93,7 +93,7 @@ export class GameScene extends Phaser.Scene {
     this.platforms = this.physics.add.staticGroup();
 
     // 起始平台（玩家正下方）
-    this.spawnY = GAME.height - 40;
+    this.spawnY = 600; // 起始平台移到底部 HUD 卡（646 起）之上
     this.addNormalPlatform(GAME.width / 2, this.spawnY);
 
     // 預先往上鋪一段
@@ -102,7 +102,8 @@ export class GameScene extends Phaser.Scene {
       this.spawnNextRow();
     }
 
-    this.player = new Player(this, GAME.width / 2, GAME.height - 90, playerColorFor(this.score.lockedLetters()));
+    this.player = new Player(this, GAME.width / 2, 550, playerColorFor(this.score.lockedLetters()));
+    this.player.setDepth(19.2); // 高於 HUD 底卡(19)、低於 chips(19.5)/HUD 文字(20)：低空與墜落時仍可見
     this.player.bounce();
 
     this.physics.add.collider(
@@ -116,13 +117,13 @@ export class GameScene extends Phaser.Scene {
     this.controls = new Controls(this);
     this.controls.start();
 
-    // HUD 底襯：資訊層（題目/關卡/得分條）與遊戲層分家，亮背景下仍可讀
+    // HUD 底襯（畫面底部）：往上跳的視野留給上方，資訊層固定在下方
     const hudScrim = this.add.graphics().setScrollFactor(0).setDepth(19);
     hudScrim.fillStyle(PALETTE.surface, 0.72);
-    hudScrim.fillRoundedRect(0, 0, GAME.width, 154, { tl: 0, tr: 0, bl: 16, br: 16 });
+    hudScrim.fillRoundedRect(0, 646, GAME.width, 154, { tl: 16, tr: 16, bl: 0, br: 0 });
 
     this.banner = this.add
-      .text(GAME.width / 2, 40, '', {
+      .text(GAME.width / 2, 660, '', {
         fontSize: '24px',
         fontStyle: 'bold',
         color: '#ffffff',
@@ -135,7 +136,7 @@ export class GameScene extends Phaser.Scene {
       .setDepth(20);
 
     this.levelLabel = this.add
-      .text(GAME.width / 2, 108, '', {
+      .text(GAME.width / 2, 728, '', {
         fontSize: '14px',
         color: '#ffffffaa',
         fontFamily: 'Nunito, system-ui, sans-serif',
@@ -151,12 +152,12 @@ export class GameScene extends Phaser.Scene {
       fontFamily: 'Nunito, system-ui, sans-serif',
     };
     this.scoreLeft = this.add
-      .text(135, 139, '', scoreLabelStyle)
+      .text(135, 757, '', scoreLabelStyle)
       .setOrigin(0, 0.5)
       .setScrollFactor(0)
       .setDepth(21);
     this.scoreRight = this.add
-      .text(315, 139, '', scoreLabelStyle)
+      .text(315, 757, '', scoreLabelStyle)
       .setOrigin(1, 0.5)
       .setScrollFactor(0)
       .setDepth(21);
@@ -173,13 +174,13 @@ export class GameScene extends Phaser.Scene {
     this.chipLeft = this.add.graphics().setScrollFactor(0).setDepth(19.5).setAlpha(0);
     this.chipRight = this.add.graphics().setScrollFactor(0).setDepth(19.5).setAlpha(0);
     this.previewLeft = this.add
-      .text(12, 158, '', { ...previewStyle, align: 'left' })
+      .text(12, 618, '', { ...previewStyle, align: 'left' })
       .setOrigin(0, 0)
       .setScrollFactor(0)
       .setDepth(20)
       .setAlpha(0);
     this.previewRight = this.add
-      .text(GAME.width - 12, 158, '', { ...previewStyle, align: 'right' })
+      .text(GAME.width - 12, 618, '', { ...previewStyle, align: 'right' })
       .setOrigin(1, 0)
       .setScrollFactor(0)
       .setDepth(20)
@@ -391,7 +392,7 @@ export class GameScene extends Phaser.Scene {
     const w = 200;
     const h = 22;
     const x0 = (GAME.width - w) / 2;
-    const y0 = 128;
+    const y0 = 746;
     const g = this.scoreBar;
     g.clear();
     g.fillGradientStyle(LETTER_COLORS[a], LETTER_COLORS[b], LETTER_COLORS[a], LETTER_COLORS[b], 1);

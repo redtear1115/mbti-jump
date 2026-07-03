@@ -45,7 +45,7 @@ export const JA: Record<StringKey, string> = {
   'compare.4': '{0}と同じタイプ——ソウルメイト！',
 
   'trend.title': 'あなたの傾向',
-  'trend.cta': '傾向 📊',
+  'trend.cta': '傾向',
   'trend.totalPlays': '{0} 回プレイ',
   'trend.topType': '最も多い',
   'trend.recent': '最近',
@@ -56,8 +56,9 @@ export const JA: Record<StringKey, string> = {
   'common.back': '◀ 戻る',
 
   'ach.title': '実績',
-  'ach.cta': '実績 🏆',
-  'ach.unlocked': '🏆 解除：{0}',
+  'ach.progress': '解除済み {0}/{1}',
+  'ach.cta': '実績',
+  'ach.unlocked': '解除：{0}',
   'ach.first_play.name': 'はじめの一歩',
   'ach.first_play.desc': '初めてのゲームをクリア',
   'ach.persistent.name': '継続は力',

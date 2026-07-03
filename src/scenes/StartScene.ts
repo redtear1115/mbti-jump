@@ -11,10 +11,7 @@ import { groupColorOf } from '../core/temperament';
 import { ensurePlayerTexture } from '../entities/Player';
 import { PLAYER_BASE_COLOR } from '../core/playerColor';
 import { prefersReducedMotion } from '../ui/reducedMotion';
-
-type OrientationPermissionApi = {
-  requestPermission?: () => Promise<'granted' | 'denied'>;
-};
+import { requestTiltPermission } from '../input/tiltPermission';
 
 export class StartScene extends Phaser.Scene {
   constructor() {
@@ -124,7 +121,7 @@ export class StartScene extends Phaser.Scene {
       height: 60,
       fontSize: 28,
       onClick: async () => {
-        await this.requestTiltPermission();
+        await requestTiltPermission();
         this.scene.start('Game', { score: new ScoreTracker() });
       },
     });
@@ -136,6 +133,7 @@ export class StartScene extends Phaser.Scene {
       bg: 0x4298b4, // 藍，區分主 CTA
       bgHover: 0x54aec9,
       bgDown: 0x3a86a0,
+      icon: 'chart',
       onClick: () => this.scene.start('Trend'),
     });
 
@@ -146,19 +144,8 @@ export class StartScene extends Phaser.Scene {
       bg: 0x88619a, // 紫，區分其他鈕
       bgHover: 0x9d78ae,
       bgDown: 0x76527f,
+      icon: 'trophy',
       onClick: () => this.scene.start('Achievements'),
     });
-  }
-
-  /** iOS 13+ 需在使用者手勢中請求體感權限；其他平台略過。 */
-  private async requestTiltPermission(): Promise<void> {
-    const api = window.DeviceOrientationEvent as unknown as OrientationPermissionApi | undefined;
-    if (api && typeof api.requestPermission === 'function') {
-      try {
-        await api.requestPermission();
-      } catch {
-        /* 被拒：交給點擊左右半邊備援 */
-      }
-    }
   }
 }
