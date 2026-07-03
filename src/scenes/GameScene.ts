@@ -395,8 +395,14 @@ export class GameScene extends Phaser.Scene {
     const y0 = 746;
     const g = this.scoreBar;
     g.clear();
-    g.fillGradientStyle(LETTER_COLORS[a], LETTER_COLORS[b], LETTER_COLORS[a], LETTER_COLORS[b], 1);
+    // 分段實色：整條先填右字母色，再以左圓角矩形蓋出左段（無跨色漸變髒段）
+    g.fillStyle(LETTER_COLORS[b], 1);
     g.fillRoundedRect(x0, y0, w, h, 11);
+    const lw = m.dividerFrac * w;
+    if (lw > 0) {
+      g.fillStyle(LETTER_COLORS[a], 1);
+      g.fillRoundedRect(x0, y0, lw, h, { tl: 11, bl: 11, tr: 0, br: 0 });
+    }
 
     // 兩端字母色圓章（深字由 scoreLeft/Right text 疊在 depth 21）
     const badge = (text: Phaser.GameObjects.Text, letter: Letter) => {
