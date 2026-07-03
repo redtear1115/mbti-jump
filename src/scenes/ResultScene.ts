@@ -156,7 +156,7 @@ export class ResultScene extends Phaser.Scene {
     const friend = getInvite();
     if (friend) {
       this.add
-        .text(cx, 522, tf(pairKey(groupOf(type), groupOf(friend)), [sharedLetters(type, friend)]), {
+        .text(cx, 526, tf(pairKey(groupOf(type), groupOf(friend)), [sharedLetters(type, friend)]), {
           fontSize: '14px',
           color: '#ffffff',
           align: 'center',
@@ -164,10 +164,10 @@ export class ResultScene extends Phaser.Scene {
           fontFamily: 'Nunito, system-ui, sans-serif',
         })
         .setOrigin(0.5);
-      this.drawCompareRow(cx, 552, type, friend);
+      this.drawCompareRow(cx, 560, type, friend);
     }
 
-    const btnY = friend ? [595, 658, 718] : [585, 650, 712];
+    const btnY = friend ? [600, 662, 722] : [585, 650, 712];
 
     const shareBtn = new Button(this, cx, btnY[0], t('share.action'), {
       width: 240,
