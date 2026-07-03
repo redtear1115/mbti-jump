@@ -25,8 +25,17 @@ export function drawOgCard(ctx: CanvasRenderingContext2D, model: ShareCardModel)
   ctx.fillStyle = hex(model.groupColor);
   ctx.font = "800 200px Fredoka, 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans JP', sans-serif";
   ctx.fillText(model.type, OG_W * 0.3, OG_H * 0.48);
+  // 族群行：綽號 · 族群名可能較長（尤其 en/es），縮字級以免伸進右側維度條
   ctx.fillStyle = '#ffffffcc';
-  ctx.font = "600 40px Fredoka, 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans JP', sans-serif";
+  const GROUP_MAXW = 560;
+  let groupSize = 40;
+  const groupFont = (px: number) =>
+    `600 ${px}px Fredoka, 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans JP', sans-serif`;
+  ctx.font = groupFont(groupSize);
+  while (groupSize > 24 && ctx.measureText(model.groupName).width > GROUP_MAXW) {
+    groupSize -= 2;
+    ctx.font = groupFont(groupSize);
+  }
   ctx.fillText(model.groupName, OG_W * 0.3, OG_H * 0.58);
 
   // 右半：描述（換行）＋四維度條
