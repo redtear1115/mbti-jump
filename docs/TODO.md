@@ -73,9 +73,16 @@
       桌面 letterbox（漸變底＋懸浮圓角 canvas）、語言 chips 與靜音鈕 ≥44pt（靜音鈕換向量喇叭 icon，emoji icon 全清）、
       海鷗 30×14 M 形。Final review 修正：5–0 全票時左段方角突出膠囊（full-pill guard）＋ IconKind 窮舉保護。
 
+## 內容包（2026-07-03，spec `2026-07-03-mbti-jump-content-pack-design.md`，8 tasks，final review 2 fix 後 READY，已部署）
+- [x] **16 型專屬文案** ✅：每型原創綽號＋被說中式描述（`type.<TYPE>.name/.desc` ×5 語 160 條），
+      貫穿結果頁/分享文字/分享卡/OG（族群行「綽號 · 族群名」、OG title「TYPE 綽號」、80 張重生成）；
+      退役 `personality.template`＋`trait.*` 模板組句。
+- [x] **好友對比深化** ✅：族群配對句（10 種無序組合 ×5 語）＋四維度字母對照列（同字母金框章／異字母並列）；
+      退役 `compare.0–4`。Final review（字型度量）修正：zh 配對句去 × 空格收 2 行、en ESFJ 描述砍句、
+      en/es 改「{0} of 4 letters」避免複數、邀請區座標留餘裕。
+
 ## Tier 3 — 內容 & 上線
-- [ ] `ja`/`es` 譯文母語校稿（目前 AI 草稿，已標 `needs-review`）
-- [ ] 人格文案深度（現為四字母組句；可升級 16 型各自文案）
+- [ ] `ja`/`es` 譯文母語校稿（目前 AI 草稿，已標 `needs-review`；含新增的型別文案與配對句）
 - [x] 部署 Cloudflare Workers ✅ `mbti-jump.southern-light.dev`（Worker＋assets，`wrangler deploy`）
 - [x] 分享頁 OG image ✅ 分享閉環完成（2026-07-02，spec `2026-07-02-mbti-jump-share-loop-design.md`，13 tasks，final review READY）：
       `/t/<TYPE>?lang=<locale>` 邀請連結 + Worker HTMLRewriter 注入 16 型×5 語 OG meta +
