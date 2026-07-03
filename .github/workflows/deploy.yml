@@ -15,9 +15,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22 # wrangler 需要 Node ≥22
           cache: npm
@@ -39,7 +39,7 @@ jobs:
       # 用官方 action 部署：它在 runner 上乾淨安裝對應平台的 wrangler，
       # 避免 npm ci 在 Linux 上缺 macOS 產生之 lockfile 的平台專屬二進位（workerd-linux-64）。
       - name: Deploy to Cloudflare Workers
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           wranglerVersion: '4.106.0'
