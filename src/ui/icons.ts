@@ -44,6 +44,10 @@ export function ensureIconTexture(scene: Phaser.Scene, kind: IconKind): string {
     g.fillRect(4, 12, 4, 8);
     g.fillRect(10, 7, 4, 13);
     g.fillRect(16, 10, 4, 10);
+  } else {
+    // 窮舉保護：新增 IconKind 時漏畫會在編譯期報錯
+    const _exhaustive: never = kind;
+    void _exhaustive;
   }
   g.generateTexture(key, 24, 24);
   g.destroy();

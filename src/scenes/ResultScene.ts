@@ -117,7 +117,11 @@ export class ResultScene extends Phaser.Scene {
         barGfx.fillStyle(d.rightColor, 1);
         barGfx.fillRoundedRect(barX, y, barW, barH, 8);
         const lw = frac * barW;
-        if (lw > 0) {
+        if (lw >= barW - 8) {
+          // 左段吃進右端圓角區（5–0 全票）：整條左色圓角，避免方角突出膠囊外
+          barGfx.fillStyle(d.leftColor, 1);
+          barGfx.fillRoundedRect(barX, y, barW, barH, 8);
+        } else if (lw > 0) {
           barGfx.fillStyle(d.leftColor, 1);
           barGfx.fillRoundedRect(barX, y, lw, barH, { tl: 8, bl: 8, tr: 0, br: 0 });
         }

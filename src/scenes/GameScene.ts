@@ -399,7 +399,11 @@ export class GameScene extends Phaser.Scene {
     g.fillStyle(LETTER_COLORS[b], 1);
     g.fillRoundedRect(x0, y0, w, h, 11);
     const lw = m.dividerFrac * w;
-    if (lw > 0) {
+    if (lw >= w - 11) {
+      // 左段吃進右端圓角區（如 1–0 開局、5–0 全票）：整條左色圓角
+      g.fillStyle(LETTER_COLORS[a], 1);
+      g.fillRoundedRect(x0, y0, w, h, 11);
+    } else if (lw > 0) {
       g.fillStyle(LETTER_COLORS[a], 1);
       g.fillRoundedRect(x0, y0, lw, h, { tl: 11, bl: 11, tr: 0, br: 0 });
     }
