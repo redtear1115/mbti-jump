@@ -112,9 +112,19 @@ export class ResultScene extends Phaser.Scene {
       barGfx.clear();
       model.dims.forEach((d, i) => {
         const y = topY + i * pitch;
-        barGfx.fillGradientStyle(d.leftColor, d.rightColor, d.leftColor, d.rightColor, 1);
-        barGfx.fillRoundedRect(barX, y, barW, barH, 8);
         const frac = 0.5 + (d.dividerFrac - 0.5) * progress;
+        // 分段實色：右色整條＋左段 per-corner 圓角覆蓋（無跨色漸變髒段）
+        barGfx.fillStyle(d.rightColor, 1);
+        barGfx.fillRoundedRect(barX, y, barW, barH, 8);
+        const lw = frac * barW;
+        if (lw >= barW - 8) {
+          // 左段吃進右端圓角區（5–0 全票）：整條左色圓角，避免方角突出膠囊外
+          barGfx.fillStyle(d.leftColor, 1);
+          barGfx.fillRoundedRect(barX, y, barW, barH, 8);
+        } else if (lw > 0) {
+          barGfx.fillStyle(d.leftColor, 1);
+          barGfx.fillRoundedRect(barX, y, lw, barH, { tl: 8, bl: 8, tr: 0, br: 0 });
+        }
         barGfx.fillStyle(0xffffff, 1);
         barGfx.fillRect(barX + frac * barW - 2, y - 2, 4, barH + 4);
       });

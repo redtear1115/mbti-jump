@@ -293,14 +293,14 @@ function ensureTextures(scene: Phaser.Scene): void {
     g.fillRect(10, 4, 1.6, 7);
   });
 
-  // 海鷗：對稱雙弧剪影（⌢⌢），無方向性
-  make(TEX.bird, 22, 10, (g) => {
-    g.lineStyle(1.8, 0x9aa0c0, 0.9);
+  // 海鷗：雙弧在中點相接的「M」形剪影，加大加粗更易辨識
+  make(TEX.bird, 30, 14, (g) => {
+    g.lineStyle(2.2, 0x9aa0c0, 0.9);
     g.beginPath();
-    g.arc(7, 7, 5, Phaser.Math.DegToRad(200), Phaser.Math.DegToRad(340));
+    g.arc(8, 9, 7, Phaser.Math.DegToRad(200), Phaser.Math.DegToRad(340));
     g.strokePath();
     g.beginPath();
-    g.arc(15, 7, 5, Phaser.Math.DegToRad(200), Phaser.Math.DegToRad(340));
+    g.arc(22, 9, 7, Phaser.Math.DegToRad(200), Phaser.Math.DegToRad(340));
     g.strokePath();
   });
 
