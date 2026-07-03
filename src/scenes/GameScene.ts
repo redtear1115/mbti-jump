@@ -189,7 +189,8 @@ export class GameScene extends Phaser.Scene {
     new MuteButton(this, GAME.width - 26, 26);
   }
 
-  update() {
+  update(_time: number, delta: number) {
+    this.player.tickJelly(delta / 1000);
     this.player.setAxis(this.controls.axis);
     this.player.wrapHorizontally();
 

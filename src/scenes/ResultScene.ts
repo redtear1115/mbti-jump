@@ -52,6 +52,15 @@ export class ResultScene extends Phaser.Scene {
       .setBlendMode(Phaser.BlendModes.SCREEN)
       .setTint(groupColorOf(type));
 
+    // 果凍落地投影
+    const jellyShadow = this.add.graphics();
+    jellyShadow.fillStyle(0x000000, 0.28);
+    jellyShadow.fillEllipse(cx, 172, 92, 18);
+    if (!reduce) {
+      jellyShadow.setAlpha(0);
+      this.tweens.add({ targets: jellyShadow, alpha: 1, duration: 500 });
+    }
+
     // 最終色果凍怪：你的顏色，elastic pop 入場
     // 一律用 proc texture；若日後重新引入點陣 player 資產，需比照 Player 的 ASSET_KEYS fallback
     const jelly = this.add
