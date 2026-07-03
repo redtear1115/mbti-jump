@@ -23,6 +23,11 @@ export class StartScene extends Phaser.Scene {
     const cx = GAME.width / 2;
     const current = getLocale();
 
+    // Hero 落地投影（白角色不浮在深底上）
+    const heroShadow = this.add.graphics();
+    heroShadow.fillStyle(0x000000, 0.28);
+    heroShadow.fillEllipse(cx, 138, 80, 16);
+
     // Hero 果凍怪：標題上方 idle 呼吸（reduced-motion 靜態）
     // 一律用 proc texture；若日後重新引入點陣 player 資產，需比照 Player 的 ASSET_KEYS fallback
     const hero = this.add
