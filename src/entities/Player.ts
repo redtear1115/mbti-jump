@@ -3,6 +3,7 @@ import { GAME } from '../config/gameConfig';
 import { ASSET_KEYS } from '../config/assets';
 import { prefersReducedMotion } from '../ui/reducedMotion';
 import { PLAYER_BASE_COLOR } from '../core/playerColor';
+import { jellyStretch } from '../core/jelly';
 
 const PROC_KEY_PREFIX = 'player-proc-';
 const TEX_W = 54;
@@ -10,7 +11,10 @@ const TEX_H = 50;
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
   private reduced = prefersReducedMotion();
-  private wobble?: Phaser.Tweens.Tween;
+  private jiggling = false;
+  private jiggleT = 0; // 已經過秒數
+  private static readonly JIGGLE_DUR = 0.42;
+  private static readonly LEAN_MAX = 0.12; // rad
 
   constructor(scene: Phaser.Scene, x: number, y: number, color: number = PLAYER_BASE_COLOR) {
     const key = scene.textures.exists(ASSET_KEYS.player)
@@ -30,34 +34,53 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   bounce(): void {
     this.setVelocityY(GAME.jumpVelocity);
-    // 液體感：落地瞬間壓扁 → 彈性回彈略微拉長，像果凍史萊姆
     if (this.reduced) return;
-    this.wobble?.stop();
-    this.setScale(1.35, 0.68);
-    this.wobble = this.scene.tweens.add({
-      targets: this,
-      scaleX: 1,
-      scaleY: 1,
-      duration: 420,
-      ease: 'Elastic.easeOut',
-      easeParams: [1.1, 0.45],
-    });
+    // 落地衝擊：開啟阻尼晃動（由 tickJelly 每幀渲染，從壓扁彈回）
+    this.jiggling = true;
+    this.jiggleT = 0;
   }
 
-  /** 依混色結果換膚（texture 帶色重生成）＋彈性 pop；點陣資產模式 no-op。 */
+  /** 依混色結果換膚（texture 帶色重生成）＋軟晃動；點陣資產模式 no-op。 */
   recolor(color: number): void {
     if (this.scene.textures.exists(ASSET_KEYS.player)) return;
     this.setTexture(ensurePlayerTexture(this.scene, color));
     if (this.reduced) return;
-    this.wobble?.stop();
-    this.setScale(1.18);
-    this.wobble = this.scene.tweens.add({
-      targets: this,
-      scaleX: 1,
-      scaleY: 1,
-      duration: 300,
-      ease: 'Back.easeOut',
-    });
+    this.jiggling = true;
+    this.jiggleT = 0;
+  }
+
+  /** 每幀更新果凍變形：晃動期用阻尼餘弦，否則依垂直速度拉伸；水平速度給微傾。 */
+  tickJelly(dt: number): void {
+    if (this.reduced) return;
+    const body = this.body as Phaser.Physics.Arcade.Body;
+
+    if (this.jiggling) {
+      this.jiggleT += dt;
+      const p = this.jiggleT / Player.JIGGLE_DUR;
+      if (p >= 1) {
+        this.jiggling = false;
+      } else {
+        const damp = Math.cos(p * Math.PI * 3) * Math.exp(-p * 4);
+        this.setScale(1 + 0.35 * damp, 1 - 0.32 * damp);
+        this.applyLean(body.velocity.x, dt);
+        return;
+      }
+    }
+
+    // 速度驅動：目標 scale 以指數平滑趨近（避免抖動）
+    const target = jellyStretch(body.velocity.y);
+    const a = 1 - Math.exp(-dt * 20);
+    this.setScale(
+      this.scaleX + (target.scaleX - this.scaleX) * a,
+      this.scaleY + (target.scaleY - this.scaleY) * a,
+    );
+    this.applyLean(body.velocity.x, dt);
+  }
+
+  private applyLean(vx: number, dt: number): void {
+    const target = Phaser.Math.Clamp(vx * 0.00032, -Player.LEAN_MAX, Player.LEAN_MAX);
+    const a = 1 - Math.exp(-dt * 12);
+    this.rotation += (target - this.rotation) * a;
   }
 
   wrapHorizontally(): void {
