@@ -7,6 +7,7 @@ import { computeTrends } from '../core/trends';
 import { groupColorOf } from '../core/temperament';
 import { t, tf } from '../i18n/t';
 import { MuteButton } from '../ui/MuteButton';
+import { muteAnchor, safeTopDelta } from '../ui/safeArea';
 import { Button } from '../ui/Button';
 import { ensurePlayerTexture } from '../entities/Player';
 import { PLAYER_BASE_COLOR } from '../core/playerColor';
@@ -27,19 +28,21 @@ export class TrendScene extends Phaser.Scene {
     this.clearArmed = false;
     this.cameras.main.setBackgroundColor(PALETTE.surface);
     const cx = GAME.width / 2;
-    new MuteButton(this, GAME.width - 26, 26);
+    const mute = muteAnchor(GAME.width);
+    new MuteButton(this, mute.x, mute.y);
+    const topDelta = safeTopDelta();
 
     this.add
-      .text(cx, 48, t('trend.title'), { fontFamily: TITLE_FONT, fontSize: '30px', color: '#ffffff', fontStyle: 'bold' })
+      .text(cx, 48 + topDelta, t('trend.title'), { fontFamily: TITLE_FONT, fontSize: '30px', color: '#ffffff', fontStyle: 'bold' })
       .setOrigin(0.5);
 
     const trends = computeTrends(getPlays());
 
     if (trends.totalPlays === 0) {
       // 空狀態：果凍怪＋文案＋直接開局（少走一步回開始頁）
-      this.add.image(cx, 300, ensurePlayerTexture(this, PLAYER_BASE_COLOR)).setScale(1.6);
+      this.add.image(cx, 300 + topDelta, ensurePlayerTexture(this, PLAYER_BASE_COLOR)).setScale(1.6);
       this.add
-        .text(cx, 400, t('trend.empty'), {
+        .text(cx, 400 + topDelta, t('trend.empty'), {
           fontFamily: BODY_FONT,
           fontSize: '18px',
           color: '#ffffffcc',
@@ -58,16 +61,16 @@ export class TrendScene extends Phaser.Scene {
       });
     } else {
       this.add
-        .text(cx, 108, tf('trend.totalPlays', [trends.totalPlays]), { fontFamily: BODY_FONT, fontSize: '18px', color: PALETTE.textMuted })
+        .text(cx, 108 + topDelta, tf('trend.totalPlays', [trends.totalPlays]), { fontFamily: BODY_FONT, fontSize: '18px', color: PALETTE.textMuted })
         .setOrigin(0.5);
 
       if (trends.topType) {
-        this.add.text(cx, 150, t('trend.topType'), { fontFamily: BODY_FONT, fontSize: '14px', color: PALETTE.textMuted }).setOrigin(0.5);
+        this.add.text(cx, 150 + topDelta, t('trend.topType'), { fontFamily: BODY_FONT, fontSize: '14px', color: PALETTE.textMuted }).setOrigin(0.5);
         const hex = '#' + groupColorOf(trends.topType).toString(16).padStart(6, '0');
-        this.add.text(cx, 188, trends.topType, { fontFamily: TITLE_FONT, fontSize: '44px', color: hex, fontStyle: 'bold' }).setOrigin(0.5);
+        this.add.text(cx, 188 + topDelta, trends.topType, { fontFamily: TITLE_FONT, fontSize: '44px', color: hex, fontStyle: 'bold' }).setOrigin(0.5);
       }
 
-      let y = 250;
+      let y = 250 + topDelta;
       for (const d of DIMENSIONS) {
         const [a, b] = LETTERS_OF[d];
         const lean = trends.dimensionLean[d];
