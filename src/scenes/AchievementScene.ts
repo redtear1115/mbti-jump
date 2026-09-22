@@ -6,6 +6,7 @@ import { getPlays } from '../core/profile';
 import { t, tf } from '../i18n/t';
 import type { StringKey } from '../i18n/t';
 import { MuteButton } from '../ui/MuteButton';
+import { muteAnchor, safeTopDelta } from '../ui/safeArea';
 import { Button } from '../ui/Button';
 import { ensureIconTexture } from '../ui/icons';
 
@@ -27,10 +28,12 @@ export class AchievementScene extends Phaser.Scene {
   create() {
     this.cameras.main.setBackgroundColor(PALETTE.surface);
     const cx = GAME.width / 2;
-    new MuteButton(this, GAME.width - 26, 26);
+    const mute = muteAnchor(GAME.width);
+    new MuteButton(this, mute.x, mute.y);
+    const topDelta = safeTopDelta();
 
     this.add
-      .text(cx, 48, t('ach.title'), { fontFamily: TITLE_FONT, fontSize: '30px', color: '#ffffff', fontStyle: 'bold' })
+      .text(cx, 48 + topDelta, t('ach.title'), { fontFamily: TITLE_FONT, fontSize: '30px', color: '#ffffff', fontStyle: 'bold' })
       .setOrigin(0.5);
 
     const plays = getPlays();
@@ -38,7 +41,7 @@ export class AchievementScene extends Phaser.Scene {
 
     // 總進度：已解鎖 x/y + 200×10 進度條
     this.add
-      .text(cx, 84, tf('ach.progress', [unlocked.size, ACHIEVEMENTS.length]), {
+      .text(cx, 84 + topDelta, tf('ach.progress', [unlocked.size, ACHIEVEMENTS.length]), {
         fontFamily: BODY_FONT,
         fontSize: '14px',
         color: PALETTE.textMuted,
@@ -48,16 +51,16 @@ export class AchievementScene extends Phaser.Scene {
     const tw = 200;
     const tx = cx - tw / 2;
     totalG.fillStyle(0xffffff, 0.13);
-    totalG.fillRoundedRect(tx, 100, tw, 10, 5);
+    totalG.fillRoundedRect(tx, 100 + topDelta, tw, 10, 5);
     if (unlocked.size > 0) {
       totalG.fillStyle(PALETTE.accent, 1);
-      totalG.fillRoundedRect(tx, 100, Math.max(10, (tw * unlocked.size) / ACHIEVEMENTS.length), 10, 5);
+      totalG.fillRoundedRect(tx, 100 + topDelta, Math.max(10, (tw * unlocked.size) / ACHIEVEMENTS.length), 10, 5);
     }
 
     // 兩欄徽章卡
     ACHIEVEMENTS.forEach((a, i) => {
       const x = GRID_X + (i % 2) * COL_PITCH;
-      const y = GRID_Y + Math.floor(i / 2) * ROW_PITCH;
+      const y = GRID_Y + topDelta + Math.floor(i / 2) * ROW_PITCH;
       const on = unlocked.has(a.id);
       const g = this.add.graphics();
       g.fillStyle(PALETTE.surfaceAlt, 1);
