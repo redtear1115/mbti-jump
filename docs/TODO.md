@@ -26,8 +26,6 @@
       `core/pickQuestions`（純函式 Fisher-Yates，注入 rng）+ `questions.ts` 每維度 5→10（共 40）+ 20 新題×五語 i18n（ja/es 沿用 needs-review）+ GameScene init/advanceDimension 每場隨機抽 5 題（奇數不平手不變）。85 tests 綠、tsc/build 通過。
       小尾巴（延後）：locale 檔內新題 key 排序非按維度分塊（純美觀、completeness 以 key set 比對不受影響）；ja/es 母語校稿。
 
----
-
 ## Tier 0 — 程式品質快修（小、低風險，隨時可做）
 - [ ] `Controls.ts` 從 `core/` 移到 `input/` 或 `entities/`（它 import Phaser，破壞 core=純邏輯 的語意）
 - [ ] 移除 `GameScene.answeredCount`，改用「本維度題目集」計數，消除與 `answeredIds` 的雙重真相
@@ -66,52 +64,34 @@
       HUD 一體式深色卡＋題目去描邊、答案預覽實心字母色 chip（顯示 latch）、台階頂亮線/底暗帶、
       得分條字母圓章＋加粗分隔線、極光降亮 15%。新增 `core/hud.ts` chipRect 純函式。
 - [x] **P1 記憶點** ✅（spec `2026-07-02-mbti-jump-p1-hero-design.md`，7 tasks，final review READY，已部署）：
-      開始頁呼吸 hero 果凍怪、果凍怪隨鎖定維度混色（`core/playerColor.ts` 純函式＋texture 帶色重生成）、
-      結果頁分享舞台（族群色 glow＋最終色果凍怪＋動畫維度條）。驗證期修正：Phaser CJK 斷行
+      開始頁呼吸 hero 果凍怪、果凍怪隨鎖定維度混色（`core/playerColor.ts` 純函式＋texture 帶色重生成）、結果頁分享舞台（族群色 glow＋最終色果凍怪＋動畫維度條）。驗證期修正：Phaser CJK 斷行
       （`useAdvancedWrap` 全站補齊）、四字母平均趨灰 → 最終色改「基底→族群色 75%」。
       小尾巴（延後）：結果頁最長 locale 字串的垂直空間偏緊（desc 3 行＋對比 2 行時距按鈕 ~3px）。
 - [x] **P2 次級畫面＋HUD 下移＋白色基底** ✅（spec `2026-07-02-mbti-jump-p2-secondary-design.md`，9 tasks，final review 3 fixes 後 READY，已部署 2026-07-03）：
-      成就頁兩欄徽章卡（`Achievement.progress` 純函式＋每卡/總進度條）、趨勢空狀態（果凍怪＋一鍵開局）、
-      按鈕族統一（destructive 紅/次級深灰）、向量 icon（`ui/icons.ts` trophy/lock/chart）取代 emoji、
-      GameScene HUD 下移至底部（上方視野全開；玩家 depth 19.2 保持可見）、基底色改微暖白 0xf0f0f4。
+      成就頁兩欄徽章卡（`Achievement.progress` 純函式＋每卡/總進度條）、趨勢空狀態（果凍怪＋一鍵開局）、按鈕族統一（destructive 紅/次級深灰）、向量 icon（`ui/icons.ts` trophy/lock/chart）取代 emoji、GameScene HUD 下移至底部（上方視野全開；玩家 depth 19.2 保持可見）、基底色改微暖白 0xf0f0f4。
       Final review 修正：玩家出生點/深度、es 成就名兩行撞描述、banner 間距。
-- [x] **P3 打磨** ✅（spec `2026-07-03-mbti-jump-p3-polish-design.md`，6 tasks，final review 1 fix 後 READY，已部署 2026-07-03）：
-      傾向條三處改分段實色（使用者回饋漸變中段髒——遊戲得分條/結果頁/分享卡＋OG 共用繪製，80 張 OG 重生成）、
-      桌面 letterbox（漸變底＋懸浮圓角 canvas）、語言 chips 與靜音鈕 ≥44pt（靜音鈕換向量喇叭 icon，emoji icon 全清）、
-      海鷗 30×14 M 形。Final review 修正：5–0 全票時左段方角突出膠囊（full-pill guard）＋ IconKind 窮舉保護。
+- [x] **P3 打磨** ✅（spec `2026-07-03-mbti-jump-p3-polish-design.md`，6 tasks，final review 1 fix 後 READY）：
+      傾向條三處改分段實色（使用者回饋漸變中段髒——遊戲得分條/結果頁/分享卡＋OG 共用繪製，80 張 OG 重生成）、桌面 letterbox（漸變底＋懸浮圓角 canvas）、語言 chips 與靜音鈕 ≥44pt（靜音鈕換向量喇叭 icon，emoji icon 全清）、海鷗 30×14 M 形。Final review 修正：5–0 全票時左段方角突出膠囊（full-pill guard）＋ IconKind 窮舉保護。
 
 ## 內容包（2026-07-03，spec `2026-07-03-mbti-jump-content-pack-design.md`，8 tasks，final review 2 fix 後 READY，已部署）
-- [x] **16 型專屬文案** ✅：每型原創綽號＋被說中式描述（`type.<TYPE>.name/.desc` ×5 語 160 條），
-      貫穿結果頁/分享文字/分享卡/OG（族群行「綽號 · 族群名」、OG title「TYPE 綽號」、80 張重生成）；
-      退役 `personality.template`＋`trait.*` 模板組句。
-- [x] **好友對比深化** ✅：族群配對句（10 種無序組合 ×5 語）＋四維度字母對照列（同字母金框章／異字母並列）；
-      退役 `compare.0–4`。Final review（字型度量）修正：zh 配對句去 × 空格收 2 行、en ESFJ 描述砍句、
-      en/es 改「{0} of 4 letters」避免複數、邀請區座標留餘裕。
+- [x] **16 型專屬文案** ✅：每型原創綽號＋被說中式描述（`type.<TYPE>.name/.desc` ×5 語 160 條），貫穿結果頁/分享文字/分享卡/OG（族群行「綽號 · 族群名」、OG title「TYPE 綽號」、80 張重生成）；退役 `personality.template`＋`trait.*` 模板組句。
+- [x] **好友對比深化** ✅：族群配對句（10 種無序組合 ×5 語）＋四維度字母對照列（同字母金框章／異字母並列）；退役 `compare.0–4`。Final review（字型度量）修正：zh 配對句去 × 空格收 2 行、en ESFJ 描述砍句、en/es 改「{0} of 4 letters」避免複數、邀請區座標留餘裕。
+
+## 主角美術 v2（2026-09-23）
+- [x] **果凍水滴可愛升級＋落地飛濺** ✅：大眼睛＋白 catchlight、粉腮紅（alpha）、更開的微笑、左右短臂肉芽；`JELLY_MAX_STRETCH` 0.28→0.36、落地 jiggle 更誇張；`bounce()` 噴出短命水滴粒子（身體色＋白高光，~300–480ms 銷毀）；reduced-motion 略過飛濺與誇張變形。純函式 `core/jellySplash.ts` 可單測。Start/Result 共用 `ensurePlayerTexture` 自動跟著變臉。
+      註：舊 YAGNI「不做粒子」已被此使用者要求覆寫——落地 splash 現為 intentional。
 
 ## 主角美術（2026-07-04，spec `2026-07-04-mbti-jump-jelly-player-design.md`，5 tasks，已部署）
-- [x] **主角改晶亮果凍水滴** ✅：材質重繪（高光＋邊光＋底陰影＋暗邊，明暗相對身體色→白基底與四關染色都成立）、
-      跳躍全速度驅動拉伸/壓扁＋落地阻尼晃動＋水平微傾（`core/jelly.ts` `jellyStretch` 純函式）、
-      開始頁/結果頁落地投影。碰撞體 36×36 與混色機制不動。過程小尾巴：T2 首版誤動 vitest 全域設定，
-      已改為把純函式移到無 Phaser 的 `core/jelly.ts` 並完整還原基礎設施。
+- [x] **主角改晶亮果凍水滴** ✅：材質重繪（高光＋邊光＋底陰影＋暗邊，明暗相對身體色→白基底與四關染色都成立）、跳躍全速度驅動拉伸/壓扁＋落地阻尼晃動＋水平微傾（`core/jelly.ts` `jellyStretch` 純函式）、開始頁/結果頁落地投影。碰撞體 36×36 與混色機制不動。過程小尾巴：T2 首版誤動 vitest 全域設定，已改為把純函式移到無 Phaser 的 `core/jelly.ts` 並完整還原基礎設施。
 
 ## Tier 3 — 內容 & 上線
 - [ ] `ja`/`es` 譯文母語校稿（目前 AI 草稿，已標 `needs-review`；含新增的型別文案與配對句）
 - [x] 部署 Cloudflare Workers ✅ `mbti-jump.southern-light.dev`（Worker＋assets，`wrangler deploy`）
-- [x] 分享頁 OG image ✅ 分享閉環完成（2026-07-02，spec `2026-07-02-mbti-jump-share-loop-design.md`，13 tasks，final review READY）：
-      `/t/<TYPE>?lang=<locale>` 邀請連結 + Worker HTMLRewriter 注入 16 型×5 語 OG meta +
-      81 張預生成 1200×630 OG PNG（`npm run generate:og`，CJK 斷行/字型 fallback 已處理）+
-      index.html 預設 OG + 結果頁單一 Web Share 鈕（桌機 fallback：先下載再複製）+
-      好友打招呼與結果對比行（重合字母數五檔文案）。
-      後續小尾巴（final review minor，非阻斷）：OG 字型堆疊 per-locale（zh-Hans 現用 TC 字形）、
-      route regex 與 invite.ts 重複、index.html 預設 meta 為 zh-Hant 單語、
-      scripts/fonts 三個 Noto TTF ~40MB 進版控（可改 gitignore＋下載步驟）。
+- [x] 分享頁 OG image ✅ 分享閉環完成（2026-07-02，spec `2026-07-02-mbti-jump-share-loop-design.md`，13 tasks，final review READY）：`/t/<TYPE>?lang=<locale>` 邀請連結 + Worker HTMLRewriter 注入 16 型×5 語 OG meta + 81 張預生成 1200×630 OG PNG（`npm run generate:og`，CJK 斷行/字型 fallback 已處理）＋ index.html 預設 OG + 結果頁單一 Web Share 鈕（桌機 fallback：先下載再複製）＋好友打招呼與結果對比行（重合字母數五檔文案）。
+      後續小尾巴（final review minor，非阻斷）：OG 字型堆疊 per-locale（zh-Hans 現用 TC 字形）、route regex 與 invite.ts 重複、index.html 預設 meta 為 zh-Hant 單語、scripts/fonts 三個 Noto TTF ~40MB 進版控（可改 gitignore＋下載步驟）。
 
 ## 需要你的部分
 - [ ] **實機試玩確認手感**：無縫維度轉場節奏、分叉間距、難度（自動化無法代替真人手感測試）
 
----
-
 ## 建議順序
-Tier 1（介面手感）＋幾個 Tier 0 快修 → 先讓遊戲立即變好按、且不必等你試玩；
-接著進 Tier 2 美術/音效（建議先 brainstorm 定風格/色票/音效觸發點，再實作，並加 BootScene）；
-最後 Tier 3 內容與上線。
+Tier 1（介面手感）＋幾個 Tier 0 快修 → 先讓遊戲立即變好按、且不必等你試玩；接著進 Tier 2 美術/音效（建議先 brainstorm 定風格/色票/音效觸發點，再實作，並加 BootScene）；最後 Tier 3 內容與上線。
