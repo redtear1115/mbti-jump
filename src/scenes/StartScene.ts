@@ -13,6 +13,7 @@ import { ensurePlayerTexture } from '../entities/Player';
 import { PLAYER_BASE_COLOR } from '../core/playerColor';
 import { prefersReducedMotion } from '../ui/reducedMotion';
 import { requestTiltPermission } from '../input/tiltPermission';
+import { isEndlessUnlocked } from '../core/endlessUnlock';
 
 export class StartScene extends Phaser.Scene {
   constructor() {
@@ -133,7 +134,48 @@ export class StartScene extends Phaser.Scene {
       },
     });
 
-    new Button(this, cx, 558, t('trend.cta'), {
+    // Endless CTA directly under Start (locked until ≥1 classic play)
+    const unlocked = isEndlessUnlocked();
+    let lockHint: Phaser.GameObjects.Text | null = null;
+    new Button(this, cx, 548, unlocked ? t('endless.cta') : t('endless.ctaLocked'), {
+      width: 200,
+      height: 50,
+      fontSize: 20,
+      bg: unlocked ? 0xe4ae3a : 0x3a3e58,
+      bgHover: unlocked ? 0xf0c45a : 0x4a4e68,
+      bgDown: unlocked ? 0xc9942a : 0x2a2e48,
+      textColor: unlocked ? '#0f1220' : '#ffffff88',
+      icon: unlocked ? undefined : 'lock',
+      onClick: async () => {
+        if (!unlocked) {
+          if (lockHint) {
+            lockHint.destroy();
+            lockHint = null;
+          }
+          lockHint = this.add
+            .text(cx, 590, t('endless.lockHint'), {
+              fontSize: '13px',
+              color: '#ffe066',
+              align: 'center',
+              wordWrap: { width: GAME.width - 48, useAdvancedWrap: true },
+              fontFamily: 'Nunito, system-ui, sans-serif',
+            })
+            .setOrigin(0.5)
+            .setDepth(30);
+          this.time.delayedCall(2800, () => {
+            if (lockHint) {
+              lockHint.destroy();
+              lockHint = null;
+            }
+          });
+          return;
+        }
+        await requestTiltPermission();
+        this.scene.start('EndlessGame');
+      },
+    });
+
+    new Button(this, cx, 628, t('trend.cta'), {
       width: 200,
       height: 50,
       fontSize: 20,
@@ -144,7 +186,7 @@ export class StartScene extends Phaser.Scene {
       onClick: () => this.scene.start('Trend'),
     });
 
-    new Button(this, cx, 620, t('ach.cta'), {
+    new Button(this, cx, 690, t('ach.cta'), {
       width: 200,
       height: 50,
       fontSize: 20,
