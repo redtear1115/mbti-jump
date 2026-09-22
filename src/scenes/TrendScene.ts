@@ -3,6 +3,7 @@ import { GAME } from '../config/gameConfig';
 import { PALETTE } from '../theme/palette';
 import { DIMENSIONS, LETTERS_OF } from '../config/questions';
 import { getPlays, clearPlays } from '../core/profile';
+import { clearEndlessProfile } from '../core/endlessProfile';
 import { computeTrends } from '../core/trends';
 import { groupColorOf } from '../core/temperament';
 import { t, tf } from '../i18n/t';
@@ -101,6 +102,7 @@ export class TrendScene extends Phaser.Scene {
             return;
           }
           clearPlays();
+          clearEndlessProfile();
           this.scene.restart();
         },
       });

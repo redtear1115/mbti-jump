@@ -63,11 +63,24 @@ export const EN = {
   'trend.totalPlays': 'Played {0} times',
   'trend.topType': 'Most often',
   'trend.recent': 'Recent',
-  'trend.clear': 'Clear history',
-  'trend.clearConfirm': 'Tap again to confirm',
+  'trend.clear': 'Clear quiz & endless',
+  'trend.clearConfirm': 'Clears quiz & endless. Tap again',
   'trend.cleared': 'History cleared',
   'trend.empty': 'No plays yet — play a round!',
   'common.back': '◀ Back',
+
+  // --- Endless mode ---
+  'endless.cta': 'Endless Jump',
+  'endless.ctaLocked': 'Endless Jump',
+  'endless.lockHint': 'Finish one personality quiz to unlock Endless.',
+  'endless.unlockedToast': 'Endless Jump unlocked!',
+  'endless.floorsLabel': 'Floors',
+  'endless.best': 'Best {0}',
+  'endless.resultTitle': 'You reached',
+  'endless.newBest': 'New best!',
+  'endless.shareText': 'I jumped {0} floors in MBTI Jump Endless Mode!',
+  'endless.again': 'Jump again ↻',
+  'endless.back': '◀ Back to Start',
 
   // --- 成就 ---
   'ach.title': 'Achievements',

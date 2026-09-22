@@ -7,6 +7,8 @@ import { GameOverScene } from './scenes/GameOverScene';
 import { ResultScene } from './scenes/ResultScene';
 import { TrendScene } from './scenes/TrendScene';
 import { AchievementScene } from './scenes/AchievementScene';
+import { EndlessGameScene } from './scenes/EndlessGameScene';
+import { EndlessResultScene } from './scenes/EndlessResultScene';
 import { parseInvite, saveInvite } from './core/invite';
 import { setLocale } from './i18n/store';
 
@@ -31,5 +33,15 @@ new Phaser.Game({
     default: 'arcade',
     arcade: { gravity: { x: 0, y: GAME.gravityY }, debug: false },
   },
-  scene: [BootScene, StartScene, GameScene, GameOverScene, ResultScene, TrendScene, AchievementScene],
+  scene: [
+    BootScene,
+    StartScene,
+    GameScene,
+    GameOverScene,
+    ResultScene,
+    TrendScene,
+    AchievementScene,
+    EndlessGameScene,
+    EndlessResultScene,
+  ],
 });

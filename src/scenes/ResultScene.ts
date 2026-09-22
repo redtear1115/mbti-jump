@@ -10,6 +10,7 @@ import { muteAnchor, safeTopDelta } from '../ui/safeArea';
 import { layoutResultButtons } from '../core/resultLayout';
 import { groupColorOf, groupOf } from '../core/temperament';
 import { recordPlay, getPlays } from '../core/profile';
+import { setEndlessLastSkinType } from '../core/endlessProfile';
 import { newlyUnlocked } from '../core/achievements';
 import { getSeenIds, markSeen } from '../core/achievementStore';
 import { prefersReducedMotion } from '../ui/reducedMotion';
@@ -35,11 +36,18 @@ export class ResultScene extends Phaser.Scene {
 
   create(data: ResultInit) {
     const type = data.score.result();
+    const playsBefore = getPlays().length;
     recordPlay(type, data.score.allTallies());
+    setEndlessLastSkinType(type);
     const fresh = newlyUnlocked(getPlays(), getSeenIds());
+    // Classic achievement toasts
     if (fresh.length > 0) {
       this.showUnlockToast(fresh);
       markSeen(fresh);
+    }
+    // First classic play unlocks endless — lightweight toast (does not block share)
+    if (playsBefore === 0) {
+      this.showEndlessUnlockToast(fresh.length);
     }
     const desc = describeType(type);
     const groupHex = '#' + groupColorOf(type).toString(16).padStart(6, '0');
@@ -284,6 +292,39 @@ export class ResultScene extends Phaser.Scene {
         yoyo: true,
         onComplete: () => label.destroy(),
       });
+    });
+  }
+
+  /** Soft toast when classic play unlocks Endless (offset below achievement toasts). */
+  private showEndlessUnlockToast(achToastCount: number): void {
+    const cx = GAME.width / 2;
+    const reduce = prefersReducedMotion();
+    const y = 44 + safeTopDelta() + achToastCount * 46;
+    const label = this.add
+      .text(cx, y, t('endless.unlockedToast'), {
+        fontFamily: 'Fredoka, system-ui, sans-serif',
+        fontSize: '18px',
+        color: '#0f1220',
+        backgroundColor: '#e4ae3a',
+        padding: { x: 12, y: 8 },
+        align: 'center',
+      })
+      .setOrigin(0.5)
+      .setDepth(60)
+      .setAlpha(0);
+    if (reduce) {
+      label.setAlpha(1);
+      this.time.delayedCall(2500, () => label.destroy());
+      return;
+    }
+    this.tweens.add({
+      targets: label,
+      alpha: { from: 0, to: 1 },
+      duration: 300,
+      delay: achToastCount * 300,
+      hold: 2000,
+      yoyo: true,
+      onComplete: () => label.destroy(),
     });
   }
 
