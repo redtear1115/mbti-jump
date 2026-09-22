@@ -2,12 +2,12 @@ import type { StringKey } from './en';
 
 export const ZH_HANS: Record<StringKey, string> = {
   'start.title': 'MBTI Jump',
-  'start.tagline': '一路往上跳——左 = Yes、右 = No。\n四关测出你的人格。',
+  'start.tagline': '用跳的测人格。\n左 = Yes、右 = No，四关测出你的类型。',
   'start.cta': '开始 ▶',
   'start.language': '语言',
 
   // --- 首次导览 ---
-  'tutorial.hint': '左平台＋左 chip＝Yes · 右＝No。\n跳到其中一边作答。',
+  'tutorial.hint': '左平台＋左侧标记＝Yes · 右＝No。\n跳到其中一边作答。',
   'tutorial.dismiss': '知道了',
 
   'dim.EI': '外向 / 内向',
@@ -30,7 +30,7 @@ export const ZH_HANS: Record<StringKey, string> = {
   'result.heading': '你的人格类型',
   'result.again': '再玩一次 ↻',
   'result.share': '我的 MBTI 是 {0}！{1} 来玩 MBTI Jump：{2}',
-  'card.tagline': 'MBTI Jump · 玩一场，跳出你的人格',
+  'card.tagline': 'MBTI Jump · 用跳的测人格。',
 
   // --- 分享闭环 ---
   'og.title': 'MBTI Jump — 我是 {0}！',
@@ -190,8 +190,8 @@ export const ZH_HANS: Record<StringKey, string> = {
   'q.sn_7.yes': '具体事实',
   'q.sn_7.no': '整体印象',
   'q.sn_8.text': '说明最好是…',
-  'q.sn_8.no': '大方向就好',
   'q.sn_8.yes': '一步一步',
+  'q.sn_8.no': '大方向就好',
   'q.sn_9.text': '你被哪种点子吸引…',
   'q.sn_9.yes': '已验证的',
   'q.sn_9.no': '新奇的',
