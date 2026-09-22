@@ -6,6 +6,10 @@ export const EN = {
   'start.cta': 'Start ▶',
   'start.language': 'Language',
 
+  // --- First-run tutorial ---
+  'tutorial.hint': 'Left platform + left chip = Yes · Right = No.\nLand on a side to answer.',
+  'tutorial.dismiss': 'Got it',
+
   // --- 維度名稱 ---
   'dim.EI': 'Extraversion / Introversion',
   'dim.SN': 'Sensing / Intuition',
