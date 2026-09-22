@@ -6,6 +6,8 @@ import { t, tf } from '../i18n/t';
 import type { StringKey } from '../i18n/t';
 import { Button } from '../ui/Button';
 import { MuteButton } from '../ui/MuteButton';
+import { muteAnchor, safeTopDelta } from '../ui/safeArea';
+import { layoutResultButtons } from '../core/resultLayout';
 import { groupColorOf, groupOf } from '../core/temperament';
 import { recordPlay, getPlays } from '../core/profile';
 import { newlyUnlocked } from '../core/achievements';
@@ -71,8 +73,9 @@ export class ResultScene extends Phaser.Scene {
       this.tweens.add({ targets: jelly, scale: 2, duration: 500, ease: 'Back.easeOut' });
     }
 
+    const topDelta = safeTopDelta();
     this.add
-      .text(cx, 48, t('result.heading'), {
+      .text(cx, 48 + topDelta, t('result.heading'), {
         fontSize: '16px',
         color: '#ffffffaa',
         fontFamily: 'Fredoka, system-ui, sans-serif',
@@ -151,32 +154,42 @@ export class ResultScene extends Phaser.Scene {
       });
     }
 
-    this.add
-      .text(cx, 470, desc, {
-        fontSize: '18px',
+    // 好友對比（有邀請時）：族群配對句＋四維度字母對照列
+    // 略縮字級／行距，確保按鈕區與內容底邊 ≥16px（見 layoutResultButtons）
+    const friend = getInvite();
+    const descText = this.add
+      .text(cx, friend ? 458 : 470, desc, {
+        fontSize: friend ? '16px' : '18px',
         color: '#ffffff',
         align: 'center',
         wordWrap: { width: GAME.width - 60, useAdvancedWrap: true },
         fontFamily: 'Nunito, system-ui, sans-serif',
       })
       .setOrigin(0.5);
+    let contentBottom = descText.y + descText.displayHeight / 2;
 
-    // 好友對比（有邀請時）：族群配對句＋四維度字母對照列
-    const friend = getInvite();
     if (friend) {
-      this.add
-        .text(cx, 526, tf(pairKey(groupOf(type), groupOf(friend)), [sharedLetters(type, friend)]), {
-          fontSize: '14px',
-          color: '#ffffff',
-          align: 'center',
-          wordWrap: { width: GAME.width - 50, useAdvancedWrap: true },
-          fontFamily: 'Nunito, system-ui, sans-serif',
-        })
+      const pair = this.add
+        .text(
+          cx,
+          contentBottom + 16,
+          tf(pairKey(groupOf(type), groupOf(friend)), [sharedLetters(type, friend)]),
+          {
+            fontSize: '13px',
+            color: '#ffffff',
+            align: 'center',
+            wordWrap: { width: GAME.width - 50, useAdvancedWrap: true },
+            fontFamily: 'Nunito, system-ui, sans-serif',
+          },
+        )
         .setOrigin(0.5);
-      this.drawCompareRow(cx, 560, type, friend);
+      contentBottom = pair.y + pair.displayHeight / 2;
+      const rowY = contentBottom + 16;
+      this.drawCompareRow(cx, rowY, type, friend);
+      contentBottom = rowY + 11; // chipH/2
     }
 
-    const btnY = friend ? [600, 662, 722] : [585, 650, 712];
+    const { ys: btnY } = layoutResultButtons(contentBottom);
 
     const shareBtn = new Button(this, cx, btnY[0], t('share.action'), {
       width: 240,
@@ -236,7 +249,8 @@ export class ResultScene extends Phaser.Scene {
       onClick: () => this.scene.start('Trend'),
     });
 
-    new MuteButton(this, GAME.width - 26, 26);
+    const mute = muteAnchor(GAME.width);
+    new MuteButton(this, mute.x, mute.y);
   }
 
   /** 於畫面上方依序淡入淡出顯示新解鎖成就；reduced-motion 時直接顯示短暫後移除。 */
@@ -245,7 +259,7 @@ export class ResultScene extends Phaser.Scene {
     const reduce = prefersReducedMotion();
     ids.forEach((id, i) => {
       const label = this.add
-        .text(cx, 44 + i * 46, tf('ach.unlocked', [t(`ach.${id}.name` as StringKey)]), {
+        .text(cx, 44 + safeTopDelta() + i * 46, tf('ach.unlocked', [t(`ach.${id}.name` as StringKey)]), {
           fontFamily: 'Fredoka, system-ui, sans-serif',
           fontSize: '18px',
           color: '#0f1220',
