@@ -7,6 +7,10 @@ export const JA: Record<StringKey, string> = {
   'start.cta': 'スタート ▶',
   'start.language': '言語',
 
+  // --- 初回チュートリアル（needs-review: AI 草稿，待母語校稿） ---
+  'tutorial.hint': '左の足場＋左チップ＝Yes · 右＝No。\nどちらかに着地して答えてね。',
+  'tutorial.dismiss': 'わかった',
+
   'dim.EI': '外向 / 内向',
   'dim.SN': '感覚 / 直観',
   'dim.TF': '思考 / 感情',
