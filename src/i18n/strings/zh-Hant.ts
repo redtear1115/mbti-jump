@@ -6,6 +6,10 @@ export const ZH_HANT: Record<StringKey, string> = {
   'start.cta': '開始 ▶',
   'start.language': '語言',
 
+  // --- 首次導覽 ---
+  'tutorial.hint': '左平台＋左 chip＝Yes · 右＝No。\n跳到其中一邊作答。',
+  'tutorial.dismiss': '知道了',
+
   'dim.EI': '外向 / 內向',
   'dim.SN': '實感 / 直覺',
   'dim.TF': '思考 / 情感',

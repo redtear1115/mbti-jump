@@ -6,6 +6,10 @@ export const ZH_HANS: Record<StringKey, string> = {
   'start.cta': '开始 ▶',
   'start.language': '语言',
 
+  // --- 首次导览 ---
+  'tutorial.hint': '左平台＋左 chip＝Yes · 右＝No。\n跳到其中一边作答。',
+  'tutorial.dismiss': '知道了',
+
   'dim.EI': '外向 / 内向',
   'dim.SN': '实感 / 直觉',
   'dim.TF': '思考 / 情感',
@@ -173,8 +177,8 @@ export const ZH_HANS: Record<StringKey, string> = {
   'q.sn_7.yes': '具体事实',
   'q.sn_7.no': '整体印象',
   'q.sn_8.text': '说明最好是…',
-  'q.sn_8.yes': '一步一步',
   'q.sn_8.no': '大方向就好',
+  'q.sn_8.yes': '一步一步',
   'q.sn_9.text': '你被哪种点子吸引…',
   'q.sn_9.yes': '已验证的',
   'q.sn_9.no': '新奇的',

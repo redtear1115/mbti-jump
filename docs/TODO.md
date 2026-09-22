@@ -7,6 +7,13 @@
 
 ---
 
+
+## P0 UX fixes（2026-09-23）✅ shipped on branch `fix/p0-safe-result-onboard`
+- [x] **P0-1 Safe-area inset**：`viewport-fit=cover` + `src/ui/safeArea.ts`（`getSafeInsets` / `safePad` / `muteAnchor`）；MuteButton／標題／解鎖 toast 避開瀏海；`clampInset` 單測。
+- [x] **P0-2 Result friend-state gap**：`layoutResultButtons(contentBottomY)` 保證內容底→Share ≥16px、按鈕間 ≥8px；好友對比時略縮字級。
+- [x] **P0-3 First-level onboarding**：`mbti-jump.tutorial.v1` + 維度 0 導覽（左 Yes／右 No），答題或「知道了」後不再擋；五語 i18n（ja/es needs-review）；`shouldShowTutorial` 單測。
+
+
 ## 新功能路線（使用者要求：成就 / 隨機題庫 / 人格趨勢）
 共用持久化底座；拆三子專案，順序 A → B → C。
 - [x] **A. 人格趨勢 + 持久化底座** ✅（spec `2026-07-01-mbti-jump-trends-design.md`、plan `...-trends.md`，6 tasks，final review READY）
@@ -34,7 +41,7 @@
 - [ ] **按鈕按下/hover 回饋**：語言鈕、Start、Copy、Again 加 `pointerover/pointerdown` 縮放或變色（150–250ms）
 - [ ] **觸控目標 ≥44pt**：語言鈕與 CTA 加大可點區（padding 或 hitArea）
 - [ ] **主 CTA 做成實心厚圓角按鈕**，每畫面一個明確主要動作
-- [ ] **安全區**：確認 HUD 頂端在瀏海/Dynamic Island 下不被遮，必要時加上 inset
+- [x] **安全區**：確認 HUD 頂端在瀏海/Dynamic Island 下不被遮，必要時加上 inset ✅（P0-1 2026-09-23）
 - [ ] **reduced-motion**：答案預覽淡入、維度名稱淡入判斷 `prefers-reduced-motion`
 
 ## Tier 2 — 美術 & 音效 ✅ 完成（程式管線）

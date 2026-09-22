@@ -7,6 +7,10 @@ export const ES: Record<StringKey, string> = {
   'start.cta': 'Empezar ▶',
   'start.language': 'Idioma',
 
+  // --- Tutorial inicial（needs-review: AI 草稿，待母語校稿） ---
+  'tutorial.hint': 'Plataforma izquierda + chip izquierdo = Sí · Derecha = No.\nAterriza en un lado para responder.',
+  'tutorial.dismiss': 'Entendido',
+
   'dim.EI': 'Extraversión / Introversión',
   'dim.SN': 'Sensación / Intuición',
   'dim.TF': 'Pensamiento / Sentimiento',

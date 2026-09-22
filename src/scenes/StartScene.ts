@@ -6,6 +6,7 @@ import { getLocale, setLocale } from '../i18n/store';
 import { SUPPORTED_LOCALES, LOCALE_LABELS } from '../i18n/locales';
 import { Button } from '../ui/Button';
 import { MuteButton } from '../ui/MuteButton';
+import { muteAnchor } from '../ui/safeArea';
 import { getInvite } from '../core/invite';
 import { groupColorOf } from '../core/temperament';
 import { ensurePlayerTexture } from '../entities/Player';
@@ -118,7 +119,8 @@ export class StartScene extends Phaser.Scene {
       });
     });
 
-    new MuteButton(this, GAME.width - 26, 26);
+    const mute = muteAnchor(GAME.width);
+    new MuteButton(this, mute.x, mute.y);
 
     // 主 CTA：實心圓角按鈕（hover/press 回饋 + ≥44 觸控）
     new Button(this, cx, 478, t('start.cta'), {

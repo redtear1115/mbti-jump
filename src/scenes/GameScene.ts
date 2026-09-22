@@ -8,17 +8,19 @@ import { Platform } from '../entities/Platform';
 import { Controls } from '../input/Controls';
 import { ScoreTracker } from '../core/ScoreTracker';
 import { shouldAutoComplete } from '../core/progression';
-import { DIMENSIONS, LETTERS_OF, questionsForDimension } from '../config/questions';
+import { DIMENSIONS, questionsForDimension } from '../config/questions';
 import { pickQuestions } from '../core/pickQuestions';
 import type { QuestionDef, Letter } from '../config/questions';
 import { chipRect } from '../core/hud';
-import { t, tf } from '../i18n/t';
+import { t } from '../i18n/t';
 import type { StringKey } from '../i18n/t';
 import { prefersReducedMotion } from '../ui/reducedMotion';
 import { playerColorFor } from '../core/playerColor';
 import { Sfx } from '../audio/Sfx';
 import { MuteButton } from '../ui/MuteButton';
-import { scoreBarModel } from '../core/scoreBar';
+import { muteAnchor } from '../ui/safeArea';
+import { drawScoreBar, announceDimension, updateLevelLabel } from '../ui/gameSceneHud';
+import { maybeStartTutorial, dismissTutorial } from '../ui/firstRunTutorial';
 
 interface GameInit {
   score: ScoreTracker;
@@ -43,10 +45,10 @@ export class GameScene extends Phaser.Scene {
   private platformsSinceFork = 0;
   private dimComplete = false; // 目前維度是否已鎖定（避免重複鎖定）
   private banner!: Phaser.GameObjects.Text;
-  private levelLabel!: Phaser.GameObjects.Text;
-  private scoreBar!: Phaser.GameObjects.Graphics; // 得分條底＋分隔線
-  private scoreLeft!: Phaser.GameObjects.Text; // 左側票數
-  private scoreRight!: Phaser.GameObjects.Text; // 右側票數
+  levelLabel!: Phaser.GameObjects.Text;
+  scoreBar!: Phaser.GameObjects.Graphics; // 得分條底＋分隔線
+  scoreLeft!: Phaser.GameObjects.Text; // 左側票數
+  scoreRight!: Phaser.GameObjects.Text; // 右側票數
   private previewLeft!: Phaser.GameObjects.Text;
   private previewRight!: Phaser.GameObjects.Text;
   private chipLeft!: Phaser.GameObjects.Graphics;
@@ -58,6 +60,8 @@ export class GameScene extends Phaser.Scene {
   private reducedMotion = false;
   private background!: Background;
   private aurora!: AuroraBackground;
+  tutorialActive = false;
+  tutorialNodes: Phaser.GameObjects.GameObject[] = [];
 
   constructor() {
     super('Game');
@@ -161,8 +165,12 @@ export class GameScene extends Phaser.Scene {
       .setOrigin(1, 0.5)
       .setScrollFactor(0)
       .setDepth(21);
-    this.updateLevelLabel();
-    this.drawScoreBar();
+    updateLevelLabel(this);
+    drawScoreBar(this);
+    void this.levelLabel;
+    void this.scoreBar;
+    void this.scoreLeft;
+    void this.scoreRight;
 
     const previewStyle = {
       fontSize: '17px',
@@ -186,7 +194,11 @@ export class GameScene extends Phaser.Scene {
       .setDepth(20)
       .setAlpha(0);
 
-    new MuteButton(this, GAME.width - 26, 26);
+    const mute = muteAnchor(GAME.width);
+    new MuteButton(this, mute.x, mute.y);
+
+    maybeStartTutorial(this);
+    void this.tutorialNodes;
   }
 
   update(_time: number, delta: number) {
@@ -214,14 +226,17 @@ export class GameScene extends Phaser.Scene {
         this.shownQuestionIdx = fork.qIndex;
         this.updateBanner(fork.qIndex);
         this.updatePreview(fork.qIndex);
-        this.setPreviewVisible(false, true); // 換題瞬間隱藏，等接近新分叉再亮
+        // 導覽中保持 chip 可見，方便對照左右＝Yes/No
+        if (!this.tutorialActive) {
+          this.setPreviewVisible(false, true); // 換題瞬間隱藏，等接近新分叉再亮
+        }
       }
       // 進入提示範圍後鎖住顯示（彈跳會反覆穿越閾值，不能用即時距離開關）
       const dist = this.player.y - fork.y;
-      if (dist < GAME.height * 1.5) {
+      if (this.tutorialActive || dist < GAME.height * 1.5) {
         this.setPreviewVisible(true);
       }
-    } else {
+    } else if (!this.tutorialActive) {
       this.setPreviewVisible(false);
     }
 
@@ -316,7 +331,8 @@ export class GameScene extends Phaser.Scene {
         this.dimAnsweredIds.add(platform.questionId);
         Sfx.play('select');
         this.score.recordAnswer(platform.side);
-        this.drawScoreBar();
+        drawScoreBar(this);
+        dismissTutorial(this);
         if (this.dimAnsweredIds.size >= GAME.questionsPerLevel) {
           this.completeCurrentDimension();
         }
@@ -375,62 +391,6 @@ export class GameScene extends Phaser.Scene {
     this.tweens.add({ targets, alpha: visible ? 1 : 0, duration: 200 });
   }
 
-  private updateLevelLabel(): void {
-    const dimCode = DIMENSIONS[this.dimIndex];
-    this.levelLabel.setText(tf('level.label', [this.dimIndex + 1, t(`dim.${dimCode}` as StringKey)]));
-  }
-
-  /** 依目前維度票數重繪得分條（雙色漸變底＋字母色圓章票數＋加粗分隔線與圓頭旋鈕）。 */
-  private drawScoreBar(): void {
-    const dimCode = DIMENSIONS[this.dimIndex];
-    const [a, b] = LETTERS_OF[dimCode];
-    const [na, nb] = this.score.tallyFor(dimCode);
-    const m = scoreBarModel(a, na, b, nb);
-
-    this.scoreLeft.setText(m.leftLabel);
-    this.scoreRight.setText(m.rightLabel);
-
-    const w = 200;
-    const h = 22;
-    const x0 = (GAME.width - w) / 2;
-    const y0 = 746;
-    const g = this.scoreBar;
-    g.clear();
-    // 分段實色：整條先填右字母色，再以左圓角矩形蓋出左段（無跨色漸變髒段）
-    g.fillStyle(LETTER_COLORS[b], 1);
-    g.fillRoundedRect(x0, y0, w, h, 11);
-    const lw = m.dividerFrac * w;
-    if (lw >= w - 11) {
-      // 左段吃進右端圓角區（如 1–0 開局、5–0 全票）：整條左色圓角
-      g.fillStyle(LETTER_COLORS[a], 1);
-      g.fillRoundedRect(x0, y0, w, h, 11);
-    } else if (lw > 0) {
-      g.fillStyle(LETTER_COLORS[a], 1);
-      g.fillRoundedRect(x0, y0, lw, h, { tl: 11, bl: 11, tr: 0, br: 0 });
-    }
-
-    // 兩端字母色圓章（深字由 scoreLeft/Right text 疊在 depth 21）
-    const badge = (text: Phaser.GameObjects.Text, letter: Letter) => {
-      const textLeft = text.originX === 1 ? text.x - text.displayWidth : text.x;
-      const textTop = text.y - text.displayHeight / 2;
-      const r = chipRect(textLeft, textTop, text.displayWidth, text.displayHeight, {
-        padX: 8,
-        padY: 3,
-        r: (text.displayHeight + 6) / 2,
-      });
-      g.fillStyle(LETTER_COLORS[letter], 1);
-      g.fillRoundedRect(r.x, r.y, r.w, r.h, r.r);
-    };
-    badge(this.scoreLeft, a);
-    badge(this.scoreRight, b);
-
-    // 加粗分隔線＋頂端圓頭旋鈕
-    const dx = x0 + m.dividerFrac * w;
-    g.fillStyle(0xffffff, 1);
-    g.fillRect(dx - 2.5, y0 - 2, 5, h + 4);
-    g.fillCircle(dx, y0 - 2, 4);
-  }
-
   private completeCurrentDimension(): void {
     if (this.dimComplete) return;
     this.dimComplete = true;
@@ -468,42 +428,13 @@ export class GameScene extends Phaser.Scene {
     this.cameras.main.setBackgroundColor(LEVEL_BG[this.dimIndex]);
     this.background.setDimension(this.dimIndex);
     this.aurora.retint(this.dimIndex);
-    this.updateLevelLabel();
-    this.drawScoreBar();
-    this.announceDimension();
-  }
-
-  /** 進入新維度時，畫面中央淡入淡出顯示新維度名稱，讓玩家知道換維度了。 */
-  private announceDimension(): void {
-    const dimCode = DIMENSIONS[this.dimIndex];
-    const label = this.add
-      .text(GAME.width / 2, GAME.height * 0.32, t(`dim.${dimCode}` as StringKey), {
-        fontSize: '26px',
-        fontStyle: 'bold',
-        color: '#ffffff',
-        align: 'center',
-        stroke: '#000000',
-        strokeThickness: 5,
-        wordWrap: { width: GAME.width - 40, useAdvancedWrap: true },
-        fontFamily: 'Fredoka, system-ui, sans-serif',
-      })
-      .setOrigin(0.5)
-      .setScrollFactor(0)
-      .setDepth(30)
-      .setAlpha(0);
-    if (this.reducedMotion) {
-      label.setAlpha(1);
-      this.time.delayedCall(1000, () => label.destroy());
-      return;
-    }
-    this.tweens.add({
-      targets: label,
-      alpha: { from: 0, to: 1 },
-      duration: 300,
-      yoyo: true,
-      hold: 700,
-      onComplete: () => label.destroy(),
-    });
+    updateLevelLabel(this);
+    drawScoreBar(this);
+    void this.levelLabel;
+    void this.scoreBar;
+    void this.scoreLeft;
+    void this.scoreRight;
+    announceDimension(this);
   }
 
   private gameOver(): void {
@@ -512,3 +443,4 @@ export class GameScene extends Phaser.Scene {
     this.scene.start('GameOver', { score: this.score });
   }
 }
+
