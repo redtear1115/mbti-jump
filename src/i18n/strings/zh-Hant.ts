@@ -2,12 +2,12 @@ import type { StringKey } from './en';
 
 export const ZH_HANT: Record<StringKey, string> = {
   'start.title': 'MBTI Jump',
-  'start.tagline': '一路往上跳——左 = Yes、右 = No。\n四關測出你的人格。',
+  'start.tagline': '用跳的測人格。\n左 = Yes、右 = No，四關測出你的類型。',
   'start.cta': '開始 ▶',
   'start.language': '語言',
 
   // --- 首次導覽 ---
-  'tutorial.hint': '左平台＋左 chip＝Yes · 右＝No。\n跳到其中一邊作答。',
+  'tutorial.hint': '左平台＋左側標記＝Yes · 右＝No。\n跳到其中一邊作答。',
   'tutorial.dismiss': '知道了',
 
   'dim.EI': '外向 / 內向',
@@ -30,7 +30,7 @@ export const ZH_HANT: Record<StringKey, string> = {
   'result.heading': '你的人格類型',
   'result.again': '再玩一次 ↻',
   'result.share': '我的 MBTI 是 {0}！{1} 來玩 MBTI Jump：{2}',
-  'card.tagline': 'MBTI Jump · 玩一場，跳出你的人格',
+  'card.tagline': 'MBTI Jump · 用跳的測人格。',
 
   // --- 分享閉環 ---
   'og.title': 'MBTI Jump — 我是 {0}！',
@@ -107,7 +107,7 @@ export const ZH_HANT: Record<StringKey, string> = {
   'type.ENFJ.desc': '你天生知道怎麼讓每個人發光，卻常忘了留一盞燈給自己。朋友圈的黏著劑。',
   'type.ENFP.name': '人形煙火',
   'type.ENFP.desc': '你的熱情能點亮整條街，專注力大概能維持三分鐘。想到就衝，通常都沒事。',
-  'type.ISTJ.name': '靠譜磐石',
+  'type.ISTJ.name': '可靠磐石',
   'type.ISTJ.desc': '你說會做到的事，天塌下來也會做到。備份的備份都有備份。',
   'type.ISFJ.name': '人間暖爐',
   'type.ISFJ.desc': '你記得所有人的生日和忌口，卻常忘了自己也需要被照顧。低調，但少了你全場會垮。',

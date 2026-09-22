@@ -3,12 +3,12 @@ import type { StringKey } from './en';
 
 export const ES: Record<StringKey, string> = {
   'start.title': 'MBTI Jump',
-  'start.tagline': 'Salta hacia arriba: izquierda = Sí, derecha = No.\nCuatro niveles revelan tu tipo.',
+  'start.tagline': 'Salta y descubre tu tipo.\nIzquierda = Sí, derecha = No — cuatro niveles.',
   'start.cta': 'Empezar ▶',
   'start.language': 'Idioma',
 
   // --- Tutorial inicial（needs-review: AI 草稿，待母語校稿） ---
-  'tutorial.hint': 'Plataforma izquierda + chip izquierdo = Sí · Derecha = No.\nAterriza en un lado para responder.',
+  'tutorial.hint': 'Plataforma izquierda + marcador izquierdo = Sí · Derecha = No.\nAterriza en un lado para responder.',
   'tutorial.dismiss': 'Entendido',
 
   'dim.EI': 'Extraversión / Introversión',
@@ -31,7 +31,7 @@ export const ES: Record<StringKey, string> = {
   'result.heading': 'Tu tipo de personalidad',
   'result.again': 'Jugar otra vez ↻',
   'result.share': '¡Mi MBTI es {0}! {1} Juega a MBTI Jump: {2}',
-  'card.tagline': 'MBTI Jump — salta y descubre tu personalidad',
+  'card.tagline': 'MBTI Jump — Salta y descubre tu tipo.',
 
   // --- 分享閉環（needs-review: AI 草稿，待母語校稿） ---
   'og.title': 'MBTI Jump — ¡Soy {0}!',
@@ -40,7 +40,7 @@ export const ES: Record<StringKey, string> = {
   'share.doneFallback': 'Copiado ✓ Tarjeta descargada',
   'share.downloadedOnly': 'Tarjeta descargada ✓ (copia fallida)',
   'share.fail': 'Error al compartir',
-  'invite.greeting': 'Tu amigo es {0}: ¡mide vuestra compatibilidad!',
+  'invite.greeting': 'Tu amigo es {0}: ¡mira qué tan compatibles son!',
 
   // --- 族群配對文案（needs-review: AI 草稿，待母語校稿） ---
   'pair.explorer_explorer': 'Explorador × Explorador — dos personas de "vámonos ya", cubriéndose en cada aventura ({0} de 4 letras en común)',
@@ -86,10 +86,10 @@ export const ES: Record<StringKey, string> = {
   'ach.creature_of_habit.name': 'Animal de costumbres',
   'ach.creature_of_habit.desc': 'Consigue el mismo tipo 3 veces',
 
-  'group.explorer': 'un Explorador',
-  'group.diplomat': 'un Diplomático',
-  'group.analyst': 'un Analista',
-  'group.sentinel': 'un Centinela',
+  'group.explorer': 'Explorador',
+  'group.diplomat': 'Diplomático',
+  'group.analyst': 'Analista',
+  'group.sentinel': 'Centinela',
 
   // --- 16 型專屬文案（needs-review: AI 草稿，待母語校稿） ---
   'type.INTJ.name': 'El Estratega Silencioso',

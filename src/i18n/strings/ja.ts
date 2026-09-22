@@ -3,12 +3,12 @@ import type { StringKey } from './en';
 
 export const JA: Record<StringKey, string> = {
   'start.title': 'MBTI Jump',
-  'start.tagline': '上へジャンプ——左＝Yes、右＝No。\n4つのステージで性格がわかる。',
+  'start.tagline': 'ジャンプで性格診断。\n左＝Yes、右＝No。4ステージでタイプがわかる。',
   'start.cta': 'スタート ▶',
   'start.language': '言語',
 
   // --- 初回チュートリアル（needs-review: AI 草稿，待母語校稿） ---
-  'tutorial.hint': '左の足場＋左チップ＝Yes · 右＝No。\nどちらかに着地して答えてね。',
+  'tutorial.hint': '左の足場＋左のマーク＝Yes · 右＝No。\nどちらかに着地して答えてね。',
   'tutorial.dismiss': 'わかった',
 
   'dim.EI': '外向 / 内向',
@@ -31,7 +31,7 @@ export const JA: Record<StringKey, string> = {
   'result.heading': 'あなたの性格タイプ',
   'result.again': 'もう一度遊ぶ ↻',
   'result.share': '私の MBTI は {0}！{1} MBTI Jump で遊ぼう：{2}',
-  'card.tagline': 'MBTI Jump — 跳んで性格を発見',
+  'card.tagline': 'MBTI Jump — ジャンプで性格診断。',
 
   // --- 分享閉環（needs-review: AI 草稿，待母語校稿） ---
   'og.title': 'MBTI Jump — 私は{0}！',
