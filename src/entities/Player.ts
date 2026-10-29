@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { GAME } from '../config/gameConfig';
 import { prefersReducedMotion } from '../ui/reducedMotion';
 import { PLAYER_BASE_COLOR } from '../core/playerColor';
+import { splashDroplets, splashTravel } from '../core/jellySplash';
 import { jellyStretch } from '../core/jelly';
 import { INK_CSS, PAPER_CSS, mixInk, mixWhite, numToHex } from '../theme/manga';
 
@@ -11,6 +12,8 @@ const TEX_H = 92;
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
   private reduced = prefersReducedMotion();
+  private bodyColor: number;
+  private splashGfx: Phaser.GameObjects.Graphics[] = [];
   private jiggling = false;
   private jiggleT = 0; // 已經過秒數
   private static readonly JIGGLE_DUR = 0.42;
@@ -18,6 +21,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   constructor(scene: Phaser.Scene, x: number, y: number, color: number = PLAYER_BASE_COLOR) {
     super(scene, x, y, ensurePlayerTexture(scene, color));
+    this.bodyColor = color;
+    scene.events.once(Phaser.Scenes.Events.SHUTDOWN, this.clearSplash, this);
+    scene.events.once(Phaser.Scenes.Events.DESTROY, this.clearSplash, this);
     scene.add.existing(this);
     scene.physics.add.existing(this);
     const body = this.body as Phaser.Physics.Arcade.Body;
@@ -32,6 +38,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   bounce(): void {
     this.setVelocityY(GAME.jumpVelocity);
     if (this.reduced) return;
+    this.spawnLandSplash();
     // 落地衝擊：開啟阻尼晃動（由 tickJelly 每幀渲染，從壓扁彈回）
     this.jiggling = true;
     this.jiggleT = 0;
@@ -39,6 +46,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   /** 依混色結果換膚＋軟晃動。 */
   recolor(color: number): void {
+    this.bodyColor = color;
     this.setTexture(ensurePlayerTexture(this.scene, color));
     this.syncBodySize();
     if (this.reduced) return;
@@ -97,6 +105,51 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     const target = Phaser.Math.Clamp(vx * 0.00035, -Player.LEAN_MAX, Player.LEAN_MAX);
     const a = 1 - Math.exp(-dt * 12);
     this.rotation += (target - this.rotation) * a;
+  }
+
+  /** 落地短命水滴飛濺（身體色＋白高光）；reduced-motion 已在 bounce 早退。 */
+  private spawnLandSplash(): void {
+    const scene = this.scene;
+    if (!scene) return;
+    const feetY = this.y + this.displayHeight / 2 - 6;
+    const depth = (this.depth || 19.2) - 0.4;
+    for (const d of splashDroplets()) {
+      const g = scene.add.graphics();
+      g.setDepth(depth);
+      const color = d.highlight ? 0xffffff : this.bodyColor;
+      g.fillStyle(color, d.alpha);
+      g.fillCircle(0, 0, d.radius);
+      // 小白高光點讓身體色液滴仍有果凍質感
+      if (!d.highlight) {
+        g.fillStyle(0xffffff, Math.min(0.7, d.alpha + 0.15));
+        g.fillCircle(-d.radius * 0.25, -d.radius * 0.3, Math.max(0.8, d.radius * 0.35));
+      }
+      g.setPosition(this.x + d.ox, feetY + d.oy);
+      this.splashGfx.push(g);
+      const { dx, dy } = splashTravel(d);
+      scene.tweens.add({
+        targets: g,
+        x: g.x + dx,
+        y: g.y + dy,
+        alpha: 0,
+        scaleX: 0.25,
+        scaleY: 0.25,
+        duration: d.lifeMs,
+        ease: 'Cubic.easeOut',
+        onComplete: () => {
+          g.destroy();
+          const idx = this.splashGfx.indexOf(g);
+          if (idx >= 0) this.splashGfx.splice(idx, 1);
+        },
+      });
+    }
+  }
+
+  private clearSplash(): void {
+    for (const g of this.splashGfx) {
+      if (g && g.active) g.destroy();
+    }
+    this.splashGfx.length = 0;
   }
 
   wrapHorizontally(): void {

@@ -6,8 +6,11 @@ import { t, tf } from '../i18n/t';
 import type { StringKey } from '../i18n/t';
 import { Button } from '../ui/Button';
 import { MuteButton } from '../ui/MuteButton';
+import { muteAnchor, safeTopDelta } from '../ui/safeArea';
+import { layoutResultButtons } from '../core/resultLayout';
 import { groupColorOf, groupOf } from '../core/temperament';
 import { recordPlay, getPlays } from '../core/profile';
+import { setEndlessLastSkinType } from '../core/endlessProfile';
 import { newlyUnlocked } from '../core/achievements';
 import { getSeenIds, markSeen } from '../core/achievementStore';
 import { prefersReducedMotion } from '../ui/reducedMotion';
@@ -34,11 +37,18 @@ export class ResultScene extends Phaser.Scene {
 
   create(data: ResultInit) {
     const type = data.score.result();
+    const playsBefore = getPlays().length;
     recordPlay(type, data.score.allTallies());
+    setEndlessLastSkinType(type);
     const fresh = newlyUnlocked(getPlays(), getSeenIds());
+    // Classic achievement toasts
     if (fresh.length > 0) {
       this.showUnlockToast(fresh);
       markSeen(fresh);
+    }
+    // First classic play unlocks endless — lightweight toast (does not block share)
+    if (playsBefore === 0) {
+      this.showEndlessUnlockToast(fresh.length);
     }
     const desc = describeType(type);
     const groupHex = '#' + groupColorOf(type).toString(16).padStart(6, '0');
@@ -67,8 +77,9 @@ export class ResultScene extends Phaser.Scene {
       this.tweens.add({ targets: jelly, scale: 1, duration: 500, ease: 'Back.easeOut' });
     }
 
+    const topDelta = safeTopDelta();
     this.add
-      .text(cx, 42, t('result.heading'), {
+      .text(cx, 42 + topDelta, t('result.heading'), {
         fontSize: '15px',
         color: '#1c1424aa',
         fontFamily: BODY_FONT,
@@ -150,32 +161,42 @@ export class ResultScene extends Phaser.Scene {
       });
     }
 
+    // 好友對比（有邀請時）：族群配對句＋四維度字母對照列
+    // 略縮字級／行距，確保按鈕區與內容底邊 ≥16px（見 layoutResultButtons）
     const friend = getInvite();
-    this.add
-      .text(cx, friend ? 462 : 470, desc, {
-        fontSize: friend ? '17px' : '18px',
+    const descText = this.add
+      .text(cx, friend ? 458 : 470, desc, {
+        fontSize: friend ? '16px' : '18px',
         color: INK_CSS,
         align: 'center',
         wordWrap: { width: GAME.width - 60, useAdvancedWrap: true },
         fontFamily: BODY_FONT,
       })
       .setOrigin(0.5);
+    let contentBottom = descText.y + descText.displayHeight / 2;
 
-    // 好友對比（有邀請時）：族群配對句＋四維度字母對照列
     if (friend) {
-      this.add
-        .text(cx, 524, tf(pairKey(groupOf(type), groupOf(friend)), [sharedLetters(type, friend)]), {
-          fontSize: '14px',
-          color: INK_CSS,
-          align: 'center',
-          wordWrap: { width: GAME.width - 50, useAdvancedWrap: true },
-          fontFamily: BODY_FONT,
-        })
+      const pair = this.add
+        .text(
+          cx,
+          contentBottom + 16,
+          tf(pairKey(groupOf(type), groupOf(friend)), [sharedLetters(type, friend)]),
+          {
+            fontSize: '13px',
+            color: INK_CSS,
+            align: 'center',
+            wordWrap: { width: GAME.width - 50, useAdvancedWrap: true },
+            fontFamily: BODY_FONT,
+          },
+        )
         .setOrigin(0.5);
-      this.drawCompareRow(cx, 560, type, friend);
+      contentBottom = pair.y + pair.displayHeight / 2;
+      const rowY = contentBottom + 16;
+      this.drawCompareRow(cx, rowY, type, friend);
+      contentBottom = rowY + 11; // chipH/2
     }
 
-    const btnY = friend ? [604, 664, 724] : [585, 650, 712];
+    const { ys: btnY } = layoutResultButtons(contentBottom);
 
     const shareBtn = new Button(this, cx, btnY[0], t('share.action'), {
       width: 240,
@@ -235,7 +256,8 @@ export class ResultScene extends Phaser.Scene {
       onClick: () => this.scene.start('Trend'),
     });
 
-    new MuteButton(this, GAME.width - 26, 26);
+    const mute = muteAnchor(GAME.width);
+    new MuteButton(this, mute.x, mute.y);
   }
 
   /** 於畫面上方依序淡入淡出顯示新解鎖成就；reduced-motion 時直接顯示短暫後移除。 */
@@ -244,7 +266,7 @@ export class ResultScene extends Phaser.Scene {
     const reduce = prefersReducedMotion();
     ids.forEach((id, i) => {
       const label = this.add
-        .text(cx, 44 + i * 46, tf('ach.unlocked', [t(`ach.${id}.name` as StringKey)]), {
+        .text(cx, 44 + safeTopDelta() + i * 46, tf('ach.unlocked', [t(`ach.${id}.name` as StringKey)]), {
           fontFamily: TITLE_FONT,
           fontSize: '16px',
           color: INK_CSS,
@@ -269,6 +291,39 @@ export class ResultScene extends Phaser.Scene {
         yoyo: true,
         onComplete: () => label.destroy(),
       });
+    });
+  }
+
+  /** Soft toast when classic play unlocks Endless (offset below achievement toasts). */
+  private showEndlessUnlockToast(achToastCount: number): void {
+    const cx = GAME.width / 2;
+    const reduce = prefersReducedMotion();
+    const y = 44 + safeTopDelta() + achToastCount * 46;
+    const label = this.add
+      .text(cx, y, t('endless.unlockedToast'), {
+        fontFamily: 'Fredoka, system-ui, sans-serif',
+        fontSize: '18px',
+        color: '#0f1220',
+        backgroundColor: '#e4ae3a',
+        padding: { x: 12, y: 8 },
+        align: 'center',
+      })
+      .setOrigin(0.5)
+      .setDepth(60)
+      .setAlpha(0);
+    if (reduce) {
+      label.setAlpha(1);
+      this.time.delayedCall(2500, () => label.destroy());
+      return;
+    }
+    this.tweens.add({
+      targets: label,
+      alpha: { from: 0, to: 1 },
+      duration: 300,
+      delay: achToastCount * 300,
+      hold: 2000,
+      yoyo: true,
+      onComplete: () => label.destroy(),
     });
   }
 

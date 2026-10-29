@@ -3,9 +3,13 @@ import type { StringKey } from './en';
 
 export const JA: Record<StringKey, string> = {
   'start.title': 'MBTI Jump',
-  'start.tagline': '上へジャンプ——左＝Yes、右＝No。\n4つのステージで性格がわかる。',
+  'start.tagline': 'ジャンプで性格診断。\n左＝Yes、右＝No。4ステージでタイプがわかる。',
   'start.cta': 'スタート ▶',
   'start.language': '言語',
+
+  // --- 初回チュートリアル（needs-review: AI 草稿，待母語校稿） ---
+  'tutorial.hint': '左の足場＋左のマーク＝Yes · 右＝No。\nどちらかに着地して答えてね。',
+  'tutorial.dismiss': 'わかった',
 
   'dim.EI': '外向 / 内向',
   'dim.SN': '感覚 / 直観',
@@ -27,7 +31,7 @@ export const JA: Record<StringKey, string> = {
   'result.heading': 'あなたの性格タイプ',
   'result.again': 'もう一度遊ぶ ↻',
   'result.share': '私の MBTI は {0}！{1} MBTI Jump で遊ぼう：{2}',
-  'card.tagline': 'MBTI Jump — 跳んで性格を発見',
+  'card.tagline': 'MBTI Jump — ジャンプで性格診断。',
 
   // --- 分享閉環（needs-review: AI 草稿，待母語校稿） ---
   'og.title': 'MBTI Jump — 私は{0}！',
@@ -55,11 +59,24 @@ export const JA: Record<StringKey, string> = {
   'trend.totalPlays': '{0} 回プレイ',
   'trend.topType': '最も多い',
   'trend.recent': '最近',
-  'trend.clear': '履歴を消去',
-  'trend.clearConfirm': 'もう一度タップで確定',
+  'trend.clear': '診断とエンドレスを消去',
+  'trend.clearConfirm': '診断とエンドレス履歴も消えます。もう一度タップ',
   'trend.cleared': '履歴を消去しました',
   'trend.empty': 'まだ記録がありません — 一度遊んでみよう！',
   'common.back': '◀ 戻る',
+
+  // --- エンドレス（needs-review: AI 草稿，待母語校稿） ---
+  'endless.cta': 'エンドレス',
+  'endless.ctaLocked': 'エンドレス',
+  'endless.lockHint': '診断を1回クリアするとエンドレスが解放されます。',
+  'endless.unlockedToast': 'エンドレスが解放されました！',
+  'endless.floorsLabel': '階',
+  'endless.best': 'ベスト {0}',
+  'endless.resultTitle': '到達階数',
+  'endless.newBest': '新記録！',
+  'endless.shareText': 'MBTI Jump エンドレスで {0} 階ジャンプしたよ！',
+  'endless.again': 'もう一回 ↻',
+  'endless.back': '◀ スタートへ',
 
   'ach.title': '実績',
   'ach.progress': '解除済み {0}/{1}',

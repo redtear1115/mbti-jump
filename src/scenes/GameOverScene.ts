@@ -6,6 +6,7 @@ import { Button } from '../ui/Button';
 import { MuteButton } from '../ui/MuteButton';
 import { BODY_FONT, INK_CSS, MANGA_RED, MANGA_YELLOW, PAPER, TITLE_FONT } from '../theme/manga';
 import { drawInkBurst, inkFrame } from '../gfx/mangaFx';
+import { muteAnchor } from '../ui/safeArea';
 
 interface GameOverInit {
   score: ScoreTracker;
@@ -59,6 +60,7 @@ export class GameOverScene extends Phaser.Scene {
       onClick: () => this.scene.start('Game', { score }),
     });
 
-    new MuteButton(this, GAME.width - 26, 26);
+    const mute = muteAnchor(GAME.width);
+    new MuteButton(this, mute.x, mute.y);
   }
 }

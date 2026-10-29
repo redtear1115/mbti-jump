@@ -2,9 +2,13 @@ import type { StringKey } from './en';
 
 export const ZH_HANS: Record<StringKey, string> = {
   'start.title': 'MBTI Jump',
-  'start.tagline': '一路往上跳——左 = Yes、右 = No。\n四关测出你的人格。',
+  'start.tagline': '用跳的测人格。\n左 = Yes、右 = No，四关测出你的类型。',
   'start.cta': '开始 ▶',
   'start.language': '语言',
+
+  // --- 首次导览 ---
+  'tutorial.hint': '左平台＋左侧标记＝Yes · 右＝No。\n跳到其中一边作答。',
+  'tutorial.dismiss': '知道了',
 
   'dim.EI': '外向 / 内向',
   'dim.SN': '实感 / 直觉',
@@ -26,7 +30,7 @@ export const ZH_HANS: Record<StringKey, string> = {
   'result.heading': '你的人格类型',
   'result.again': '再玩一次 ↻',
   'result.share': '我的 MBTI 是 {0}！{1} 来玩 MBTI Jump：{2}',
-  'card.tagline': 'MBTI Jump · 玩一场，跳出你的人格',
+  'card.tagline': 'MBTI Jump · 用跳的测人格。',
 
   // --- 分享闭环 ---
   'og.title': 'MBTI Jump — 我是 {0}！',
@@ -54,11 +58,24 @@ export const ZH_HANS: Record<StringKey, string> = {
   'trend.totalPlays': '已玩 {0} 次',
   'trend.topType': '最常出现',
   'trend.recent': '最近',
-  'trend.clear': '清除记录',
-  'trend.clearConfirm': '再点一次确认',
+  'trend.clear': '清除测验与无限',
+  'trend.clearConfirm': '会清除测验与无限记录，再点确认',
   'trend.cleared': '已清除记录',
   'trend.empty': '还没有记录 — 玩一场吧！',
   'common.back': '◀ 返回',
+
+  // --- 无限模式 ---
+  'endless.cta': '无限跳',
+  'endless.ctaLocked': '无限跳',
+  'endless.lockHint': '先完成一场测验即可解锁无限跳。',
+  'endless.unlockedToast': '无限跳已解锁！',
+  'endless.floorsLabel': '层',
+  'endless.best': '最佳 {0}',
+  'endless.resultTitle': '跳到这里',
+  'endless.newBest': '新纪录！',
+  'endless.shareText': '我在 MBTI Jump 无限模式跳了 {0} 层！',
+  'endless.again': '再跳一次 ↻',
+  'endless.back': '◀ 回开始',
 
   'ach.title': '成就',
   'ach.progress': '已解锁 {0}/{1}',

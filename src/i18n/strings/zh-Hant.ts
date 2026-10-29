@@ -2,9 +2,13 @@ import type { StringKey } from './en';
 
 export const ZH_HANT: Record<StringKey, string> = {
   'start.title': 'MBTI Jump',
-  'start.tagline': '一路往上跳——左 = Yes、右 = No。\n四關測出你的人格。',
+  'start.tagline': '用跳的測人格。\n左 = Yes、右 = No，四關測出你的類型。',
   'start.cta': '開始 ▶',
   'start.language': '語言',
+
+  // --- 首次導覽 ---
+  'tutorial.hint': '左平台＋左側標記＝Yes · 右＝No。\n跳到其中一邊作答。',
+  'tutorial.dismiss': '知道了',
 
   'dim.EI': '外向 / 內向',
   'dim.SN': '實感 / 直覺',
@@ -26,7 +30,7 @@ export const ZH_HANT: Record<StringKey, string> = {
   'result.heading': '你的人格類型',
   'result.again': '再玩一次 ↻',
   'result.share': '我的 MBTI 是 {0}！{1} 來玩 MBTI Jump：{2}',
-  'card.tagline': 'MBTI Jump · 玩一場，跳出你的人格',
+  'card.tagline': 'MBTI Jump · 用跳的測人格。',
 
   // --- 分享閉環 ---
   'og.title': 'MBTI Jump — 我是 {0}！',
@@ -54,11 +58,24 @@ export const ZH_HANT: Record<StringKey, string> = {
   'trend.totalPlays': '已玩 {0} 次',
   'trend.topType': '最常出現',
   'trend.recent': '最近',
-  'trend.clear': '清除紀錄',
-  'trend.clearConfirm': '再點一次確認',
+  'trend.clear': '清除測驗與無限',
+  'trend.clearConfirm': '會清除測驗與無限紀錄，再點確認',
   'trend.cleared': '已清除紀錄',
   'trend.empty': '還沒有紀錄 — 玩一場吧！',
   'common.back': '◀ 返回',
+
+  // --- 無限模式 ---
+  'endless.cta': '無限跳',
+  'endless.ctaLocked': '無限跳',
+  'endless.lockHint': '先完成一場測驗即可解鎖無限跳。',
+  'endless.unlockedToast': '無限跳已解鎖！',
+  'endless.floorsLabel': '層',
+  'endless.best': '最佳 {0}',
+  'endless.resultTitle': '跳到這裡',
+  'endless.newBest': '新紀錄！',
+  'endless.shareText': '我在 MBTI Jump 無限模式跳了 {0} 層！',
+  'endless.again': '再跳一次 ↻',
+  'endless.back': '◀ 回開始',
 
   'ach.title': '成就',
   'ach.progress': '已解鎖 {0}/{1}',
@@ -103,7 +120,7 @@ export const ZH_HANT: Record<StringKey, string> = {
   'type.ENFJ.desc': '你天生知道怎麼讓每個人發光，卻常忘了留一盞燈給自己。朋友圈的黏著劑。',
   'type.ENFP.name': '人形煙火',
   'type.ENFP.desc': '你的熱情能點亮整條街，專注力大概能維持三分鐘。想到就衝，通常都沒事。',
-  'type.ISTJ.name': '靠譜磐石',
+  'type.ISTJ.name': '可靠磐石',
   'type.ISTJ.desc': '你說會做到的事，天塌下來也會做到。備份的備份都有備份。',
   'type.ISFJ.name': '人間暖爐',
   'type.ISFJ.desc': '你記得所有人的生日和忌口，卻常忘了自己也需要被照顧。低調，但少了你全場會垮。',

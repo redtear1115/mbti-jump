@@ -2,9 +2,13 @@
 export const EN = {
   // --- 通用 / 開始 ---
   'start.title': 'MBTI Jump',
-  'start.tagline': 'Jump up — left = Yes, right = No.\nFour levels reveal your type.',
+  'start.tagline': 'Jump to find your type.\nLeft = Yes, right = No — four levels.',
   'start.cta': 'Start ▶',
   'start.language': 'Language',
+
+  // --- First-run tutorial ---
+  'tutorial.hint': 'Left platform + left marker = Yes · Right = No.\nLand on a side to answer.',
+  'tutorial.dismiss': 'Got it',
 
   // --- 維度名稱 ---
   'dim.EI': 'Extraversion / Introversion',
@@ -31,7 +35,7 @@ export const EN = {
   'result.heading': 'Your personality type',
   'result.again': 'Play again ↻',
   'result.share': 'My MBTI is {0}! {1} Play MBTI Jump: {2}',
-  'card.tagline': 'MBTI Jump — jump out your personality',
+  'card.tagline': 'MBTI Jump — Jump to find your type.',
 
   // --- 分享閉環 ---
   'og.title': "MBTI Jump — I'm {0}!",
@@ -59,11 +63,24 @@ export const EN = {
   'trend.totalPlays': 'Played {0} times',
   'trend.topType': 'Most often',
   'trend.recent': 'Recent',
-  'trend.clear': 'Clear history',
-  'trend.clearConfirm': 'Tap again to confirm',
+  'trend.clear': 'Clear quiz & endless',
+  'trend.clearConfirm': 'Clears quiz & endless. Tap again',
   'trend.cleared': 'History cleared',
   'trend.empty': 'No plays yet — play a round!',
   'common.back': '◀ Back',
+
+  // --- Endless mode ---
+  'endless.cta': 'Endless Jump',
+  'endless.ctaLocked': 'Endless Jump',
+  'endless.lockHint': 'Finish one personality quiz to unlock Endless.',
+  'endless.unlockedToast': 'Endless Jump unlocked!',
+  'endless.floorsLabel': 'Floors',
+  'endless.best': 'Best {0}',
+  'endless.resultTitle': 'You reached',
+  'endless.newBest': 'New best!',
+  'endless.shareText': 'I jumped {0} floors in MBTI Jump Endless Mode!',
+  'endless.again': 'Jump again ↻',
+  'endless.back': '◀ Back to Start',
 
   // --- 成就 ---
   'ach.title': 'Achievements',
@@ -88,10 +105,10 @@ export const EN = {
   'ach.creature_of_habit.desc': 'Get the same type 3 times',
 
   // --- 族群 ---
-  'group.explorer': 'an Explorer',
-  'group.diplomat': 'a Diplomat',
-  'group.analyst': 'an Analyst',
-  'group.sentinel': 'a Sentinel',
+  'group.explorer': 'Explorer',
+  'group.diplomat': 'Diplomat',
+  'group.analyst': 'Analyst',
+  'group.sentinel': 'Sentinel',
 
   // --- 16 型專屬文案 ---
   'type.INTJ.name': 'The Silent Strategist',

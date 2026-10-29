@@ -21,6 +21,8 @@ import { MuteButton } from '../ui/MuteButton';
 import { scoreBarModel } from '../core/scoreBar';
 import { BODY_FONT, INK, INK_CSS, PAPER_CARD, TITLE_FONT } from '../theme/manga';
 import { inkFrame, drawInkBurst, drawMangaSpeechBox, MangaSpeedLines, popHop, popLetter } from '../gfx/mangaFx';
+import { muteAnchor } from '../ui/safeArea';
+import { maybeStartTutorial, dismissTutorial } from '../ui/firstRunTutorial';
 
 interface GameInit {
   score: ScoreTracker;
@@ -45,10 +47,10 @@ export class GameScene extends Phaser.Scene {
   private platformsSinceFork = 0;
   private dimComplete = false; // 目前維度是否已鎖定（避免重複鎖定）
   private banner!: Phaser.GameObjects.Text;
-  private levelLabel!: Phaser.GameObjects.Text;
-  private scoreBar!: Phaser.GameObjects.Graphics; // 得分條底＋分隔線
-  private scoreLeft!: Phaser.GameObjects.Text; // 左側票數
-  private scoreRight!: Phaser.GameObjects.Text; // 右側票數
+  levelLabel!: Phaser.GameObjects.Text;
+  scoreBar!: Phaser.GameObjects.Graphics; // 得分條底＋分隔線
+  scoreLeft!: Phaser.GameObjects.Text; // 左側票數
+  scoreRight!: Phaser.GameObjects.Text; // 右側票數
   private previewLeft!: Phaser.GameObjects.Text;
   private previewRight!: Phaser.GameObjects.Text;
   private chipLeft!: Phaser.GameObjects.Graphics;
@@ -62,6 +64,8 @@ export class GameScene extends Phaser.Scene {
   private aurora!: AuroraBackground;
   private speedLines!: MangaSpeedLines;
   private hop = 0;
+  tutorialActive = false;
+  tutorialNodes: Phaser.GameObjects.GameObject[] = [];
 
   constructor() {
     super('Game');
@@ -174,6 +178,10 @@ export class GameScene extends Phaser.Scene {
       .setDepth(21);
     this.updateLevelLabel();
     this.drawScoreBar();
+    void this.levelLabel;
+    void this.scoreBar;
+    void this.scoreLeft;
+    void this.scoreRight;
 
     const previewStyle = {
       fontSize: '18px',
@@ -196,7 +204,11 @@ export class GameScene extends Phaser.Scene {
       .setDepth(20)
       .setAlpha(0);
 
-    new MuteButton(this, GAME.width - 26, 26);
+    const mute = muteAnchor(GAME.width);
+    new MuteButton(this, mute.x, mute.y);
+
+    maybeStartTutorial(this);
+    void this.tutorialNodes;
   }
 
   update(_time: number, delta: number) {
@@ -226,14 +238,17 @@ export class GameScene extends Phaser.Scene {
         this.shownQuestionIdx = fork.qIndex;
         this.updateBanner(fork.qIndex);
         this.updatePreview(fork.qIndex);
-        this.setPreviewVisible(false, true); // 換題瞬間隱藏，等接近新分叉再亮
+        // 導覽中保持 chip 可見，方便對照左右＝Yes/No
+        if (!this.tutorialActive) {
+          this.setPreviewVisible(false, true); // 換題瞬間隱藏，等接近新分叉再亮
+        }
       }
       // 進入提示範圍後鎖住顯示（彈跳會反覆穿越閾值，不能用即時距離開關）
       const dist = this.player.y - fork.y;
-      if (dist < GAME.height * 1.5) {
+      if (this.tutorialActive || dist < GAME.height * 1.5) {
         this.setPreviewVisible(true);
       }
-    } else {
+    } else if (!this.tutorialActive) {
       this.setPreviewVisible(false);
     }
 
@@ -336,6 +351,7 @@ export class GameScene extends Phaser.Scene {
         Sfx.play('select');
         this.score.recordAnswer(platform.side);
         this.drawScoreBar();
+        dismissTutorial(this);
         if (this.dimAnsweredIds.size >= GAME.questionsPerLevel) {
           this.completeCurrentDimension();
         }

@@ -6,6 +6,7 @@ import { getLocale, setLocale } from '../i18n/store';
 import { SUPPORTED_LOCALES, LOCALE_LABELS } from '../i18n/locales';
 import { Button } from '../ui/Button';
 import { MuteButton } from '../ui/MuteButton';
+import { muteAnchor } from '../ui/safeArea';
 import { getInvite } from '../core/invite';
 import { groupColorOf } from '../core/temperament';
 import { ensurePlayerTexture } from '../entities/Player';
@@ -14,6 +15,7 @@ import { prefersReducedMotion } from '../ui/reducedMotion';
 import { requestTiltPermission } from '../input/tiltPermission';
 import { BODY_FONT, DISPLAY_FONT, INK, INK_CSS, MANGA_RED, MANGA_YELLOW, PAPER, PAPER_CARD, numToHex } from '../theme/manga';
 import { drawHalftoneBand, drawMangaSpeechBox, inkFrame } from '../gfx/mangaFx';
+import { isEndlessUnlocked } from '../core/endlessUnlock';
 
 export class StartScene extends Phaser.Scene {
   constructor() {
@@ -197,10 +199,11 @@ export class StartScene extends Phaser.Scene {
       });
     });
 
-    new MuteButton(this, GAME.width - 30, 30);
+    const mute = muteAnchor(GAME.width);
+    new MuteButton(this, mute.x, mute.y);
 
     // 主 CTA
-    new Button(this, cx, 560, t('start.cta'), {
+    new Button(this, cx, 536, t('start.cta'), {
       width: 220,
       height: 62,
       fontSize: 28,
@@ -214,8 +217,49 @@ export class StartScene extends Phaser.Scene {
       },
     });
 
-    new Button(this, cx, 640, t('trend.cta'), {
-      width: 210,
+    // Endless CTA directly under Start (locked until ≥1 classic play)
+    const unlocked = isEndlessUnlocked();
+    let lockHint: Phaser.GameObjects.Text | null = null;
+    new Button(this, cx, 606, unlocked ? t('endless.cta') : t('endless.ctaLocked'), {
+      width: 200,
+      height: 50,
+      fontSize: 20,
+      bg: unlocked ? 0xe4ae3a : 0x3a3e58,
+      bgHover: unlocked ? 0xf0c45a : 0x4a4e68,
+      bgDown: unlocked ? 0xc9942a : 0x2a2e48,
+      textColor: unlocked ? '#0f1220' : '#ffffff88',
+      icon: unlocked ? undefined : 'lock',
+      onClick: async () => {
+        if (!unlocked) {
+          if (lockHint) {
+            lockHint.destroy();
+            lockHint = null;
+          }
+          lockHint = this.add
+            .text(cx, 638, t('endless.lockHint'), {
+              fontSize: '13px',
+              color: INK_CSS,
+              align: 'center',
+              wordWrap: { width: GAME.width - 48, useAdvancedWrap: true },
+              fontFamily: 'Nunito, system-ui, sans-serif',
+            })
+            .setOrigin(0.5)
+            .setDepth(30);
+          this.time.delayedCall(2800, () => {
+            if (lockHint) {
+              lockHint.destroy();
+              lockHint = null;
+            }
+          });
+          return;
+        }
+        await requestTiltPermission();
+        this.scene.start('EndlessGame');
+      },
+    });
+
+    new Button(this, cx, 672, t('trend.cta'), {
+      width: 200,
       height: 50,
       fontSize: 17,
       bg: PAPER_CARD,
@@ -226,7 +270,7 @@ export class StartScene extends Phaser.Scene {
       onClick: () => this.scene.start('Trend'),
     });
 
-    new Button(this, cx, 708, t('ach.cta'), {
+    new Button(this, cx, 734, t('ach.cta'), {
       width: 210,
       height: 50,
       fontSize: 17,
