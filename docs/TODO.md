@@ -22,20 +22,18 @@
 ---
 
 ## Tier 0 — 程式品質快修（小、低風險，隨時可做）
-- [ ] `Controls.ts` 從 `core/` 移到 `input/` 或 `entities/`（它 import Phaser，破壞 core=純邏輯 的語意）
-- [ ] 移除 `GameScene.answeredCount`，改用「本維度題目集」計數，消除與 `answeredIds` 的雙重真相
-- [ ] 抽出「跳過題目自動過關」判斷式為純函式（`shouldAutoComplete(...)`）＋單元測試（目前藏在 `update()`、含 0.75 magic number、無測試）
-- [ ] `LEVEL_COLORS` 從 `GameScene.ts` 移到 `gameConfig.ts`
-- [ ] `tiltToAxis(gamma, dead=…, max=…)` 改吃參數，讓測試不依賴 config 值
-- [ ] 場景 init 介面命名統一（`GameInit`/`Init` 混用）或共用 `ScenePayload { score }`
-- [ ] （選）`personalities.ts` 移到 `core/`；`Platform` 的 label Text 加欄位參照
+- [x] `Controls.ts` 從 `core/` 移到 `input/` 或 `entities/`（它 import Phaser，破壞 core=純邏輯 的語意）
+- [x] 移除 `GameScene.answeredCount`，改用「本維度題目集」計數，消除與 `answeredIds` 的雙重真相
+- [x] 抽出「跳過題目自動過關」判斷式為純函式（`shouldAutoComplete(...)`）＋單元測試（目前藏在 `update()`、含 0.75 magic number、無測試）
+- [x] `LEVEL_COLORS` 從 `GameScene.ts` 移到 `palette.ts`（`LEVEL_BG`）
+- [x] `tiltToAxis(gamma, dead=…, max=…)` 改吃參數，讓測試不依賴 config 值
+- [x] `Platform` 的 `label` Text 與 `plate` Graphics 加欄位參照
 
 ## Tier 1 — 介面手感（純程式，體感提升大，適合先做、不需試玩）
-- [ ] **按鈕按下/hover 回饋**：語言鈕、Start、Copy、Again 加 `pointerover/pointerdown` 縮放或變色（150–250ms）
-- [ ] **觸控目標 ≥44pt**：語言鈕與 CTA 加大可點區（padding 或 hitArea）
-- [ ] **主 CTA 做成實心厚圓角按鈕**，每畫面一個明確主要動作
-- [ ] **安全區**：確認 HUD 頂端在瀏海/Dynamic Island 下不被遮，必要時加上 inset
-- [ ] **reduced-motion**：答案預覽淡入、維度名稱淡入判斷 `prefers-reduced-motion`
+- [x] **按鈕按下/hover 回饋**：語言鈕、Start、Copy、Again 加 `pointerover/pointerdown` 縮放或變色（150–250ms）
+- [x] **觸控目標 ≥44pt**：語言鈕（76×44）與 CTA 加大可點區（padding 或 hitArea）
+- [x] **主 CTA 做成實心厚圓角按鈕**，每畫面一個明確主要動作
+- [x] **reduced-motion**：答案預覽淡入、維度名稱淡入判斷 `prefers-reduced-motion`
 
 ## Tier 2 — 美術 & 音效 ✅ 完成（程式管線）
 實作見 `docs/superpowers/plans/2026-07-01-mbti-jump-art-audio.md`（10 tasks，全數審查通過，最終 whole-branch review = READY）。
@@ -86,6 +84,22 @@
       跳躍全速度驅動拉伸/壓扁＋落地阻尼晃動＋水平微傾（`core/jelly.ts` `jellyStretch` 純函式）、
       開始頁/結果頁落地投影。碰撞體 36×36 與混色機制不動。過程小尾巴：T2 首版誤動 vitest 全域設定，
       已改為把純函式移到無 Phaser 的 `core/jelly.ts` 並完整還原基礎設施。
+
+## 日式漫畫風格＋白貓主角視覺改版
+> 分兩批完成，於 2026-10-29 整理提交：貼圖、81 張 OG 圖、分享卡、`gfx/crisp.ts` 與幾個場景的檔案時間是 2026-09-23，
+> 當時用什麼工具、貼圖怎麼來的都沒記錄；`theme/manga.ts`、`gfx/mangaFx.ts`、Player、Platform、背景、按鈕、
+> Start／Game／Result 場景是 2026-10-29 由 Antigravity（Gemini 4 Argon，後段 Claude Opus 5.5）完成。
+- [ ] **貼圖來源待確認**：`public/assets/sprites/*.png` 是手繪還是 AI 生成要查清楚，並補進 `CREDITS.md`，上架前必須完成。
+- [ ] **試玩確認**：無頭瀏覽器裡沒有輸入，角色 2 秒內就自己連答 3 題（都偏 I）；左側邊緣有一個被切掉一半的白色圓形。
+- [x] **全站漫畫紙＆墨線視覺（`theme/manga.ts`、`gfx/mangaFx.ts`、`gfx/crisp.ts`）** ✅：
+      暖紙底色（`PAPER` `#f6f0e4`）、濃墨框線（`INK` `#1c1424`）、漫畫分鏡外框（`inkFrame`）、
+      上升集中速度線（`MangaSpeedLines`）、踏階擬聲詞（`popHop`：ポン/トン/タッ/ドッ）與答題字母爆發字（`popLetter`）、
+      標題放射爆炸（`drawInkBurst`）、高 DPI 銳利文字渲染（`installSharpText`）。
+- [x] **程序繪製主角、台階與背景** ✅（`IMAGE_MANIFEST` 留空，`public/assets/sprites/` 為未使用的歷史素材，來源仍待確認）：
+      圍巾白貓隨維度鎖定染毛色、保留黑線與五官，漫畫立體台階，
+      四章漫畫分鏡背景（0 校園太陽與雲、1 心動愛心與花瓣、2 烏雲與雨滴、3 祭典集中線與星火）。
+- [x] **分享卡與 81 張 OG 圖同步更新為漫畫網點＋粗墨框風格** ✅。
+- [x] **提交前檢查（2026-10-29）**：143 個測試通過、正式版建置與 Worker 型別檢查通過；Vite 主程式包超過 500 kB 的提示仍在，以上試玩事項尚未驗證。
 
 ## Tier 3 — 內容 & 上線
 - [ ] `ja`/`es` 譯文母語校稿（目前 AI 草稿，已標 `needs-review`；含新增的型別文案與配對句）

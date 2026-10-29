@@ -2,58 +2,26 @@ import Phaser from 'phaser';
 import { GAME } from '../config/gameConfig';
 import { LETTER_COLORS } from '../theme/palette';
 import { DIMENSIONS, LETTERS_OF } from '../config/questions';
-import { ensureGlowTexture } from './glowTexture';
+import { drawHalftoneBand } from './mangaFx';
 
 /**
- * 兩團維度色柔光緩慢飄移的程序背景（無美術資產）。
- * 以 SCREEN 疊加在相機底色上，深度 -11 → 位於既有氛圍背景（星點 -10、
- * 飛蟲/天象 -9）之後，只做「顏色暈染」不遮擋其上元素。retint 依維度換色。
+ * 依目前維度的兩個代表字母色，在漫畫紙上下兩端繪製淡雅的彩色漫畫網點帶（スクリーントーン）。
+ * 取代原本會洗髒紙面的模糊柔光球，維持純粹的日式印刷網點質感。
  */
 export class AuroraBackground {
-  private glowA: Phaser.GameObjects.Image;
-  private glowB: Phaser.GameObjects.Image;
+  private scene: Phaser.Scene;
+  private toneGfx: Phaser.GameObjects.Graphics;
 
-  constructor(scene: Phaser.Scene, reducedMotion: boolean) {
-    const glowKey = ensureGlowTexture(scene);
-    const mk = () =>
-      scene.add
-        .image(0, 0, glowKey)
-        .setScrollFactor(0)
-        .setDepth(-11)
-        .setBlendMode(Phaser.BlendModes.SCREEN)
-        .setDisplaySize(GAME.width * 1.7, GAME.width * 1.7);
-    this.glowA = mk();
-    this.glowB = mk();
-
-    this.glowA.setPosition(GAME.width * 0.2, GAME.height * 0.25);
-    this.glowB.setPosition(GAME.width * 0.8, GAME.height * 0.75);
-
-    if (!reducedMotion) {
-      scene.tweens.add({
-        targets: this.glowA,
-        x: GAME.width * 0.6,
-        y: GAME.height * 0.5,
-        duration: 9000,
-        yoyo: true,
-        repeat: -1,
-        ease: 'Sine.easeInOut',
-      });
-      scene.tweens.add({
-        targets: this.glowB,
-        x: GAME.width * 0.35,
-        y: GAME.height * 0.45,
-        duration: 11000,
-        yoyo: true,
-        repeat: -1,
-        ease: 'Sine.easeInOut',
-      });
-    }
+  constructor(scene: Phaser.Scene, _reducedMotion: boolean) {
+    this.scene = scene;
+    this.toneGfx = this.scene.add.graphics().setScrollFactor(0).setDepth(-11);
   }
 
-  /** 依維度更新兩團柔光顏色。 */
+  /** 依維度更新上下兩端彩色漫畫網點。 */
   retint(dimIndex: number): void {
     const [a, b] = LETTERS_OF[DIMENSIONS[dimIndex]];
-    this.glowA.setTint(LETTER_COLORS[a]);
-    this.glowB.setTint(LETTER_COLORS[b]);
+    this.toneGfx.clear();
+    drawHalftoneBand(this.toneGfx, 10, 10, GAME.width - 20, 190, LETTER_COLORS[a], 0.22, 'down', 10);
+    drawHalftoneBand(this.toneGfx, 10, GAME.height - 260, GAME.width - 20, 140, LETTER_COLORS[b], 0.18, 'up', 10);
   }
 }

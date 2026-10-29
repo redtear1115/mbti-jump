@@ -16,10 +16,11 @@ import { renderShareCard, canvasToBlob, downloadBlob } from '../share/shareCard'
 import { getLocale } from '../i18n/store';
 import { getInvite } from '../core/invite';
 import { sharedLetters, pairKey } from '../core/compare';
-import { ensureGlowTexture } from '../gfx/glowTexture';
 import { ensurePlayerTexture } from '../entities/Player';
 import { playerColorFor } from '../core/playerColor';
 import { LETTER_COLORS, PALETTE, letterHex } from '../theme/palette';
+import { BODY_FONT, DISPLAY_FONT, INK, INK_CSS, PAPER, TITLE_FONT } from '../theme/manga';
+import { drawInkBurst, inkFrame } from '../gfx/mangaFx';
 import type { Letter } from '../config/questions';
 
 interface ResultInit {
@@ -41,49 +42,45 @@ export class ResultScene extends Phaser.Scene {
     }
     const desc = describeType(type);
     const groupHex = '#' + groupColorOf(type).toString(16).padStart(6, '0');
-    this.cameras.main.setBackgroundColor('#101018');
+    this.cameras.main.setBackgroundColor(PAPER);
+    inkFrame(this);
     const cx = GAME.width / 2;
     const reduce = prefersReducedMotion();
 
-    // 族群色 radial glow（與分享卡同視覺語言）
-    this.add
-      .image(cx, 300, ensureGlowTexture(this))
-      .setDisplaySize(900, 900)
-      .setBlendMode(Phaser.BlendModes.SCREEN)
-      .setTint(groupColorOf(type));
+    const burst = this.add.graphics();
+    drawInkBurst(burst, cx, 118, 28, 92, 12, groupColorOf(type));
 
-    // 果凍落地投影
     const jellyShadow = this.add.graphics();
-    jellyShadow.fillStyle(0x000000, 0.28);
-    jellyShadow.fillEllipse(cx, 172, 92, 18);
+    jellyShadow.fillStyle(INK, 0.18);
+    jellyShadow.fillEllipse(cx, 158, 70, 12);
     if (!reduce) {
       jellyShadow.setAlpha(0);
       this.tweens.add({ targets: jellyShadow, alpha: 1, duration: 500 });
     }
 
-    // 最終色果凍怪：你的顏色，elastic pop 入場
-    // 一律用 proc texture；若日後重新引入點陣 player 資產，需比照 Player 的 ASSET_KEYS fallback
+    // 最終色小貓：elastic pop 入場
     const jelly = this.add
-      .image(cx, 120, ensurePlayerTexture(this, playerColorFor(type.split('') as Letter[])))
-      .setScale(2);
+      .image(cx, 118, ensurePlayerTexture(this, playerColorFor(type.split('') as Letter[])))
+      .setScale(1);
     if (!reduce) {
       jelly.setScale(0);
-      this.tweens.add({ targets: jelly, scale: 2, duration: 500, ease: 'Back.easeOut' });
+      this.tweens.add({ targets: jelly, scale: 1, duration: 500, ease: 'Back.easeOut' });
     }
 
     this.add
-      .text(cx, 48, t('result.heading'), {
-        fontSize: '16px',
-        color: '#ffffffaa',
-        fontFamily: 'Fredoka, system-ui, sans-serif',
+      .text(cx, 42, t('result.heading'), {
+        fontSize: '15px',
+        color: '#1c1424aa',
+        fontFamily: BODY_FONT,
       })
       .setOrigin(0.5);
     this.add
-      .text(cx, 210, type, {
-        fontSize: '72px',
+      .text(cx, 206, type, {
+        fontSize: '64px',
         color: groupHex,
-        fontStyle: 'bold',
-        fontFamily: 'Fredoka, system-ui, sans-serif',
+        fontFamily: DISPLAY_FONT,
+        stroke: INK_CSS,
+        strokeThickness: 8,
       })
       .setOrigin(0.5);
 
@@ -91,8 +88,8 @@ export class ResultScene extends Phaser.Scene {
     const model = buildShareCardModel(type, data.score.allTallies(), getLocale());
     this.add
       .text(cx, 268, model.groupName, {
-        fontFamily: 'Fredoka, system-ui, sans-serif',
-        fontSize: '20px',
+        fontFamily: TITLE_FONT,
+        fontSize: '18px',
         color: groupHex,
       })
       .setOrigin(0.5);
@@ -107,7 +104,7 @@ export class ResultScene extends Phaser.Scene {
       const labelStyle = {
         fontSize: '13px',
         fontStyle: 'bold',
-        fontFamily: 'Nunito, system-ui, sans-serif',
+        fontFamily: BODY_FONT,
       };
       this.add
         .text(barX - 10, y, d.leftLetter, { ...labelStyle, color: letterHex(d.leftLetter) })
@@ -133,7 +130,9 @@ export class ResultScene extends Phaser.Scene {
           barGfx.fillStyle(d.leftColor, 1);
           barGfx.fillRoundedRect(barX, y, lw, barH, { tl: 8, bl: 8, tr: 0, br: 0 });
         }
-        barGfx.fillStyle(0xffffff, 1);
+        barGfx.lineStyle(2, INK, 1);
+        barGfx.strokeRoundedRect(barX, y, barW, barH, 8);
+        barGfx.fillStyle(0xfffaf2, 1);
         barGfx.fillRect(barX + frac * barW - 2, y - 2, 4, barH + 4);
       });
     };
@@ -151,32 +150,32 @@ export class ResultScene extends Phaser.Scene {
       });
     }
 
+    const friend = getInvite();
     this.add
-      .text(cx, 470, desc, {
-        fontSize: '18px',
-        color: '#ffffff',
+      .text(cx, friend ? 462 : 470, desc, {
+        fontSize: friend ? '17px' : '18px',
+        color: INK_CSS,
         align: 'center',
         wordWrap: { width: GAME.width - 60, useAdvancedWrap: true },
-        fontFamily: 'Nunito, system-ui, sans-serif',
+        fontFamily: BODY_FONT,
       })
       .setOrigin(0.5);
 
     // 好友對比（有邀請時）：族群配對句＋四維度字母對照列
-    const friend = getInvite();
     if (friend) {
       this.add
-        .text(cx, 526, tf(pairKey(groupOf(type), groupOf(friend)), [sharedLetters(type, friend)]), {
+        .text(cx, 524, tf(pairKey(groupOf(type), groupOf(friend)), [sharedLetters(type, friend)]), {
           fontSize: '14px',
-          color: '#ffffff',
+          color: INK_CSS,
           align: 'center',
           wordWrap: { width: GAME.width - 50, useAdvancedWrap: true },
-          fontFamily: 'Nunito, system-ui, sans-serif',
+          fontFamily: BODY_FONT,
         })
         .setOrigin(0.5);
       this.drawCompareRow(cx, 560, type, friend);
     }
 
-    const btnY = friend ? [600, 662, 722] : [585, 650, 712];
+    const btnY = friend ? [604, 664, 724] : [585, 650, 712];
 
     const shareBtn = new Button(this, cx, btnY[0], t('share.action'), {
       width: 240,
@@ -246,10 +245,10 @@ export class ResultScene extends Phaser.Scene {
     ids.forEach((id, i) => {
       const label = this.add
         .text(cx, 44 + i * 46, tf('ach.unlocked', [t(`ach.${id}.name` as StringKey)]), {
-          fontFamily: 'Fredoka, system-ui, sans-serif',
-          fontSize: '18px',
-          color: '#0f1220',
-          backgroundColor: '#ffe066',
+          fontFamily: TITLE_FONT,
+          fontSize: '16px',
+          color: INK_CSS,
+          backgroundColor: '#ffe14a',
           padding: { x: 12, y: 8 },
           align: 'center',
         })
@@ -280,7 +279,7 @@ export class ResultScene extends Phaser.Scene {
     const font = {
       fontSize: '14px',
       fontStyle: 'bold',
-      fontFamily: 'Nunito, system-ui, sans-serif',
+      fontFamily: BODY_FONT,
     };
     const gap = 16;
     const widths = [0, 1, 2, 3].map((i) => (mine[i] === theirs[i] ? 30 : 50));
@@ -290,16 +289,18 @@ export class ResultScene extends Phaser.Scene {
       if (same) {
         g.fillStyle(LETTER_COLORS[mine[i] as Letter], 1);
         g.fillRoundedRect(x, y - chipH / 2, 30, chipH, chipH / 2);
-        g.lineStyle(2, PALETTE.accent, 1);
+        g.lineStyle(2.5, INK, 1);
         g.strokeRoundedRect(x, y - chipH / 2, 30, chipH, chipH / 2);
         this.add.text(x + 15, y, mine[i], { ...font, color: PALETTE.textOn }).setOrigin(0.5);
       } else {
         g.fillStyle(LETTER_COLORS[mine[i] as Letter], 1);
         g.fillRoundedRect(x, y - chipH / 2, 24, chipH, chipH / 2);
         this.add.text(x + 12, y, mine[i], { ...font, color: PALETTE.textOn }).setOrigin(0.5);
-        g.fillStyle(0xffffff, 0.13);
+        g.fillStyle(0xe7e0d4, 1);
         g.fillRoundedRect(x + 26, y - chipH / 2, 24, chipH, chipH / 2);
-        this.add.text(x + 38, y, theirs[i], { ...font, color: '#8888aa' }).setOrigin(0.5);
+        g.lineStyle(2, INK, 1);
+        g.strokeRoundedRect(x + 26, y - chipH / 2, 24, chipH, chipH / 2);
+        this.add.text(x + 38, y, theirs[i], { ...font, color: INK_CSS }).setOrigin(0.5);
       }
       x += widths[i] + gap;
     }

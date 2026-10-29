@@ -19,6 +19,8 @@ import { playerColorFor } from '../core/playerColor';
 import { Sfx } from '../audio/Sfx';
 import { MuteButton } from '../ui/MuteButton';
 import { scoreBarModel } from '../core/scoreBar';
+import { BODY_FONT, INK, INK_CSS, PAPER_CARD, TITLE_FONT } from '../theme/manga';
+import { inkFrame, drawInkBurst, drawMangaSpeechBox, MangaSpeedLines, popHop, popLetter } from '../gfx/mangaFx';
 
 interface GameInit {
   score: ScoreTracker;
@@ -58,6 +60,8 @@ export class GameScene extends Phaser.Scene {
   private reducedMotion = false;
   private background!: Background;
   private aurora!: AuroraBackground;
+  private speedLines!: MangaSpeedLines;
+  private hop = 0;
 
   constructor() {
     super('Game');
@@ -81,6 +85,7 @@ export class GameScene extends Phaser.Scene {
     this.shownQuestionIdx = -1;
     this.score.resetCurrentLevel();
     this.previewShown = false;
+    this.hop = 0;
   }
 
   create() {
@@ -90,6 +95,8 @@ export class GameScene extends Phaser.Scene {
     this.aurora.retint(this.dimIndex);
     this.background = new Background(this);
     this.background.setDimension(this.dimIndex);
+    this.speedLines = new MangaSpeedLines(this);
+    inkFrame(this);
     this.platforms = this.physics.add.staticGroup();
 
     // 起始平台（玩家正下方）
@@ -117,39 +124,43 @@ export class GameScene extends Phaser.Scene {
     this.controls = new Controls(this);
     this.controls.start();
 
-    // HUD 底襯（畫面底部）：往上跳的視野留給上方，資訊層固定在下方
+    // HUD：底部漫畫旁白框（ナレーション枠）。往上跳的視野留給上方。
     const hudScrim = this.add.graphics().setScrollFactor(0).setDepth(19);
-    hudScrim.fillStyle(PALETTE.surface, 0.72);
-    hudScrim.fillRoundedRect(0, 646, GAME.width, 154, { tl: 16, tr: 16, bl: 0, br: 0 });
+    const hx = 14;
+    const hy = 636;
+    const hw = GAME.width - 32;
+    const hh = 146;
+    drawMangaSpeechBox(hudScrim, hx, hy, hw, hh, { shadowOffset: 5, lineWidth: 3.2, cornerSlash: true });
+    // 分隔線：題目區 / 關卡＋得分區
+    hudScrim.lineStyle(1.5, INK, 0.3);
+    hudScrim.lineBetween(hx + 14, 718, hx + hw - 14, 718);
 
     this.banner = this.add
-      .text(GAME.width / 2, 660, '', {
-        fontSize: '24px',
-        fontStyle: 'bold',
-        color: '#ffffff',
+      .text(GAME.width / 2, 650, '', {
+        fontSize: '20px',
+        color: INK_CSS,
         align: 'center',
-        wordWrap: { width: GAME.width - 24, useAdvancedWrap: true },
-        fontFamily: 'Fredoka, system-ui, sans-serif',
+        wordWrap: { width: GAME.width - 48, useAdvancedWrap: true },
+        fontFamily: BODY_FONT,
       })
       .setOrigin(0.5, 0)
       .setScrollFactor(0)
       .setDepth(20);
 
     this.levelLabel = this.add
-      .text(GAME.width / 2, 728, '', {
-        fontSize: '14px',
-        color: '#ffffffaa',
-        fontFamily: 'Nunito, system-ui, sans-serif',
+      .text(GAME.width / 2, 724, '', {
+        fontSize: '15px',
+        color: INK_CSS,
+        fontFamily: BODY_FONT,
       })
       .setOrigin(0.5, 0)
       .setScrollFactor(0)
       .setDepth(20);
     this.scoreBar = this.add.graphics().setScrollFactor(0).setDepth(20);
     const scoreLabelStyle = {
-      fontSize: '14px',
-      fontStyle: 'bold',
+      fontSize: '16px',
       color: PALETTE.textOn,
-      fontFamily: 'Nunito, system-ui, sans-serif',
+      fontFamily: BODY_FONT,
     };
     this.scoreLeft = this.add
       .text(135, 757, '', scoreLabelStyle)
@@ -165,23 +176,22 @@ export class GameScene extends Phaser.Scene {
     this.drawScoreBar();
 
     const previewStyle = {
-      fontSize: '17px',
-      fontStyle: 'bold',
+      fontSize: '18px',
       color: PALETTE.textOn,
       wordWrap: { width: GAME.width * 0.44, useAdvancedWrap: true },
-      fontFamily: 'Nunito, system-ui, sans-serif',
+      fontFamily: BODY_FONT,
     };
     this.chipLeft = this.add.graphics().setScrollFactor(0).setDepth(19.5).setAlpha(0);
     this.chipRight = this.add.graphics().setScrollFactor(0).setDepth(19.5).setAlpha(0);
     this.previewLeft = this.add
-      .text(12, 618, '', { ...previewStyle, align: 'left' })
-      .setOrigin(0, 0)
+      .text(22, 622, '', { ...previewStyle, align: 'left' })
+      .setOrigin(0, 1)
       .setScrollFactor(0)
       .setDepth(20)
       .setAlpha(0);
     this.previewRight = this.add
-      .text(GAME.width - 12, 618, '', { ...previewStyle, align: 'right' })
-      .setOrigin(1, 0)
+      .text(GAME.width - 22, 622, '', { ...previewStyle, align: 'right' })
+      .setOrigin(1, 1)
       .setScrollFactor(0)
       .setDepth(20)
       .setAlpha(0);
@@ -191,6 +201,8 @@ export class GameScene extends Phaser.Scene {
 
   update(_time: number, delta: number) {
     this.player.tickJelly(delta / 1000);
+    const body = this.player.body as Phaser.Physics.Arcade.Body;
+    this.speedLines.draw(body.velocity.y, this.reducedMotion);
     this.player.setAxis(this.controls.axis);
     this.player.wrapHorizontally();
 
@@ -285,13 +297,13 @@ export class GameScene extends Phaser.Scene {
       this.lastForkY = y;
       this.add
         .text(GAME.width / 2, y - 54, t('level.lastQuestionMarker'), {
-          fontSize: '20px',
+          fontFamily: TITLE_FONT,
           fontStyle: 'bold',
-          color: '#ffe066',
+          fontSize: '20px',
+          color: '#e23b4a',
           align: 'center',
-          stroke: '#000000',
-          strokeThickness: 5,
-          fontFamily: 'Fredoka, system-ui, sans-serif',
+          stroke: '#fffaf2',
+          strokeThickness: 3,
         })
         .setOrigin(0.5)
         .setDepth(15);
@@ -310,6 +322,13 @@ export class GameScene extends Phaser.Scene {
     const platform = platformObj as Platform;
     this.player.bounce();
     Sfx.play('bounce');
+    if (!this.reducedMotion) {
+      if (platform.kind === 'question' && platform.side) {
+        popLetter(this, platform.x, platform.y, platform.side, LETTER_COLORS[platform.side]);
+      } else {
+        popHop(this, platform.x, platform.y, this.hop++);
+      }
+    }
 
     if (platform.kind === 'question' && platform.side && platform.questionId !== undefined) {
       if (!this.dimAnsweredIds.has(platform.questionId)) {
@@ -340,7 +359,11 @@ export class GameScene extends Phaser.Scene {
     if (!q) return;
     const isLast = questionIdx === this.questions.length - 1;
     const prefix = isLast ? t('level.lastQuestion') : `(${questionIdx + 1}/${GAME.questionsPerLevel})`;
+    this.banner.setFontSize(20);
     this.banner.setText(`${prefix} ${t(`q.${q.id}.text` as StringKey)}`);
+    if (this.banner.displayHeight > 68) {
+      this.banner.setFontSize(18);
+    }
   }
 
   private updatePreview(questionIdx: number): void {
@@ -357,9 +380,14 @@ export class GameScene extends Phaser.Scene {
     gfx.clear();
     if (!text.text) return;
     const textLeft = text.originX === 1 ? text.x - text.displayWidth : text.x;
-    const r = chipRect(textLeft, text.y, text.displayWidth, text.displayHeight);
+    const textTop = text.originY === 1 ? text.y - text.displayHeight : text.y;
+    const r = chipRect(textLeft, textTop, text.displayWidth, text.displayHeight);
+    gfx.fillStyle(INK, 1);
+    gfx.fillRect(r.x + 3, r.y + 3, r.w, r.h);
     gfx.fillStyle(LETTER_COLORS[side], 1);
-    gfx.fillRoundedRect(r.x, r.y, r.w, r.h, r.r);
+    gfx.fillRect(r.x, r.y, r.w, r.h);
+    gfx.lineStyle(2.5, INK, 1);
+    gfx.strokeRect(r.x, r.y, r.w, r.h);
   }
 
   /** 預覽（文字＋chip）顯隱：200ms 淡入淡出；snap 或 reduced-motion 時直接切換。 */
@@ -424,11 +452,16 @@ export class GameScene extends Phaser.Scene {
     badge(this.scoreLeft, a);
     badge(this.scoreRight, b);
 
+    g.lineStyle(2.5, INK, 1);
+    g.strokeRoundedRect(x0, y0, w, h, 11);
+
     // 加粗分隔線＋頂端圓頭旋鈕
     const dx = x0 + m.dividerFrac * w;
-    g.fillStyle(0xffffff, 1);
+    g.fillStyle(0xfffaf2, 1);
     g.fillRect(dx - 2.5, y0 - 2, 5, h + 4);
     g.fillCircle(dx, y0 - 2, 4);
+    g.lineStyle(2, INK, 1);
+    g.strokeCircle(dx, y0 - 2, 4);
   }
 
   private completeCurrentDimension(): void {
@@ -473,36 +506,54 @@ export class GameScene extends Phaser.Scene {
     this.announceDimension();
   }
 
-  /** 進入新維度時，畫面中央淡入淡出顯示新維度名稱，讓玩家知道換維度了。 */
+  /** 進入新章時，中央砸下一張分鏡標題卡。 */
   private announceDimension(): void {
     const dimCode = DIMENSIONS[this.dimIndex];
+    const cx = GAME.width / 2;
+    const cy = GAME.height * 0.3;
     const label = this.add
-      .text(GAME.width / 2, GAME.height * 0.32, t(`dim.${dimCode}` as StringKey), {
+      .text(cx, cy, tf('level.label', [this.dimIndex + 1, t(`dim.${dimCode}` as StringKey)]), {
         fontSize: '26px',
         fontStyle: 'bold',
-        color: '#ffffff',
+        color: INK_CSS,
         align: 'center',
-        stroke: '#000000',
-        strokeThickness: 5,
-        wordWrap: { width: GAME.width - 40, useAdvancedWrap: true },
-        fontFamily: 'Fredoka, system-ui, sans-serif',
+        wordWrap: { width: GAME.width - 88, useAdvancedWrap: true },
+        fontFamily: TITLE_FONT,
       })
       .setOrigin(0.5)
       .setScrollFactor(0)
-      .setDepth(30)
+      .setDepth(31)
       .setAlpha(0);
+    const pw = Math.min(GAME.width - 36, Math.max(240, label.width + 48));
+    const ph = Math.max(64, label.height + 28);
+    const plate = this.add.graphics().setScrollFactor(0).setDepth(30).setAlpha(0);
+    // 章節標題：ウニフラッシュ爆發底＋斜貼黃色標題格
+    drawInkBurst(plate, cx, cy, pw * 0.42, pw * 0.62, 18, PAPER_CARD, 0.55);
+    plate.fillStyle(INK, 1);
+    plate.fillRect(cx - pw / 2 + 5, cy - ph / 2 + 5, pw, ph);
+    plate.fillStyle(0xffd938, 1);
+    plate.fillRect(cx - pw / 2, cy - ph / 2, pw, ph);
+    plate.lineStyle(3.2, INK, 1);
+    plate.strokeRect(cx - pw / 2, cy - ph / 2, pw, ph);
+    label.setAngle(-3);
+    const targets = [label, plate];
     if (this.reducedMotion) {
       label.setAlpha(1);
-      this.time.delayedCall(1000, () => label.destroy());
+      plate.setAlpha(1);
+      this.time.delayedCall(1000, () => targets.forEach((o) => o.destroy()));
       return;
     }
     this.tweens.add({
-      targets: label,
+      targets,
       alpha: { from: 0, to: 1 },
-      duration: 300,
-      yoyo: true,
-      hold: 700,
-      onComplete: () => label.destroy(),
+      duration: 160,
+    });
+    this.tweens.add({
+      targets,
+      alpha: 0,
+      duration: 280,
+      delay: 900,
+      onComplete: () => targets.forEach((o) => o.destroy()),
     });
   }
 

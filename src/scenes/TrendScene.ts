@@ -1,6 +1,9 @@
 import Phaser from 'phaser';
 import { GAME } from '../config/gameConfig';
-import { PALETTE } from '../theme/palette';
+import { LETTER_COLORS, PALETTE } from '../theme/palette';
+import { BODY_FONT, DISPLAY_FONT, INK, INK_CSS, PAPER, PAPER_CARD, TITLE_FONT } from '../theme/manga';
+import { inkFrame } from '../gfx/mangaFx';
+import type { Letter } from '../config/questions';
 import { DIMENSIONS, LETTERS_OF } from '../config/questions';
 import { getPlays, clearPlays } from '../core/profile';
 import { computeTrends } from '../core/trends';
@@ -13,9 +16,6 @@ import { PLAYER_BASE_COLOR } from '../core/playerColor';
 import { ScoreTracker } from '../core/ScoreTracker';
 import { requestTiltPermission } from '../input/tiltPermission';
 
-const TITLE_FONT = 'Fredoka, system-ui, sans-serif';
-const BODY_FONT = 'Nunito, system-ui, sans-serif';
-
 export class TrendScene extends Phaser.Scene {
   private clearArmed = false;
 
@@ -25,24 +25,25 @@ export class TrendScene extends Phaser.Scene {
 
   create() {
     this.clearArmed = false;
-    this.cameras.main.setBackgroundColor(PALETTE.surface);
+    this.cameras.main.setBackgroundColor(PAPER);
+    inkFrame(this);
     const cx = GAME.width / 2;
     new MuteButton(this, GAME.width - 26, 26);
 
     this.add
-      .text(cx, 48, t('trend.title'), { fontFamily: TITLE_FONT, fontSize: '30px', color: '#ffffff', fontStyle: 'bold' })
+      .text(cx, 48, t('trend.title'), { fontFamily: TITLE_FONT, fontSize: '30px', fontStyle: 'bold', color: INK_CSS })
       .setOrigin(0.5);
 
     const trends = computeTrends(getPlays());
 
     if (trends.totalPlays === 0) {
       // 空狀態：果凍怪＋文案＋直接開局（少走一步回開始頁）
-      this.add.image(cx, 300, ensurePlayerTexture(this, PLAYER_BASE_COLOR)).setScale(1.6);
+      this.add.image(cx, 300, ensurePlayerTexture(this, PLAYER_BASE_COLOR)).setScale(1);
       this.add
         .text(cx, 400, t('trend.empty'), {
           fontFamily: BODY_FONT,
           fontSize: '18px',
-          color: '#ffffffcc',
+          color: INK_CSS,
           align: 'center',
           wordWrap: { width: GAME.width - 60, useAdvancedWrap: true },
         })
@@ -58,13 +59,13 @@ export class TrendScene extends Phaser.Scene {
       });
     } else {
       this.add
-        .text(cx, 108, tf('trend.totalPlays', [trends.totalPlays]), { fontFamily: BODY_FONT, fontSize: '18px', color: PALETTE.textMuted })
+        .text(cx, 108, tf('trend.totalPlays', [trends.totalPlays]), { fontFamily: BODY_FONT, fontSize: '18px', color: INK_CSS })
         .setOrigin(0.5);
 
       if (trends.topType) {
-        this.add.text(cx, 150, t('trend.topType'), { fontFamily: BODY_FONT, fontSize: '14px', color: PALETTE.textMuted }).setOrigin(0.5);
+        this.add.text(cx, 150, t('trend.topType'), { fontFamily: BODY_FONT, fontSize: '14px', color: '#1c1424aa' }).setOrigin(0.5);
         const hex = '#' + groupColorOf(trends.topType).toString(16).padStart(6, '0');
-        this.add.text(cx, 188, trends.topType, { fontFamily: TITLE_FONT, fontSize: '44px', color: hex, fontStyle: 'bold' }).setOrigin(0.5);
+        this.add.text(cx, 188, trends.topType, { fontFamily: DISPLAY_FONT, fontSize: '44px', color: hex }).setOrigin(0.5);
       }
 
       let y = 250;
@@ -75,9 +76,9 @@ export class TrendScene extends Phaser.Scene {
         y += 56;
       }
 
-      this.add.text(cx, 486, t('trend.recent'), { fontFamily: BODY_FONT, fontSize: '14px', color: PALETTE.textMuted }).setOrigin(0.5);
+      this.add.text(cx, 486, t('trend.recent'), { fontFamily: BODY_FONT, fontSize: '14px', color: '#1c1424aa' }).setOrigin(0.5);
       trends.recent.forEach((r, i) => {
-        this.add.text(cx, 514 + i * 26, r.type, { fontFamily: BODY_FONT, fontSize: '16px', color: '#ffffff' }).setOrigin(0.5);
+        this.add.text(cx, 514 + i * 26, r.type, { fontFamily: DISPLAY_FONT, fontSize: '18px', color: INK_CSS }).setOrigin(0.5);
       });
     }
 
@@ -107,10 +108,10 @@ export class TrendScene extends Phaser.Scene {
       width: 160,
       height: 46,
       fontSize: 16,
-      bg: PALETTE.surfaceAlt,
-      bgHover: 0x3a3e58,
-      bgDown: 0x22243a,
-      textColor: '#ffffff',
+      bg: PAPER_CARD,
+      bgHover: 0xfff3c4,
+      bgDown: 0xe6dcc8,
+      textColor: INK_CSS,
       onClick: () => this.scene.start('Start'),
     });
   }
@@ -121,12 +122,14 @@ export class TrendScene extends Phaser.Scene {
     const h = 20;
     const x = cx - w / 2;
     const g = this.add.graphics();
-    g.fillStyle(PALETTE.surfaceAlt, 1);
+    g.fillStyle(INK, 0.1);
     g.fillRoundedRect(x, y, w, h, 6);
-    g.fillStyle(PALETTE.accent, 1);
+    g.fillStyle(LETTER_COLORS[a as Letter], 1);
     const fw = Math.max(0, Math.min(w, (w * firstPct) / 100));
     if (fw > 0) g.fillRoundedRect(x, y, fw, h, 6);
-    this.add.text(x - 8, y + h / 2, `${a} ${firstPct}%`, { fontFamily: BODY_FONT, fontSize: '13px', color: '#ffffff' }).setOrigin(1, 0.5);
-    this.add.text(x + w + 8, y + h / 2, `${b} ${secondPct}%`, { fontFamily: BODY_FONT, fontSize: '13px', color: '#ffffff' }).setOrigin(0, 0.5);
+    g.lineStyle(2, INK, 1);
+    g.strokeRoundedRect(x, y, w, h, 6);
+    this.add.text(x - 8, y + h / 2, `${a} ${firstPct}%`, { fontFamily: BODY_FONT, fontSize: '13px', color: INK_CSS }).setOrigin(1, 0.5);
+    this.add.text(x + w + 8, y + h / 2, `${b} ${secondPct}%`, { fontFamily: BODY_FONT, fontSize: '13px', color: INK_CSS }).setOrigin(0, 0.5);
   }
 }

@@ -1,5 +1,6 @@
 import type { ShareCardModel } from './shareCardModel';
-import { hex, tintToward, wrapText, drawDimBars } from './draw';
+import { hex, wrapText, drawDimBars, roundRect } from './draw';
+import { BODY_FONT, DISPLAY_FONT, INK_CSS, PAPER_CSS, TITLE_FONT } from '../theme/manga';
 
 const W = 1080;
 const H = 1350;
@@ -11,37 +12,51 @@ export function renderShareCard(model: ShareCardModel): HTMLCanvasElement {
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('2d context unavailable');
 
-  // 放射漸變底（族群色 → 深底）
-  const grd = ctx.createRadialGradient(W / 2, H * 0.32, 60, W / 2, H * 0.32, H * 0.8);
-  grd.addColorStop(0, tintToward(model.groupColor, 0.25));
-  grd.addColorStop(1, '#101018');
-  ctx.fillStyle = grd;
+  ctx.fillStyle = PAPER_CSS;
   ctx.fillRect(0, 0, W, H);
 
-  ctx.textAlign = 'center';
-
-  // 型別
+  // 上半網點（族群色）
   ctx.fillStyle = hex(model.groupColor);
-  ctx.font = '800 210px Fredoka, system-ui, sans-serif';
-  ctx.fillText(model.type, W / 2, H * 0.30);
+  for (let y = 48; y < 500; y += 18) {
+    for (let x = 48 + ((y / 18) % 2) * 9; x < W - 40; x += 18) {
+      ctx.beginPath();
+      ctx.arc(x, y, 2.4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
 
-  // 族群名
-  ctx.fillStyle = '#ffffffcc';
-  ctx.font = '600 46px Fredoka, system-ui, sans-serif';
-  ctx.fillText(model.groupName, W / 2, H * 0.37);
+  ctx.lineWidth = 16;
+  ctx.strokeStyle = INK_CSS;
+  ctx.strokeRect(28, 28, W - 56, H - 56);
 
-  // 描述（自動換行）
-  ctx.fillStyle = '#ffffff';
-  ctx.font = '400 40px Nunito, system-ui, sans-serif';
-  wrapText(ctx, model.description, W / 2, H * 0.45, W - 160, 56);
+  roundRect(ctx, 64, 520, W - 128, 700, 28);
+  ctx.fillStyle = '#fffaf2';
+  ctx.fill();
+  ctx.lineWidth = 6;
+  ctx.stroke();
 
-  // 四維度傾向條
-  drawDimBars(ctx, model.dims, { x: 100, y: H * 0.66, w: W - 200, barH: 34, gap: 26 });
+  ctx.textAlign = 'center';
+  ctx.lineJoin = 'round';
 
-  // 底部標語
-  ctx.fillStyle = '#ffffff88';
-  ctx.font = '400 32px Nunito, system-ui, sans-serif';
-  ctx.fillText(model.tagline, W / 2, H - 56);
+  ctx.font = `400 180px ${DISPLAY_FONT}`;
+  ctx.lineWidth = 14;
+  ctx.strokeStyle = INK_CSS;
+  ctx.strokeText(model.type, W / 2, H * 0.28);
+  ctx.fillStyle = hex(model.groupColor);
+  ctx.fillText(model.type, W / 2, H * 0.28);
+
+  ctx.fillStyle = INK_CSS;
+  ctx.font = `700 42px ${TITLE_FONT}`;
+  ctx.fillText(model.groupName, W / 2, H * 0.36);
+
+  ctx.font = `500 38px ${BODY_FONT}`;
+  wrapText(ctx, model.description, W / 2, 620, W - 200, 54);
+
+  drawDimBars(ctx, model.dims, { x: 120, y: 860, w: W - 240, barH: 32, gap: 24 });
+
+  ctx.fillStyle = INK_CSS;
+  ctx.font = `500 30px ${BODY_FONT}`;
+  ctx.fillText(model.tagline, W / 2, H - 72);
 
   return canvas;
 }

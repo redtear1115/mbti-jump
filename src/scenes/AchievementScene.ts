@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { GAME } from '../config/gameConfig';
-import { PALETTE } from '../theme/palette';
+import { BODY_FONT, INK, INK_CSS, MANGA_YELLOW, PAPER, PAPER_CARD, TITLE_FONT } from '../theme/manga';
+import { inkFrame } from '../gfx/mangaFx';
 import { ACHIEVEMENTS, unlockedIds } from '../core/achievements';
 import { getPlays } from '../core/profile';
 import { t, tf } from '../i18n/t';
@@ -8,9 +9,6 @@ import type { StringKey } from '../i18n/t';
 import { MuteButton } from '../ui/MuteButton';
 import { Button } from '../ui/Button';
 import { ensureIconTexture } from '../ui/icons';
-
-const TITLE_FONT = 'Fredoka, system-ui, sans-serif';
-const BODY_FONT = 'Nunito, system-ui, sans-serif';
 
 const CARD_W = 198;
 const CARD_H = 126;
@@ -25,12 +23,13 @@ export class AchievementScene extends Phaser.Scene {
   }
 
   create() {
-    this.cameras.main.setBackgroundColor(PALETTE.surface);
+    this.cameras.main.setBackgroundColor(PAPER);
+    inkFrame(this);
     const cx = GAME.width / 2;
     new MuteButton(this, GAME.width - 26, 26);
 
     this.add
-      .text(cx, 48, t('ach.title'), { fontFamily: TITLE_FONT, fontSize: '30px', color: '#ffffff', fontStyle: 'bold' })
+      .text(cx, 48, t('ach.title'), { fontFamily: TITLE_FONT, fontSize: '30px', fontStyle: 'bold', color: INK_CSS })
       .setOrigin(0.5);
 
     const plays = getPlays();
@@ -41,18 +40,20 @@ export class AchievementScene extends Phaser.Scene {
       .text(cx, 84, tf('ach.progress', [unlocked.size, ACHIEVEMENTS.length]), {
         fontFamily: BODY_FONT,
         fontSize: '14px',
-        color: PALETTE.textMuted,
+        color: '#1c1424aa',
       })
       .setOrigin(0.5);
     const totalG = this.add.graphics();
     const tw = 200;
     const tx = cx - tw / 2;
-    totalG.fillStyle(0xffffff, 0.13);
+    totalG.fillStyle(INK, 0.12);
     totalG.fillRoundedRect(tx, 100, tw, 10, 5);
     if (unlocked.size > 0) {
-      totalG.fillStyle(PALETTE.accent, 1);
+      totalG.fillStyle(MANGA_YELLOW, 1);
       totalG.fillRoundedRect(tx, 100, Math.max(10, (tw * unlocked.size) / ACHIEVEMENTS.length), 10, 5);
     }
+    totalG.lineStyle(2, INK, 1);
+    totalG.strokeRoundedRect(tx, 100, tw, 10, 5);
 
     // 兩欄徽章卡
     ACHIEVEMENTS.forEach((a, i) => {
@@ -60,28 +61,31 @@ export class AchievementScene extends Phaser.Scene {
       const y = GRID_Y + Math.floor(i / 2) * ROW_PITCH;
       const on = unlocked.has(a.id);
       const g = this.add.graphics();
-      g.fillStyle(PALETTE.surfaceAlt, 1);
-      g.fillRoundedRect(x, y, CARD_W, CARD_H, 12);
-      if (on) {
-        g.lineStyle(2, PALETTE.accent, 1);
-        g.strokeRoundedRect(x, y, CARD_W, CARD_H, 12);
-      }
+      g.fillStyle(INK, 1);
+      g.fillRoundedRect(x + 3, y + 3, CARD_W, CARD_H, 10);
+      g.fillStyle(on ? PAPER_CARD : 0xe7e0d4, 1);
+      g.fillRoundedRect(x, y, CARD_W, CARD_H, 10);
+      g.lineStyle(on ? 3 : 2, on ? 0xe23b4a : INK, 1);
+      g.strokeRoundedRect(x, y, CARD_W, CARD_H, 10);
 
       // 徽章：彩色獎盃（解鎖）或灰鎖（未解鎖）
       const bx = x + 28;
       const by = y + 30;
-      g.fillStyle(on ? PALETTE.accent : 0xffffff, on ? 1 : 0.13);
+      g.fillStyle(on ? MANGA_YELLOW : PAPER_CARD, 1);
       g.fillCircle(bx, by, 16);
+      g.lineStyle(2, INK, 1);
+      g.strokeCircle(bx, by, 16);
       this.add
         .image(bx, by, ensureIconTexture(this, on ? 'trophy' : 'lock'))
         .setDisplaySize(18, 18)
-        .setTint(on ? 0x0f1220 : 0x8888aa);
+        .setTint(INK);
 
       const nameText = this.add
         .text(x + 52, y + 22, t(`ach.${a.id}.name` as StringKey), {
           fontFamily: TITLE_FONT,
-          fontSize: '15px',
-          color: on ? '#ffe066' : '#ffffff66',
+          fontStyle: 'bold',
+          fontSize: '16px',
+          color: on ? INK_CSS : '#5c564e',
           wordWrap: { width: CARD_W - 60, useAdvancedWrap: true },
         })
         .setOrigin(0, 0);
@@ -89,8 +93,8 @@ export class AchievementScene extends Phaser.Scene {
       this.add
         .text(x + 14, descY, t(`ach.${a.id}.desc` as StringKey), {
           fontFamily: BODY_FONT,
-          fontSize: '11px',
-          color: on ? '#ffffffcc' : '#ffffff44',
+          fontSize: '13px',
+          color: on ? INK_CSS : '#5c564e',
           wordWrap: { width: CARD_W - 28, useAdvancedWrap: true },
         })
         .setOrigin(0, 0);
@@ -101,17 +105,17 @@ export class AchievementScene extends Phaser.Scene {
         const pw = CARD_W - 28;
         const px = x + 14;
         const py = y + CARD_H - 16;
-        g.fillStyle(0xffffff, 0.13);
+        g.fillStyle(INK, 0.12);
         g.fillRoundedRect(px, py, pw, 4, 2);
         if (prog.current > 0) {
-          g.fillStyle(PALETTE.accent, 1);
+          g.fillStyle(MANGA_YELLOW, 1);
           g.fillRoundedRect(px, py, Math.max(4, (pw * prog.current) / prog.target), 4, 2);
         }
         this.add
           .text(x + CARD_W - 14, py - 4, `${prog.current}/${prog.target}`, {
             fontFamily: BODY_FONT,
-            fontSize: '10px',
-            color: '#ffffff88',
+            fontSize: '12px',
+            color: '#3a342c',
           })
           .setOrigin(1, 1);
       }
@@ -121,10 +125,10 @@ export class AchievementScene extends Phaser.Scene {
       width: 160,
       height: 46,
       fontSize: 16,
-      bg: PALETTE.surfaceAlt,
-      bgHover: 0x3a3e58,
-      bgDown: 0x22243a,
-      textColor: '#ffffff',
+      bg: PAPER_CARD,
+      bgHover: 0xfff3c4,
+      bgDown: 0xe6dcc8,
+      textColor: INK_CSS,
       onClick: () => this.scene.start('Start'),
     });
   }

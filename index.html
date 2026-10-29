@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
     <title>MBTI Jump</title>
@@ -26,15 +26,25 @@
       html, body {
         margin: 0;
         height: 100%;
-        background: radial-gradient(circle at 50% 38%, #232640 0%, #14162a 55%, #0d0e1c 100%);
+        background-color: #241c2c;
+        background-image:
+          radial-gradient(#382c44 1.5px, transparent 1.5px),
+          radial-gradient(#382c44 1.5px, #241c2c 1.5px);
+        background-size: 20px 20px;
+        background-position: 0 0, 10px 10px;
         overflow: hidden;
       }
       #app { width: 100vw; height: 100vh; }
       canvas { display: block; }
       @media (min-width: 500px) {
         #app canvas {
-          border-radius: 18px;
-          box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+          border-radius: 2px;
+          border: 5px solid #141019;
+          box-shadow:
+            6px 6px 0 #fbf7ef,
+            6px 6px 0 3px #141019,
+            14px 14px 0 #141019,
+            0 24px 60px rgba(0, 0, 0, 0.55);
         }
       }
     </style>

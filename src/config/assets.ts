@@ -3,6 +3,13 @@ export const ASSET_KEYS = {
   platformNormal: 'platform-normal',
   platformYes: 'platform-yes',
   platformNo: 'platform-no',
+  platformArt: 'platform-art',
+  cloud: 'sprite-cloud',
+  sun: 'sprite-sun',
+  petal: 'sprite-petal',
+  spark: 'sprite-spark',
+  heart: 'sprite-heart',
+  rain: 'sprite-rain',
   bgSky: 'bg-sky',
   bgClouds: 'bg-clouds',
   bgHills: 'bg-hills',
@@ -18,8 +25,7 @@ export const SFX_KEYS = {
 
 /**
  * BootScene 依此預載；檔案缺失時由 loaderror 略過（漸進增強）。
- * 目前刻意留空：主角/台階/背景全用程式美術（proc art），不載入點陣圖。
- * 若日後要換回點陣素材，把對應項目加回（ASSET_KEYS 與 fallback 判斷都還在）。
+ * 主角、台階與漫畫分鏡全數採用高解析 2D Canvas 向量墨線與網點程序繪製，不載入外部點陣圖。
  */
 export const IMAGE_MANIFEST: { key: string; path: string }[] = [];
 

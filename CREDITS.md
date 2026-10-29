@@ -12,7 +12,8 @@
 
 | 素材名稱 | 用途 (模組) | 作者 | 授權 | 連結 |
 |---|---|---|---|---|
-| （目前無第三方美術）主角、台階、背景氛圍皆為程式美術（proc art） | Player / Platform / Background | 本專案 | — | — |
+| 漫畫風貼圖（`public/assets/sprites/*.png`：白貓主角、石塊台階、太陽、雲、花瓣、愛心、雨滴、星火） | Player / Platform / Background | **來源待確認**（2026-09-23 加入，未記錄是手繪還是 AI 生成；上架前補齊作者與授權） | 待確認 | — |
+| 程序美術（目前主角、台階與背景以 Canvas / Graphics 繪製，未載入上述 PNG） | Player / Platform / Background | 本專案 | — | — |
 
 ## 🎵 音樂 (Music)
 
@@ -32,8 +33,8 @@
 
 | 字型名稱 | 用途 | 作者 | 授權 | 連結 |
 |---|---|---|---|---|
-| _（範例）Kenney Fonts_ | _UI / 標題_ | _Kenney_ | _CC0_ | _https://kenney.nl/assets/kenney-fonts_ |
-|  |  |  |  |  |
+| Dela Gothic One | 遊戲標題、MBTI 四碼、漫畫擬聲詞 | artakana | SIL OFL 1.1 | https://fonts.google.com/specimen/Dela+Gothic+One |
+| Fredoka / Nunito / Noto Sans (TC, SC, JP) | OG 圖片預渲染與介面備援字體 | Google Fonts | SIL OFL 1.1 | https://fonts.google.com/ |
 
 ---
 

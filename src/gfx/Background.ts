@@ -1,326 +1,352 @@
 import Phaser from 'phaser';
 import { GAME } from '../config/gameConfig';
-import { PALETTE } from '../theme/palette';
+import { INK, MANGA_RED, MANGA_YELLOW, PAPER_CARD } from '../theme/manga';
 import { prefersReducedMotion } from '../ui/reducedMotion';
 
 /**
- * 程式美術的氛圍背景（無點陣圖、無山層）。
- * 固定貼在鏡頭（scrollFactor 0），畫在遊戲物件之後（depth < 0）。
- * - 基底：微微閃爍的星點 + 幾隻飄動的蝴蝶/蜜蜂/小鳥
- * - 各維度不同天象：0 流星、1 極光、2 下雨、3 螢火蟲
- * 相機底色（LEVEL_BG 四色）由 GameScene 設定，透在最後面。
+ * 日式漫畫分鏡背景。固定貼在鏡頭上、畫在台階後面。
+ * 全部採用清晰向量筆觸與程序貼圖繪製（零模糊點陣圖、零白邊）：
+ * - 第 0 章（E/I）：少年漫晴空太陽＋排線雲朵
+ * - 第 1 章（S/N）：少女漫櫻吹雪＋閃亮十字星芒＋夢幻泡泡網點
+ * - 第 2 章（T/F）：青年漫層雲＋斜向雨線（アメ線）
+ * - 第 3 章（J/P）：熱血終章放射集中線（ベタフラッシュ）＋上升星火
  */
-type SkyKind = 'meteors' | 'aurora' | 'rain' | 'fireflies';
-const SKY_BY_DIM: readonly SkyKind[] = ['meteors', 'aurora', 'rain', 'fireflies'];
-
-const TEX = {
-  butterfly: 'amb-butterfly',
-  bee: 'amb-bee',
-  bird: 'amb-bird',
-  meteor: 'amb-meteor',
-  rain: 'amb-rain',
-  firefly: 'amb-firefly',
-} as const;
-
 export class Background {
   private scene: Phaser.Scene;
   private reduced: boolean;
-  private sky: Phaser.GameObjects.GameObject[] = [];
-  private skyTimer?: Phaser.Time.TimerEvent;
-  private current?: SkyKind;
+  private plate: Phaser.GameObjects.Graphics;
+  private decor: Phaser.GameObjects.GameObject[] = [];
+  private current?: number;
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
     this.reduced = prefersReducedMotion();
-    ensureTextures(scene);
-    this.createStars();
-    this.createCreatures();
+    this.plate = scene.add.graphics().setScrollFactor(0).setDepth(-9);
+    ensureDecorTextures(scene);
   }
 
-  /** 依維度切換天象（GameScene 於 create 與 advanceDimension 呼叫）。 */
   setDimension(dimIndex: number): void {
-    const kind = SKY_BY_DIM[dimIndex % SKY_BY_DIM.length];
-    if (kind === this.current) return;
-    this.clearSky();
-    this.current = kind;
-    this.buildSky(kind);
+    if (dimIndex === this.current) return;
+    this.current = dimIndex;
+    this.clearDecor();
+    this.drawPlate(dimIndex % 4);
+    this.spawnDecor(dimIndex % 4);
   }
 
-  // 動畫皆由 tween/timer 驅動，無需逐幀更新；保留簽名相容 GameScene。
   update(_scrollY: number): void {
-    /* no-op */
+    /* 裝飾以 tween 驅動 */
   }
 
-  private createStars(): void {
-    const n = this.reduced ? 16 : 30;
-    for (let i = 0; i < n; i++) {
-      const star = this.scene.add
-        .circle(
-          Phaser.Math.Between(0, GAME.width),
-          Phaser.Math.Between(0, GAME.height),
-          Phaser.Math.FloatBetween(0.8, 2),
-          0xffffff,
-          Phaser.Math.FloatBetween(0.4, 0.9),
-        )
-        .setScrollFactor(0)
-        .setDepth(-10);
-      if (!this.reduced) {
-        this.scene.tweens.add({
-          targets: star,
-          alpha: 0.15,
-          duration: Phaser.Math.Between(1200, 2600),
-          yoyo: true,
-          repeat: -1,
-          delay: Phaser.Math.Between(0, 1500),
-        });
-      }
-    }
-  }
-
-  private createCreatures(): void {
-    const wingTints = [0xf6c6e0, 0xc6d8ff, 0xfff0b3];
-    const kinds: (keyof typeof TEX)[] = ['butterfly', 'bee', 'bird', 'butterfly'];
-    const n = this.reduced ? 2 : kinds.length;
-    for (let i = 0; i < n; i++) {
-      const kind = kinds[i];
-      const y = Phaser.Math.Between(70, GAME.height - 130);
-      const dir = i % 2 === 0 ? 1 : -1;
-      const startX = dir > 0 ? -24 : GAME.width + 24;
-      const endX = dir > 0 ? GAME.width + 24 : -24;
-      const sprite = this.scene.add
-        .image(startX, y, TEX[kind])
-        .setScrollFactor(0)
-        .setDepth(-9)
-        .setFlipX(dir < 0);
-      if (kind === 'butterfly') sprite.setTint(wingTints[i % wingTints.length]);
-      if (this.reduced) {
-        sprite.setX(Phaser.Math.Between(40, GAME.width - 40));
-        continue;
-      }
-      this.scene.tweens.add({
-        targets: sprite,
-        x: endX,
-        duration: Phaser.Math.Between(11000, 20000),
-        repeat: -1,
-        delay: Phaser.Math.Between(0, 6000),
-      });
-      this.scene.tweens.add({
-        targets: sprite,
-        y: y + Phaser.Math.Between(12, 28),
-        duration: Phaser.Math.Between(1400, 2600),
-        yoyo: true,
-        repeat: -1,
-        ease: 'Sine.easeInOut',
-      });
-      if (kind !== 'bird') {
-        this.scene.tweens.add({
-          targets: sprite,
-          scaleX: 0.55,
-          duration: 220,
-          yoyo: true,
-          repeat: -1,
-          ease: 'Sine.easeInOut',
-        });
-      }
-    }
-  }
-
-  private clearSky(): void {
-    this.skyTimer?.remove();
-    this.skyTimer = undefined;
-    for (const o of this.sky) {
+  private clearDecor(): void {
+    for (const o of this.decor) {
       this.scene.tweens.killTweensOf(o);
       o.destroy();
     }
-    this.sky = [];
+    this.decor = [];
   }
 
-  private buildSky(kind: SkyKind): void {
-    if (kind === 'meteors') this.buildMeteors();
-    else if (kind === 'aurora') this.buildAurora();
-    else if (kind === 'rain') this.buildRain();
-    else this.buildFireflies();
+  private drawPlate(dim: number): void {
+    const g = this.plate;
+    g.clear();
+
+    // 背景斜切分鏡輔助框線（コマ割り風）
+    g.lineStyle(1.5, INK, 0.08);
+    g.lineBetween(12, 165, GAME.width - 12, 130);
+    g.lineBetween(12, 480, GAME.width - 12, 520);
+
+    if (dim === 0) this.drawSunChapter(g);
+    else if (dim === 1) this.drawShojoChapter(g);
+    else if (dim === 2) this.drawRainChapter(g);
+    else this.drawClimaxChapter(g);
   }
 
-  private buildMeteors(): void {
-    if (this.reduced) return;
-    this.skyTimer = this.scene.time.addEvent({
-      delay: 1500,
-      loop: true,
-      callback: () => this.spawnMeteor(),
-    });
+  /** 第 0 章：漫畫烈日與放射光線。 */
+  private drawSunChapter(g: Phaser.GameObjects.Graphics): void {
+    const sx = 368;
+    const sy = 96;
+    // 太陽外圍放射漫畫線
+    g.lineStyle(2.2, INK, 0.16);
+    for (let i = 0; i < 24; i++) {
+      const a = (i / 24) * Math.PI * 2;
+      const r0 = 44;
+      const r1 = i % 2 === 0 ? 110 : 72;
+      g.lineBetween(sx + Math.cos(a) * r0, sy + Math.sin(a) * r0, sx + Math.cos(a) * r1, sy + Math.sin(a) * r1);
+    }
+    // 太陽本體（立體黑影＋黃底＋粗墨框）
+    g.fillStyle(INK, 0.9);
+    g.fillCircle(sx + 3, sy + 3, 34);
+    g.fillStyle(MANGA_YELLOW, 1);
+    g.fillCircle(sx, sy, 34);
+    g.lineStyle(3, INK, 1);
+    g.strokeCircle(sx, sy, 34);
+    // 太陽內部漫畫排線陰影
+    g.lineStyle(1.5, INK, 0.25);
+    for (let i = -3; i <= 3; i++) {
+      g.lineBetween(sx + 8 + i * 3, sy + 18 - Math.abs(i) * 2, sx + 18 + i * 3, sy + 26 - Math.abs(i) * 2);
+    }
   }
 
-  private spawnMeteor(): void {
-    // 行進方向與拖尾角度一致：往左下 122°（cos<0 向左、sin>0 向下）
-    const angleDeg = 122;
-    const rad = Phaser.Math.DegToRad(angleDeg);
-    const dist = Phaser.Math.Between(300, 380);
-    const x = Phaser.Math.Between(Math.floor(GAME.width * 0.3), GAME.width + 40);
-    const y = Phaser.Math.Between(-30, Math.floor(GAME.height * 0.4));
-    const m = this.scene.add
-      .image(x, y, TEX.meteor)
-      .setScrollFactor(0)
-      .setDepth(-9)
-      .setAngle(angleDeg)
-      .setAlpha(0);
-    this.sky.push(m);
-    this.scene.tweens.add({
-      targets: m,
-      x: x + Math.cos(rad) * dist,
-      y: y + Math.sin(rad) * dist,
-      alpha: { from: 0.9, to: 0 },
-      duration: 720,
-      ease: 'Quad.easeIn',
-      onComplete: () => {
-        this.sky = this.sky.filter((o) => o !== m);
-        m.destroy();
-      },
-    });
+  /** 第 1 章：少女漫畫夢幻泡泡網點（丸アミ）與星芒。 */
+  private drawShojoChapter(g: Phaser.GameObjects.Graphics): void {
+    const bubbles: [number, number, number][] = [
+      [74, 110, 38],
+      [96, 138, 22],
+      [378, 170, 44],
+      [352, 206, 24],
+      [68, 330, 30],
+      [386, 390, 34],
+    ];
+    for (const [bx, by, br] of bubbles) {
+      g.fillStyle(0xffffff, 0.55);
+      g.fillCircle(bx, by, br);
+      g.lineStyle(1.8, INK, 0.16);
+      g.strokeCircle(bx, by, br);
+    }
+    // 靜態大十字星芒
+    const stars: [number, number, number][] = [
+      [118, 92, 14],
+      [338, 130, 12],
+      [92, 286, 11],
+      [364, 340, 15],
+    ];
+    for (const [sx, sy, sr] of stars) {
+      drawFourPointStar(g, sx, sy, sr, MANGA_YELLOW);
+    }
   }
 
-  private buildAurora(): void {
-    const colors = [PALETTE.diplomat, PALETTE.analyst, PALETTE.sentinel];
-    for (let i = 0; i < 3; i++) {
-      const band = this.scene.add
-        .ellipse(GAME.width / 2, 72 + i * 46, GAME.width * 1.4, 74, colors[i], 0.14)
-        .setScrollFactor(0)
-        .setDepth(-9)
-        .setBlendMode(Phaser.BlendModes.ADD);
-      this.sky.push(band);
-      if (!this.reduced) {
-        this.scene.tweens.add({
-          targets: band,
-          x: GAME.width / 2 + (i % 2 ? 40 : -40),
-          scaleX: 1.15,
-          alpha: 0.24,
-          duration: 2600 + i * 400,
-          yoyo: true,
-          repeat: -1,
-          ease: 'Sine.easeInOut',
-        });
+  /** 第 2 章：青年漫畫陰雨層雲與垂直速度線。 */
+  private drawRainChapter(g: Phaser.GameObjects.Graphics): void {
+    // 頂部厚重排線烏雲帶
+    const clouds: [number, number, number, number][] = [
+      [90, 64, 150, 48],
+      [225, 56, 180, 54],
+      [365, 68, 140, 46],
+    ];
+    for (const [cx, cy, cw, ch] of clouds) {
+      g.fillStyle(INK, 0.12);
+      g.fillEllipse(cx + 3, cy + 4, cw, ch);
+      g.fillStyle(0xdbe4ee, 0.85);
+      g.fillEllipse(cx, cy, cw, ch);
+      g.lineStyle(2.4, INK, 0.55);
+      g.strokeEllipse(cx, cy, cw, ch);
+      // 雲底漫畫垂直排線
+      g.lineStyle(1.2, INK, 0.22);
+      for (let x = cx - cw * 0.35; x <= cx + cw * 0.35; x += 7) {
+        g.lineBetween(x, cy + 4, x, cy + ch * 0.38);
       }
     }
   }
 
-  private buildRain(): void {
-    const n = this.reduced ? 0 : 46;
-    for (let i = 0; i < n; i++) {
-      const drop = this.scene.add
-        .image(Phaser.Math.Between(0, GAME.width + 30), -20, TEX.rain)
+  /** 第 3 章：少年漫畫終局放射集中線（ベタフラッシュ）。 */
+  private drawClimaxChapter(g: Phaser.GameObjects.Graphics): void {
+    const cx = GAME.width / 2;
+    const cy = 220;
+    for (let i = 0; i < 36; i++) {
+      const a = (i / 36) * Math.PI * 2;
+      const inner = 135 + (i % 3) * 28;
+      const outer = 620;
+      g.lineStyle(i % 2 === 0 ? 2.4 : 1.2, INK, i % 2 === 0 ? 0.16 : 0.1);
+      g.lineBetween(
+        cx + Math.cos(a) * inner,
+        cy + Math.sin(a) * inner,
+        cx + Math.cos(a) * outer,
+        cy + Math.sin(a) * outer,
+      );
+    }
+  }
+
+  private spawnDecor(dim: number): void {
+    if (dim === 0) this.spawnClouds();
+    else if (dim === 1) this.spawnPetals();
+    else if (dim === 2) this.spawnRain();
+    else this.spawnSparks();
+  }
+
+  private track(obj: Phaser.GameObjects.GameObject): void {
+    this.decor.push(obj);
+  }
+
+  private spawnClouds(): void {
+    const ys = [128, 232, 340];
+    ys.forEach((y, i) => {
+      const dir = i % 2 === 0 ? 1 : -1;
+      const startX = dir > 0 ? -60 : GAME.width + 60;
+      const endX = dir > 0 ? GAME.width + 60 : -60;
+      const cloud = this.scene.add
+        .image(this.reduced ? 90 + i * 130 : startX, y, 'manga-decor-cloud')
+        .setScale(0.85 + (i % 2) * 0.15)
+        .setAlpha(0.88)
         .setScrollFactor(0)
-        .setDepth(-9)
-        .setAngle(12)
-        .setAlpha(0.35);
-      this.sky.push(drop);
+        .setDepth(-8);
+      this.track(cloud);
+      if (this.reduced) return;
       this.scene.tweens.add({
-        targets: drop,
-        y: GAME.height + 20,
-        duration: Phaser.Math.Between(650, 1100),
+        targets: cloud,
+        x: endX,
+        duration: 17000 + i * 3200,
         repeat: -1,
-        delay: Phaser.Math.Between(0, 1400),
+        delay: i * 1600,
+      });
+    });
+  }
+
+  private spawnPetals(): void {
+    const n = this.reduced ? 5 : 10;
+    for (let i = 0; i < n; i++) {
+      const x = Phaser.Math.Between(24, GAME.width - 24);
+      const petal = this.scene.add
+        .image(x, this.reduced ? 80 + i * 65 : Phaser.Math.Between(-40, GAME.height), 'manga-decor-petal')
+        .setScale(0.75 + (i % 3) * 0.15)
+        .setScrollFactor(0)
+        .setDepth(-8)
+        .setAngle(Phaser.Math.Between(-35, 35));
+      this.track(petal);
+      if (this.reduced) continue;
+      this.scene.tweens.add({
+        targets: petal,
+        y: GAME.height + 24,
+        x: x + Phaser.Math.Between(-50, 50),
+        angle: petal.angle + Phaser.Math.Between(-90, 90),
+        duration: Phaser.Math.Between(6500, 11000),
+        repeat: -1,
+        delay: i * 380,
       });
     }
   }
 
-  private buildFireflies(): void {
-    const n = this.reduced ? 6 : 16;
+  private spawnRain(): void {
+    const n = this.reduced ? 6 : 20;
     for (let i = 0; i < n; i++) {
-      const x = Phaser.Math.Between(20, GAME.width - 20);
-      const y = Phaser.Math.Between(80, GAME.height - 80);
-      const f = this.scene.add
-        .image(x, y, TEX.firefly)
+      const x = Phaser.Math.Between(10, GAME.width - 10);
+      const drop = this.scene.add
+        .image(x, this.reduced ? 90 + i * 80 : Phaser.Math.Between(-30, GAME.height), 'manga-decor-rain')
         .setScrollFactor(0)
-        .setDepth(-9)
-        .setBlendMode(Phaser.BlendModes.ADD)
-        .setAlpha(0.2);
-      this.sky.push(f);
-      if (!this.reduced) {
-        this.scene.tweens.add({
-          targets: f,
-          alpha: 0.9,
-          scale: 1.4,
-          duration: Phaser.Math.Between(700, 1600),
-          yoyo: true,
-          repeat: -1,
-          delay: Phaser.Math.Between(0, 1200),
-          ease: 'Sine.easeInOut',
-        });
-        this.scene.tweens.add({
-          targets: f,
-          x: x + Phaser.Math.Between(-30, 30),
-          y: y + Phaser.Math.Between(-24, 24),
-          duration: Phaser.Math.Between(2000, 4000),
-          yoyo: true,
-          repeat: -1,
-          ease: 'Sine.easeInOut',
-        });
-      }
+        .setDepth(-8)
+        .setAlpha(0.65);
+      this.track(drop);
+      if (this.reduced) continue;
+      this.scene.tweens.add({
+        targets: drop,
+        y: GAME.height + 30,
+        x: x - 48,
+        duration: Phaser.Math.Between(650, 980),
+        repeat: -1,
+        delay: i * 55,
+      });
+    }
+  }
+
+  private spawnSparks(): void {
+    const n = this.reduced ? 5 : 9;
+    for (let i = 0; i < n; i++) {
+      const spark = this.scene.add
+        .image(
+          Phaser.Math.Between(34, GAME.width - 34),
+          Phaser.Math.Between(56, GAME.height - 200),
+          'manga-decor-spark',
+        )
+        .setScale(0.7 + (i % 3) * 0.2)
+        .setScrollFactor(0)
+        .setDepth(-8)
+        .setAlpha(0.85);
+      this.track(spark);
+      if (this.reduced) continue;
+      this.scene.tweens.add({
+        targets: spark,
+        alpha: 0.2,
+        scale: 0.45,
+        angle: 45,
+        duration: Phaser.Math.Between(650, 1250),
+        yoyo: true,
+        repeat: -1,
+      });
     }
   }
 }
 
-/** 產生氛圍用的小貼圖（只做一次）。 */
-function ensureTextures(scene: Phaser.Scene): void {
-  const make = (key: string, w: number, h: number, draw: (g: Phaser.GameObjects.Graphics) => void) => {
-    if (scene.textures.exists(key)) return;
+function drawFourPointStar(
+  g: Phaser.GameObjects.Graphics,
+  cx: number,
+  cy: number,
+  r: number,
+  fill: number,
+): void {
+  g.fillStyle(fill, 1);
+  g.lineStyle(2, INK, 1);
+  g.beginPath();
+  for (let i = 0; i < 8; i++) {
+    const rad = i % 2 === 0 ? r : r * 0.28;
+    const a = (i / 8) * Math.PI * 2 - Math.PI / 2;
+    const x = cx + Math.cos(a) * rad;
+    const y = cy + Math.sin(a) * rad;
+    if (i === 0) g.moveTo(x, y);
+    else g.lineTo(x, y);
+  }
+  g.closePath();
+  g.fillPath();
+  g.strokePath();
+}
+
+/** 生成無白邊、純漫畫墨線風格的背景裝飾貼圖（雲、櫻花瓣、雨絲、星芒）。 */
+function ensureDecorTextures(scene: Phaser.Scene): void {
+  if (!scene.textures.exists('manga-decor-cloud')) {
     const g = scene.make.graphics({ x: 0, y: 0 }, false);
-    draw(g);
-    g.generateTexture(key, w, h);
+    // 漫畫雲：平坦底部＋圓弧頂＋排線底影
+    g.fillStyle(INK, 1);
+    g.fillCircle(30, 34, 17);
+    g.fillCircle(52, 26, 22);
+    g.fillCircle(78, 33, 18);
+    g.fillRoundedRect(16, 28, 76, 22, 10);
+
+    g.fillStyle(PAPER_CARD, 1);
+    g.fillCircle(30, 33, 14.5);
+    g.fillCircle(52, 25, 19.5);
+    g.fillCircle(78, 32, 15.5);
+    g.fillRoundedRect(18, 28, 72, 19, 8);
+
+    // 雲底漫畫斜排線
+    g.lineStyle(1.5, INK, 0.28);
+    for (let x = 24; x <= 82; x += 6) {
+      g.lineBetween(x, 41, x - 3, 46);
+    }
+    g.generateTexture('manga-decor-cloud', 110, 56);
     g.destroy();
-  };
+  }
 
-  // 蝴蝶（白色供 tint）：兩對圓翅 + 深色身體
-  make(TEX.butterfly, 18, 15, (g) => {
-    g.fillStyle(0xffffff, 1);
-    g.fillCircle(6, 5, 5);
-    g.fillCircle(6, 11, 4);
-    g.fillCircle(12, 5, 5);
-    g.fillCircle(12, 11, 4);
-    g.fillStyle(0x3a2f4a, 1);
-    g.fillRoundedRect(8.5, 3, 1.6, 10, 0.8);
-  });
-
-  // 蜜蜂：黃身黑紋 + 半透明翅
-  make(TEX.bee, 16, 12, (g) => {
-    g.fillStyle(0xffffff, 0.8);
-    g.fillEllipse(5, 4, 8, 5);
-    g.fillEllipse(11, 4, 8, 5);
-    g.fillStyle(0xf2c200, 1);
-    g.fillRoundedRect(3, 4, 11, 7, 3);
-    g.fillStyle(0x2b2440, 1);
-    g.fillRect(6, 4, 1.6, 7);
-    g.fillRect(10, 4, 1.6, 7);
-  });
-
-  // 海鷗：雙弧在中點相接的「M」形剪影，加大加粗更易辨識
-  make(TEX.bird, 30, 14, (g) => {
-    g.lineStyle(2.2, 0x9aa0c0, 0.9);
+  if (!scene.textures.exists('manga-decor-petal')) {
+    const g = scene.make.graphics({ x: 0, y: 0 }, false);
+    // 櫻花瓣（帶缺口與墨線）
+    g.fillStyle(0xffb3c6, 1);
+    g.lineStyle(2.2, INK, 1);
     g.beginPath();
-    g.arc(8, 9, 7, Phaser.Math.DegToRad(200), Phaser.Math.DegToRad(340));
+    g.moveTo(14, 24);
+    g.lineTo(5, 12);
+    g.lineTo(10, 4);
+    g.lineTo(14, 9);
+    g.lineTo(18, 4);
+    g.lineTo(23, 12);
+    g.closePath();
+    g.fillPath();
     g.strokePath();
-    g.beginPath();
-    g.arc(22, 9, 7, Phaser.Math.DegToRad(200), Phaser.Math.DegToRad(340));
-    g.strokePath();
-  });
+    g.generateTexture('manga-decor-petal', 28, 28);
+    g.destroy();
+  }
 
-  // 流星：白色短拖尾
-  make(TEX.meteor, 28, 3, (g) => {
-    g.fillStyle(0xffffff, 1);
-    g.fillRoundedRect(0, 0, 28, 3, 1.5);
-  });
+  if (!scene.textures.exists('manga-decor-rain')) {
+    const g = scene.make.graphics({ x: 0, y: 0 }, false);
+    // 銳利漫畫斜雨線（アメ線）
+    g.lineStyle(2, INK, 0.55);
+    g.lineBetween(14, 2, 2, 34);
+    g.lineStyle(1.2, MANGA_RED, 0.15);
+    g.lineBetween(16, 6, 6, 32);
+    g.generateTexture('manga-decor-rain', 18, 36);
+    g.destroy();
+  }
 
-  // 雨滴：細長淡藍
-  make(TEX.rain, 2, 14, (g) => {
-    g.fillStyle(0xbfd0ff, 1);
-    g.fillRoundedRect(0, 0, 2, 14, 1);
-  });
-
-  // 螢火蟲：黃綠光暈
-  make(TEX.firefly, 10, 10, (g) => {
-    g.fillStyle(0xdcff8c, 0.4);
-    g.fillCircle(5, 5, 5);
-    g.fillStyle(0xdcff8c, 1);
-    g.fillCircle(5, 5, 3);
-  });
+  if (!scene.textures.exists('manga-decor-spark')) {
+    const g = scene.make.graphics({ x: 0, y: 0 }, false);
+    drawFourPointStar(g, 14, 14, 12, MANGA_YELLOW);
+    g.generateTexture('manga-decor-spark', 28, 28);
+    g.destroy();
+  }
 }

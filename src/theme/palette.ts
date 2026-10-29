@@ -19,9 +19,9 @@ export const PALETTE = {
   textMuted: '#ffffffaa',
 } as const;
 
-/** 四維度背景（族群色深化版，僅美術用途、非語意對應維度）。 */
+/** 四章紙色（校園／心動／雨／祭典）。僅美術，不對應字母語意。 */
 export const LEVEL_BG: readonly [number, number, number, number] = [
-  0x2e3a59, 0x3a2e59, 0x594a2e, 0x2e594a,
+  0xf7f1df, 0xfbe7ef, 0xe5eef6, 0xf3e6fa,
 ];
 
 /** 八字母語意色（由四族群原色混出，brainstorm 方案 B）。供答案台階、得分條、分享卡沿用。 */

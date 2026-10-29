@@ -1,6 +1,10 @@
 import type { ShareCardModel } from './shareCardModel';
-import { hex, tintToward, wrapText, drawDimBars } from './draw';
+import { hex, wrapText, drawDimBars } from './draw';
 import { PALETTE } from '../theme/palette';
+
+const INK = '#1c1424';
+const PAPER = '#f6f0e4';
+const OG_FONT = "'Fredoka', 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans JP', sans-serif";
 
 export const OG_W = 1200;
 export const OG_H = 630;
@@ -10,63 +14,79 @@ export const OG_H = 630;
  * 只用 CanvasRenderingContext2D 介面，瀏覽器與 @napi-rs/canvas 皆可餵。
  */
 export function drawOgCard(ctx: CanvasRenderingContext2D, model: ShareCardModel): void {
-  const grd = ctx.createRadialGradient(
-    OG_W * 0.3, OG_H * 0.45, 60,
-    OG_W * 0.3, OG_H * 0.45, OG_W * 0.65,
-  );
-  grd.addColorStop(0, tintToward(model.groupColor, 0.25));
-  grd.addColorStop(1, '#101018');
-  ctx.fillStyle = grd;
+  ctx.fillStyle = PAPER;
   ctx.fillRect(0, 0, OG_W, OG_H);
+  ctx.fillStyle = hex(model.groupColor);
+  for (let y = 36; y < OG_H - 24; y += 16) {
+    for (let x = 36 + ((y / 16) % 2) * 8; x < OG_W * 0.44; x += 16) {
+      ctx.beginPath();
+      ctx.arc(x, y, 2.1, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  ctx.fillStyle = INK;
+  ctx.fillRect(OG_W * 0.46, 28, 6, OG_H - 56);
+  ctx.lineWidth = 12;
+  ctx.strokeStyle = INK;
+  ctx.strokeRect(16, 16, OG_W - 32, OG_H - 32);
 
   ctx.textAlign = 'center';
+  ctx.lineJoin = 'round';
 
   // 左半：型別大字＋族群名
+  ctx.font = `800 168px ${OG_FONT}`;
+  ctx.lineWidth = 10;
+  ctx.strokeStyle = INK;
+  ctx.strokeText(model.type, OG_W * 0.24, OG_H * 0.46);
   ctx.fillStyle = hex(model.groupColor);
-  ctx.font = "800 200px Fredoka, 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans JP', sans-serif";
-  ctx.fillText(model.type, OG_W * 0.3, OG_H * 0.48);
-  // 族群行：綽號 · 族群名可能較長（尤其 en/es），縮字級以免伸進右側維度條
-  ctx.fillStyle = '#ffffffcc';
-  const GROUP_MAXW = 560;
-  let groupSize = 40;
-  const groupFont = (px: number) =>
-    `600 ${px}px Fredoka, 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans JP', sans-serif`;
+  ctx.fillText(model.type, OG_W * 0.24, OG_H * 0.46);
+  ctx.fillStyle = INK;
+  const GROUP_MAXW = 480;
+  let groupSize = 34;
+  const groupFont = (px: number) => `700 ${px}px ${OG_FONT}`;
   ctx.font = groupFont(groupSize);
-  while (groupSize > 24 && ctx.measureText(model.groupName).width > GROUP_MAXW) {
+  while (groupSize > 22 && ctx.measureText(model.groupName).width > GROUP_MAXW) {
     groupSize -= 2;
     ctx.font = groupFont(groupSize);
   }
-  ctx.fillText(model.groupName, OG_W * 0.3, OG_H * 0.58);
+  ctx.fillText(model.groupName, OG_W * 0.24, OG_H * 0.64);
 
   // 右半：描述（換行）＋四維度條
-  ctx.fillStyle = '#ffffff';
-  ctx.font = "400 30px Nunito, 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans JP', sans-serif";
-  wrapText(ctx, model.description, OG_W * 0.72, OG_H * 0.22, OG_W * 0.4, 42);
+  ctx.fillStyle = INK;
+  ctx.font = `500 28px Nunito, 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans JP', sans-serif`;
+  wrapText(ctx, model.description, OG_W * 0.73, OG_H * 0.2, OG_W * 0.4, 40);
   drawDimBars(ctx, model.dims, {
-    x: OG_W * 0.55, y: OG_H * 0.52, w: OG_W * 0.34, barH: 24, gap: 16,
+    x: OG_W * 0.55, y: OG_H * 0.52, w: OG_W * 0.34, barH: 22, gap: 16,
   });
 
-  // 底部標語
-  ctx.fillStyle = '#ffffff88';
-  ctx.font = "400 26px Nunito, 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans JP', sans-serif";
-  ctx.fillText(model.tagline, OG_W / 2, OG_H - 30);
+  ctx.fillStyle = INK;
+  ctx.font = `500 24px Nunito, 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans JP', sans-serif`;
+  ctx.fillText(model.tagline, OG_W * 0.73, OG_H - 52);
 }
 
 /** 首頁通用 OG 圖：站名＋四族群色圓點＋標語。 */
 export function drawOgDefault(ctx: CanvasRenderingContext2D, tagline: string): void {
-  const grd = ctx.createRadialGradient(
-    OG_W / 2, OG_H * 0.42, 60,
-    OG_W / 2, OG_H * 0.42, OG_W * 0.6,
-  );
-  grd.addColorStop(0, '#2a2d42');
-  grd.addColorStop(1, '#101018');
-  ctx.fillStyle = grd;
+  ctx.fillStyle = PAPER;
   ctx.fillRect(0, 0, OG_W, OG_H);
+  ctx.fillStyle = hex(PALETTE.accent);
+  for (let y = 40; y < OG_H - 30; y += 18) {
+    for (let x = 40 + ((y / 18) % 2) * 9; x < OG_W - 30; x += 18) {
+      ctx.beginPath();
+      ctx.arc(x, y, 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  ctx.lineWidth = 12;
+  ctx.strokeStyle = INK;
+  ctx.strokeRect(16, 16, OG_W - 32, OG_H - 32);
 
   ctx.textAlign = 'center';
-  ctx.fillStyle = hex(PALETTE.accent);
-  ctx.font = "800 120px Fredoka, 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans JP', sans-serif";
-  ctx.fillText('MBTI Jump', OG_W / 2, OG_H * 0.45);
+  ctx.lineJoin = 'round';
+  ctx.font = `800 108px ${OG_FONT}`;
+  ctx.lineWidth = 10;
+  ctx.strokeText('MBTI Jump', OG_W / 2, OG_H * 0.42);
+  ctx.fillStyle = INK;
+  ctx.fillText('MBTI Jump', OG_W / 2, OG_H * 0.42);
 
   const groupColors = [PALETTE.explorer, PALETTE.diplomat, PALETTE.analyst, PALETTE.sentinel];
   groupColors.forEach((c, i) => {
@@ -76,7 +96,7 @@ export function drawOgDefault(ctx: CanvasRenderingContext2D, tagline: string): v
     ctx.fill();
   });
 
-  ctx.fillStyle = '#ffffffcc';
-  ctx.font = "400 34px Nunito, 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans JP', sans-serif";
+  ctx.fillStyle = INK;
+  ctx.font = `500 32px Nunito, 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans JP', sans-serif`;
   ctx.fillText(tagline, OG_W / 2, OG_H * 0.74);
 }

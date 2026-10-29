@@ -103,8 +103,12 @@ export function drawDimBars(
       ctx.fill();
       ctx.restore();
     }
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#1c1424';
+    roundRect(ctx, opts.x, y, opts.w, opts.barH, opts.barH / 2);
+    ctx.stroke();
     const dx = opts.x + d.dividerFrac * opts.w;
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = '#fffaf2';
     ctx.fillRect(dx - 2, y - 3, 4, opts.barH + 6);
     y += opts.barH + opts.gap;
   }
