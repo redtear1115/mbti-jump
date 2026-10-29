@@ -2,7 +2,7 @@ import { LETTER_COLORS } from '../theme/palette';
 import type { Letter } from '../config/questions';
 import { groupColorOf } from './temperament';
 
-/** 果凍怪基底色（微暖白——從白紙開始，四關染成你的顏色）。 */
+/** 對白精靈基底色：從白紙開始，四關染成你的人格色。 */
 export const PLAYER_BASE_COLOR = 0xf0f0f4;
 
 /** RGB 各通道線性插值（t 0..1），逐通道四捨五入。 */
@@ -15,7 +15,7 @@ export function lerpColor(a: number, b: number, t: number): number {
 }
 
 /**
- * 已鎖定字母 → 果凍怪身體色。
+ * 已鎖定字母 → 對白精靈身體色。
  * 0-3 碼：基底紫向「已鎖字母色的 RGB 平均」靠近 0.75*k/4（k=已鎖數）。
  * 四碼鎖完：改向「四碼所屬族群色」靠近 0.75，避免四色互補平均後偏灰
  * （例：INFP 四色平均會塌成 0x819293 的灰綠，改用族群色 0x33a474 混色更有識別度）。

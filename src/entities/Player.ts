@@ -3,9 +3,9 @@ import { GAME } from '../config/gameConfig';
 import { prefersReducedMotion } from '../ui/reducedMotion';
 import { PLAYER_BASE_COLOR } from '../core/playerColor';
 import { jellyStretch } from '../core/jelly';
-import { INK_CSS, MANGA_RED, MANGA_YELLOW, PAPER_CSS, mixInk, mixWhite, numToHex } from '../theme/manga';
+import { INK_CSS, PAPER_CSS, mixInk, mixWhite, numToHex } from '../theme/manga';
 
-const PROC_KEY_PREFIX = 'player-manga-v2-';
+const PROC_KEY_PREFIX = 'player-dialogue-v1-';
 const TEX_W = 84;
 const TEX_H = 92;
 
@@ -78,10 +78,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   /**
    * 反補償視覺 scale，讓 Arcade body 維持真正 36×36，並貼在腳上。
-   * 貼圖比碰撞高，頭與貓耳可以伸出命中框。
+   * 貼圖比碰撞高，對白框頂端可以伸出命中框。
    */
   private syncBodySize(): void {
     const body = this.body as Phaser.Physics.Arcade.Body;
+    // setSize 使用 Body 快取的縮放；先同步本幀 scale，避免變形時碰撞尺寸落後一幀。
+    body.updateBounds();
     const srcW = 36 / Math.abs(this.scaleX);
     const srcH = 36 / Math.abs(this.scaleY);
     body.setSize(srcW, srcH, false);
@@ -104,11 +106,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 }
 
 /**
- * 以 2D Canvas 向量貝茲曲線精繪「日式漫畫風圍巾貓主角」：
- * - 外圍白邊貼紙保護圈（在任何網點與速度線背景上都清晰跳出）
- * - G 筆感粗細墨線、賽璐珞雙層陰影、漫畫排線陰影（カケアミ）
- * - 閃亮漫畫大眼、腮紅斜線（///）、紅領巾與金鈴鐺
- * - 毛色隨已鎖定的 MBTI 維度動態混色
+ * 對白精靈：以漫畫吹き出し作為輪廓，保留大片可染色紙面。
+ * 粗墨線、偏移硬影與局部網點沿用介面語言；尾角落在腳部碰撞框內。
+ * 首頁、遊戲與結果頁共用同一張依人格色快取的材質。
  */
 export function ensurePlayerTexture(scene: Phaser.Scene, bodyColor: number): string {
   const key = PROC_KEY_PREFIX + bodyColor.toString(16).padStart(6, '0');
@@ -122,332 +122,114 @@ export function ensurePlayerTexture(scene: Phaser.Scene, bodyColor: number): str
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
 
-  const cx = 41;
-  const mainHex = numToHex(mixWhite(bodyColor, 0.12));
-  const shadeHex = numToHex(mixInk(bodyColor, 0.22));
-  const deepHex = numToHex(mixInk(bodyColor, 0.42));
-  const highlightHex = numToHex(mixWhite(bodyColor, 0.68));
-  const scarfRed = numToHex(MANGA_RED);
-  const bellGold = numToHex(MANGA_YELLOW);
-
-  // 定義頭與貓耳閉合路徑
-  const traceHeadPath = () => {
+  // 略不對稱的圓角對白框，右下收成一個向內勾的小尾角。
+  const outline = () => {
     ctx.beginPath();
-    // 頭頂中央偏左起點
-    ctx.moveTo(cx - 10, 21);
-    // 左貓耳外緣 → 耳尖 → 內緣
-    ctx.quadraticCurveTo(cx - 21, 14, cx - 25, 8);
-    ctx.quadraticCurveTo(cx - 28, 19, cx - 23, 31);
-    // 左臉頰毛絨弧線
-    ctx.bezierCurveTo(cx - 30, 39, cx - 29, 53, cx - 17, 57);
-    // 下巴弧線
-    ctx.quadraticCurveTo(cx, 61, cx + 17, 57);
-    // 右臉頰毛絨弧線
-    ctx.bezierCurveTo(cx + 29, 53, cx + 30, 39, cx + 23, 31);
-    // 右貓耳
-    ctx.quadraticCurveTo(cx + 28, 19, cx + 25, 8);
-    ctx.quadraticCurveTo(cx + 21, 14, cx + 10, 21);
-    // 頭頂弧線
-    ctx.quadraticCurveTo(cx, 19, cx - 10, 21);
+    ctx.moveTo(39, 15);
+    ctx.bezierCurveTo(61, 13, 73, 25, 73, 43);
+    ctx.bezierCurveTo(74, 56, 69, 65, 60, 71);
+    ctx.quadraticCurveTo(59, 79, 65, 84);
+    ctx.quadraticCurveTo(51, 84, 46, 75);
+    ctx.bezierCurveTo(23, 78, 11, 67, 11, 47);
+    ctx.bezierCurveTo(10, 28, 19, 17, 39, 15);
     ctx.closePath();
   };
 
-  // 定義身體與雙腳閉合路徑
-  const traceBodyPath = () => {
-    ctx.beginPath();
-    ctx.moveTo(cx - 14, 54);
-    // 左小手
-    ctx.quadraticCurveTo(cx - 25, 60, cx - 22, 70);
-    ctx.quadraticCurveTo(cx - 18, 72, cx - 15, 67);
-    // 左腿與腳掌
-    ctx.quadraticCurveTo(cx - 16, 78, cx - 13, 84);
-    ctx.quadraticCurveTo(cx - 7, 86, cx - 4, 79);
-    // 胯下
-    ctx.quadraticCurveTo(cx, 78, cx + 4, 79);
-    // 右腿與腳掌
-    ctx.quadraticCurveTo(cx + 7, 86, cx + 13, 84);
-    ctx.quadraticCurveTo(cx + 16, 78, cx + 15, 67);
-    // 右小手
-    ctx.quadraticCurveTo(cx + 18, 72, cx + 22, 70);
-    ctx.quadraticCurveTo(cx + 25, 60, cx + 14, 54);
-    ctx.closePath();
-  };
-
-  // 1. 貼紙外白框（讓角色在漫畫背景與速度線前永遠鮮明）
-  ctx.save();
+  // 紙白保護邊 + 右下硬墨落影，在雨景、集中線上仍保有完整輪廓。
+  outline();
   ctx.strokeStyle = PAPER_CSS;
-  ctx.lineWidth = 8.5;
-  traceBodyPath();
+  ctx.lineWidth = 10;
   ctx.stroke();
-  traceHeadPath();
-  ctx.stroke();
-  ctx.restore();
-
-  // 2. 翹尾巴（右側探出）
   ctx.save();
-  ctx.beginPath();
-  ctx.moveTo(cx + 12, 73);
-  ctx.bezierCurveTo(cx + 28, 72, cx + 36, 56, cx + 30, 48);
-  ctx.bezierCurveTo(cx + 26, 44, cx + 21, 52, cx + 23, 60);
-  ctx.quadraticCurveTo(cx + 21, 67, cx + 12, 70);
-  ctx.closePath();
-  ctx.fillStyle = shadeHex;
-  ctx.fill();
-  ctx.lineWidth = 3.4;
-  ctx.strokeStyle = INK_CSS;
-  ctx.stroke();
-  ctx.restore();
-
-  // 3. 身體填色＋賽璐珞陰影＋漫畫排線
-  ctx.save();
-  traceBodyPath();
-  ctx.fillStyle = mainHex;
-  ctx.fill();
-  ctx.save();
-  ctx.clip();
-  // 右下側賽璐珞陰影塊
-  ctx.fillStyle = shadeHex;
-  ctx.beginPath();
-  ctx.arc(cx + 8, 72, 20, 0, Math.PI * 2);
-  ctx.fill();
-  // 肚子亮白毛區
-  ctx.fillStyle = highlightHex;
-  ctx.beginPath();
-  ctx.ellipse(cx - 2, 68, 8.5, 9.5, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.restore();
-  ctx.lineWidth = 3.6;
-  ctx.strokeStyle = INK_CSS;
-  traceBodyPath();
-  ctx.stroke();
-  ctx.restore();
-
-  // 4. 紅色漫畫領巾＋飄帶＋金鈴鐺
-  ctx.save();
-  // 右側飄起的小領巾尾
-  ctx.beginPath();
-  ctx.moveTo(cx + 10, 56);
-  ctx.quadraticCurveTo(cx + 26, 54, cx + 29, 62);
-  ctx.quadraticCurveTo(cx + 21, 65, cx + 11, 61);
-  ctx.closePath();
-  ctx.fillStyle = scarfRed;
-  ctx.fill();
-  ctx.lineWidth = 3;
-  ctx.strokeStyle = INK_CSS;
-  ctx.stroke();
-
-  // 領巾本體
-  ctx.beginPath();
-  ctx.ellipse(cx, 57.5, 16.5, 5.2, 0, 0, Math.PI * 2);
-  ctx.fillStyle = scarfRed;
-  ctx.fill();
-  ctx.lineWidth = 3;
-  ctx.strokeStyle = INK_CSS;
-  ctx.stroke();
-
-  // 金色小鈴鐺
-  ctx.beginPath();
-  ctx.arc(cx, 62, 4.4, 0, Math.PI * 2);
-  ctx.fillStyle = bellGold;
-  ctx.fill();
-  ctx.lineWidth = 2.4;
-  ctx.strokeStyle = INK_CSS;
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(cx - 2.5, 62.5);
-  ctx.lineTo(cx + 2.5, 62.5);
-  ctx.stroke();
-  ctx.restore();
-
-  // 5. 頭部填色＋賽璐珞分層＋漫畫排線
-  ctx.save();
-  traceHeadPath();
-  ctx.fillStyle = mainHex;
-  ctx.fill();
-
-  ctx.save();
-  ctx.clip();
-  // 頭頂與雙耳染色漸層塊（隨人格色更明顯）
-  ctx.fillStyle = shadeHex;
-  ctx.beginPath();
-  ctx.ellipse(cx - 20, 18, 12, 14, -0.2, 0, Math.PI * 2);
-  ctx.ellipse(cx + 20, 18, 12, 14, 0.2, 0, Math.PI * 2);
-  ctx.fill();
-
-  // 右下臉頰賽璐珞陰影
-  ctx.fillStyle = shadeHex;
-  ctx.beginPath();
-  ctx.arc(cx + 18, 46, 16, 0, Math.PI * 2);
-  ctx.fill();
-
-  // 左上額頭高光斑
-  ctx.fillStyle = highlightHex;
-  ctx.beginPath();
-  ctx.ellipse(cx - 10, 27, 8, 4.2, -0.35, 0, Math.PI * 2);
-  ctx.fill();
-
-  // 右臉頰漫畫斜排線（カケアミ）
-  ctx.strokeStyle = INK_CSS;
-  ctx.lineWidth = 1.4;
-  for (let i = 0; i < 3; i++) {
-    ctx.beginPath();
-    ctx.moveTo(cx + 18 + i * 3, 50 - i * 2);
-    ctx.lineTo(cx + 22 + i * 3, 54 - i * 2);
-    ctx.stroke();
-  }
-  ctx.restore();
-
-  // 耳窩內粉紅／深色三角
-  const drawInnerEar = (dir: -1 | 1) => {
-    ctx.beginPath();
-    ctx.moveTo(cx + dir * 13, 22);
-    ctx.lineTo(cx + dir * 22, 12);
-    ctx.lineTo(cx + dir * 20, 26);
-    ctx.closePath();
-    ctx.fillStyle = '#ff9eb0';
-    ctx.fill();
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = INK_CSS;
-    ctx.stroke();
-  };
-  drawInnerEar(-1);
-  drawInnerEar(1);
-
-  // 頭部粗墨外框
-  ctx.lineWidth = 3.8;
-  ctx.strokeStyle = INK_CSS;
-  traceHeadPath();
-  ctx.stroke();
-
-  // 頭頂呆毛（アホ毛）
-  ctx.beginPath();
-  ctx.moveTo(cx - 1, 20);
-  ctx.quadraticCurveTo(cx - 6, 9, cx + 5, 7);
-  ctx.quadraticCurveTo(cx + 2, 14, cx + 3, 20);
-  ctx.fillStyle = shadeHex;
-  ctx.fill();
-  ctx.lineWidth = 2.8;
-  ctx.strokeStyle = INK_CSS;
-  ctx.stroke();
-
-  // 額頭小虎斑／漫畫十字星記號
-  ctx.fillStyle = deepHex;
-  ctx.beginPath();
-  ctx.moveTo(cx, 22.5);
-  ctx.lineTo(cx + 2.2, 26);
-  ctx.lineTo(cx, 29.5);
-  ctx.lineTo(cx - 2.2, 26);
-  ctx.closePath();
-  ctx.fill();
-
-  // 6. 日式漫畫閃亮大眼
-  const drawMangaEye = (ex: number, dir: -1 | 1) => {
-    // 眼白微底
-    ctx.beginPath();
-    ctx.ellipse(ex, 39.5, 6.2, 7.2, 0, 0, Math.PI * 2);
-    ctx.fillStyle = '#ffffff';
-    ctx.fill();
-    ctx.lineWidth = 2.2;
-    ctx.strokeStyle = INK_CSS;
-    ctx.stroke();
-
-    // 濃墨瞳孔
-    ctx.beginPath();
-    ctx.ellipse(ex - dir * 0.5, 40, 4.7, 5.8, 0, 0, Math.PI * 2);
-    ctx.fillStyle = INK_CSS;
-    ctx.fill();
-
-    // 下緣人格色反光月牙
-    ctx.beginPath();
-    ctx.arc(ex - dir * 0.5, 41.2, 3.2, 0.15 * Math.PI, 0.85 * Math.PI);
-    ctx.strokeStyle = mainHex;
-    ctx.lineWidth = 1.8;
-    ctx.stroke();
-
-    // 左上大高光＋右下小星點
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.arc(ex - 1.8, 37.2, 2.2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(ex + 1.6, 42.2, 1.0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // 上眼瞼加粗睫毛線
-    ctx.beginPath();
-    ctx.arc(ex, 39, 6.4, 1.12 * Math.PI, 1.88 * Math.PI);
-    ctx.lineWidth = 3.2;
-    ctx.strokeStyle = INK_CSS;
-    ctx.stroke();
-  };
-  drawMangaEye(cx - 10.5, -1);
-  drawMangaEye(cx + 10.5, 1);
-
-  // 7. 漫畫風斜線腮紅（///）
-  ctx.strokeStyle = '#ff6b8b';
-  ctx.lineWidth = 1.8;
-  for (let i = -1; i <= 1; i++) {
-    ctx.beginPath();
-    ctx.moveTo(cx - 17 + i * 2.6, 46);
-    ctx.lineTo(cx - 19 + i * 2.6, 49.2);
-    ctx.moveTo(cx + 19 + i * 2.6, 46);
-    ctx.lineTo(cx + 17 + i * 2.6, 49.2);
-    ctx.stroke();
-  }
-
-  // 8. 倒三角小貓鼻＋元氣開口笑（ω＋小虎牙感）
+  ctx.translate(2, 3);
+  outline();
   ctx.fillStyle = INK_CSS;
-  ctx.beginPath();
-  ctx.moveTo(cx - 2.4, 43.2);
-  ctx.lineTo(cx + 2.4, 43.2);
-  ctx.lineTo(cx, 45.8);
-  ctx.closePath();
   ctx.fill();
-
-  // 開口笑舌頭底
-  ctx.beginPath();
-  ctx.arc(cx, 48.2, 4.2, 0, Math.PI);
-  ctx.fillStyle = '#ff7892';
-  ctx.fill();
-  ctx.lineWidth = 2.2;
-  ctx.strokeStyle = INK_CSS;
-  ctx.stroke();
-
-  // ω 貓嘴上唇遮罩與墨線
-  ctx.fillStyle = mainHex;
-  ctx.fillRect(cx - 5.5, 45.2, 11, 3.2);
-  ctx.beginPath();
-  ctx.moveTo(cx - 5.5, 47.2);
-  ctx.quadraticCurveTo(cx - 2.6, 50.2, cx, 46.8);
-  ctx.quadraticCurveTo(cx + 2.6, 50.2, cx + 5.5, 47.2);
-  ctx.lineWidth = 2.4;
-  ctx.strokeStyle = INK_CSS;
-  ctx.stroke();
-
-  // 9. 左右貓鬍鬚（ピンと張ったヒゲ）
-  ctx.lineWidth = 2.1;
-  ctx.strokeStyle = INK_CSS;
-  ctx.beginPath();
-  ctx.moveTo(cx - 21, 43);
-  ctx.lineTo(cx - 29, 41);
-  ctx.moveTo(cx - 21, 47);
-  ctx.lineTo(cx - 29, 48.5);
-  ctx.moveTo(cx + 21, 43);
-  ctx.lineTo(cx + 29, 41);
-  ctx.moveTo(cx + 21, 47);
-  ctx.lineTo(cx + 29, 48.5);
-  ctx.stroke();
-
   ctx.restore();
+
+  outline();
+  ctx.fillStyle = numToHex(mixWhite(bodyColor, 0.12));
+  ctx.fill();
+  ctx.save();
+  ctx.clip();
+
+  // 下緣一塊平塗陰影，避免把角色畫成有光澤的立體玩具。
+  ctx.beginPath();
+  ctx.moveTo(11, 57);
+  ctx.bezierCurveTo(29, 76, 61, 69, 74, 51);
+  ctx.lineTo(80, 92);
+  ctx.lineTo(6, 92);
+  ctx.closePath();
+  ctx.fillStyle = numToHex(mixInk(bodyColor, 0.12));
+  ctx.fill();
+
+  // 只在下半部保留稀疏網點，臉部與主要染色面保持乾淨。
+  ctx.fillStyle = INK_CSS;
+  ctx.globalAlpha = 0.22;
+  for (let row = 0; row < 5; row++) {
+    const y = 64 + row * 5;
+    for (let x = 15 + (row % 2) * 2.5; x < 75; x += 5) {
+      ctx.beginPath();
+      ctx.arc(x, y, 0.75, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  ctx.restore();
+
+  outline();
+  ctx.strokeStyle = INK_CSS;
+  ctx.lineWidth = 3.4;
+  ctx.stroke();
+
+  // 左上短弧是紙面留白，跟隨角色輪廓而非玻璃高光。
+  ctx.beginPath();
+  ctx.moveTo(21, 32);
+  ctx.quadraticCurveTo(25, 24, 35, 23);
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
+  // 兩顆墨滴眼與微微上揚的嘴，在實際遊戲尺寸仍可辨識。
+  ctx.fillStyle = INK_CSS;
+  for (const x of [31, 52]) {
+    ctx.beginPath();
+    ctx.ellipse(x, 43, 3.5, 5.8, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.beginPath();
+  ctx.moveTo(36, 55);
+  ctx.quadraticCurveTo(42, 61, 48, 54);
+  ctx.strokeStyle = INK_CSS;
+  ctx.lineWidth = 2.6;
+  ctx.stroke();
+
+  // 兩側短排線呼應按鈕與平台，不加獨立配件色干擾人格混色。
+  ctx.lineWidth = 1.4;
+  for (const x of [22, 58]) {
+    for (let i = 0; i < 2; i++) {
+      ctx.beginPath();
+      ctx.moveTo(x + i * 3, 51);
+      ctx.lineTo(x - 1 + i * 3, 54);
+      ctx.stroke();
+    }
+  }
+
   canvasTex.refresh();
   return key;
 }
 
-/** 無 Canvas 2D 環境時的 Graphics 退路。 */
+/** Canvas texture 不可用時，以同樣的對白框輪廓繪製。 */
 function ensureFallbackGraphicsTexture(scene: Phaser.Scene, key: string, bodyColor: number): string {
   const g = scene.make.graphics({ x: 0, y: 0 }, false);
   g.fillStyle(bodyColor, 1);
-  g.fillCircle(42, 46, 26);
+  g.fillRoundedRect(11, 15, 62, 60, 25);
+  g.fillTriangle(44, 70, 60, 68, 65, 84);
+  g.lineStyle(3.4, 0x141019, 1);
+  g.strokeRoundedRect(11, 15, 62, 60, 25);
+  g.fillStyle(0x141019, 1);
+  g.fillEllipse(31, 43, 7, 12);
+  g.fillEllipse(52, 43, 7, 12);
+  g.lineBetween(37, 56, 47, 56);
   g.generateTexture(key, TEX_W, TEX_H);
   g.destroy();
   return key;

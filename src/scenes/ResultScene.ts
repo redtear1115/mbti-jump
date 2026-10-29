@@ -58,7 +58,7 @@ export class ResultScene extends Phaser.Scene {
       this.tweens.add({ targets: jellyShadow, alpha: 1, duration: 500 });
     }
 
-    // 最終色小貓：elastic pop 入場
+    // 最終色對白精靈：elastic pop 入場
     const jelly = this.add
       .image(cx, 118, ensurePlayerTexture(this, playerColorFor(type.split('') as Letter[])))
       .setScale(1);
